@@ -5,11 +5,20 @@ import 'package:apidash/providers/providers.dart';
 import 'package:apidash/widgets/widgets.dart';
 import 'package:apidash/consts.dart';
 
+import 'package:apidash/widgets/mqtt/mqtt_response_pane.dart';
+
 class ResponsePane extends ConsumerWidget {
   const ResponsePane({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final apiType = ref.watch(
+        selectedRequestModelProvider.select((value) => value?.apiType));
+        
+    if (apiType == APIType.mqtt) {
+      return const MQTTResponsePane();
+    }
+
     final isWorking = ref.watch(
             selectedRequestModelProvider.select((value) => value?.isWorking)) ??
         false;

@@ -11,6 +11,7 @@ import '../response_pane.dart';
 import 'ai_request/request_pane_ai.dart';
 import 'request_pane_graphql.dart';
 import 'request_pane_rest.dart';
+import 'mqtt/mqtt_request_pane.dart';
 
 class EditRequestPane extends ConsumerWidget {
   const EditRequestPane({
@@ -52,15 +53,14 @@ class EditRequestPane extends ConsumerWidget {
                     controller: controller,
                     children: [
                       switch (apiType) {
-                        APIType.rest => EditRestRequestPane(
-                            showViewCodeButton: false,
-                          ),
-                        APIType.graphql => EditGraphQLRequestPane(
-                            showViewCodeButton: false,
-                          ),
-                        APIType.ai => EditAIRequestPane(
-                            showViewCodeButton: false,
-                          ),
+                        APIType.rest =>
+                          EditRestRequestPane(showViewCodeButton: false),
+                        APIType.graphql =>
+                          EditGraphQLRequestPane(showViewCodeButton: false),
+                        APIType.ai =>
+                          EditAIRequestPane(showViewCodeButton: false),
+                        APIType.mqtt =>
+                          const EditMQTTRequestPane(),
                         _ => kSizedBoxEmpty,
                       },
                       ResponsePane(),
@@ -86,6 +86,7 @@ class EditRequestPane extends ConsumerWidget {
       APIType.ai => EditAIRequestPane(
           showViewCodeButton: showViewCodeButton,
         ),
+      APIType.mqtt => const EditMQTTRequestPane(),
       _ => kSizedBoxEmpty,
     };
   }

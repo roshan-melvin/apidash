@@ -7,6 +7,8 @@ import 'package:apidash/consts.dart';
 import 'package:apidash/terminal/terminal.dart';
 import 'providers.dart';
 import '../models/models.dart';
+import '../models/mqtt_request_model.dart';
+import '../services/mqtt_service.dart' show MQTTConnectionState;
 import '../services/services.dart';
 import '../utils/utils.dart';
 
@@ -106,6 +108,25 @@ class CollectionStateNotifier
         .read(requestSequenceProvider.notifier)
         .update((state) => [id, ...state]);
     ref.read(selectedIdStateProvider.notifier).state = newRequestModel.id;
+    unsave();
+  }
+
+  void updateMQTTState({
+    required String id,
+    MQTTRequestModel? mqttRequestModel,
+    MQTTConnectionState? mqttConnectionState,
+  }) {
+    if (state == null || !state!.containsKey(id)) return;
+    
+    final currentModel = state![id]!;
+    final newModel = currentModel.copyWith(
+      mqttRequestModel: mqttRequestModel ?? currentModel.mqttRequestModel,
+      mqttConnectionState: mqttConnectionState ?? currentModel.mqttConnectionState,
+    );
+
+    var map = {...state!};
+    map[id] = newModel;
+    state = map;
     unsave();
   }
 
@@ -263,6 +284,8 @@ class CollectionStateNotifier
           description: description ?? currentModel.description,
           httpRequestModel: const HttpRequestModel(),
           aiRequestModel: null,
+          mqttRequestModel: null,
+          mqttConnectionState: null,
         ),
         APIType.ai => currentModel.copyWith(
           apiType: apiType,
@@ -273,6 +296,18 @@ class CollectionStateNotifier
           aiRequestModel: defaultModel == null
               ? const AIRequestModel()
               : AIRequestModel.fromJson(defaultModel),
+          mqttRequestModel: null,
+          mqttConnectionState: null,
+        ),
+        APIType.mqtt => currentModel.copyWith(
+          apiType: apiType,
+          requestTabIndex: 0,
+          name: name ?? currentModel.name,
+          description: description ?? currentModel.description,
+          httpRequestModel: null,
+          aiRequestModel: null,
+          mqttRequestModel: const MQTTRequestModel(),
+          mqttConnectionState: MQTTConnectionState(),
         ),
       };
     } else {
@@ -304,6 +339,8 @@ class CollectionStateNotifier
         preRequestScript: preRequestScript ?? currentModel.preRequestScript,
         postRequestScript: postRequestScript ?? currentModel.postRequestScript,
         aiRequestModel: aiRequestModel ?? currentModel.aiRequestModel,
+        mqttRequestModel: currentModel.mqttRequestModel,
+        mqttConnectionState: currentModel.mqttConnectionState,
       );
     }
 
@@ -323,7 +360,14 @@ class CollectionStateNotifier
 
     RequestModel? requestModel = state![requestId];
     if (requestModel?.httpRequestModel == null &&
-        requestModel?.aiRequestModel == null) {
+        requestModel?.aiRequestModel == null &&
+        requestModel?.apiType != APIType.mqtt) {
+      return;
+    }
+
+    if (requestModel?.apiType == APIType.mqtt) {
+      // For MQTT, sendRequest() is replaced by the custom publish logic 
+      // in EditMQTTRequestPane. We just return here for simplicity.
       return;
     }
 

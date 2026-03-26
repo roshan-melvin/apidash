@@ -652,8 +652,11 @@ const kMsgCodegenAINotAvailable =
     "Code generation for AI Requests is currently not available.";
 const kMsgCodegenGraphQLNotAvailable =
     "Code generation for GraphQL is currently not available.";
+const kMsgCodegenMQTTNotAvailable =
+    "Code generation for MQTT is currently not available.";
 const kMsgCodegenError =
     "An error was encountered while generating code. $kRaiseIssue";
+
 
 // Scripts Tabs
 const kLabelPreRequest = "Pre Request";

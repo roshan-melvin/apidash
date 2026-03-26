@@ -36,6 +36,7 @@ class EditorPaneRequestURLCard extends ConsumerWidget {
                     APIType.rest => const DropdownButtonHTTPMethod(),
                     APIType.graphql => kSizedBoxEmpty,
                     APIType.ai => const AIModelSelector(),
+                    APIType.mqtt => kSizedBoxEmpty,
                     null => kSizedBoxEmpty,
                   },
                   switch (apiType) {
@@ -53,6 +54,7 @@ class EditorPaneRequestURLCard extends ConsumerWidget {
                     APIType.rest => const DropdownButtonHTTPMethod(),
                     APIType.graphql => kSizedBoxEmpty,
                     APIType.ai => const AIModelSelector(),
+                    APIType.mqtt => kSizedBoxEmpty,
                     null => kSizedBoxEmpty,
                   },
                   switch (apiType) {

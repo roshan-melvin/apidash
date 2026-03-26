@@ -33,6 +33,11 @@ class CodePane extends ConsumerWidget {
       return const ErrorMessage(message: kMsgCodegenAINotAvailable);
     }
 
+    // TODO: Add MQTT Codegen (paho-mqtt, dart_mqtt)
+    if (selectedRequestModel?.apiType == APIType.mqtt) {
+      return const ErrorMessage(message: kMsgCodegenMQTTNotAvailable);
+    }
+
     final defaultUriScheme = ref.watch(
       settingsProvider.select((value) => value.defaultUriScheme),
     );
