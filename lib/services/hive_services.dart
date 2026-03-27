@@ -56,8 +56,23 @@ Future<bool> openHiveBoxes() async {
     }
     return true;
   } catch (e) {
-    debugPrint("ERROR OPEN HIVE BOXES: $e");
-    return false;
+    debugPrint("ERROR OPEN HIVE BOXES: $e. Attempting Auto-Recovery...");
+    try {
+      for (var box in kHiveBoxes) {
+        await Hive.deleteBoxFromDisk(box.$1);
+      }
+      for (var box in kHiveBoxes) {
+        if (box.$2 == HiveBoxType.normal) {
+          await Hive.openBox(box.$1);
+        } else if (box.$2 == HiveBoxType.lazy) {
+          await Hive.openLazyBox(box.$1);
+        }
+      }
+      return true;
+    } catch (e2) {
+      debugPrint("AUTO-RECOVERY FAILED: $e2");
+      return false;
+    }
   }
 }
 

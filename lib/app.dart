@@ -124,10 +124,18 @@ class DashApp extends ConsumerWidget {
         home: showWorkspaceSelector
             ? WorkspaceSelector(
                 onContinue: (val) async {
-                  await initHiveBoxes(kIsDesktop, val);
-                  ref
-                      .read(settingsProvider.notifier)
-                      .update(workspaceFolderPath: val);
+                  final success = await initHiveBoxes(kIsDesktop, val);
+                  if (success) {
+                    ref
+                        .read(settingsProvider.notifier)
+                        .update(workspaceFolderPath: val);
+                  } else {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Failed to initialize workspace in selected folder.')),
+                      );
+                    }
+                  }
                 },
                 onCancel: () async {
                   try {

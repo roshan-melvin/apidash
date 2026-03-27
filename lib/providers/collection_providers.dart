@@ -9,6 +9,7 @@ import 'providers.dart';
 import '../models/models.dart';
 import '../models/mqtt_request_model.dart';
 import '../services/mqtt_service.dart' show MQTTConnectionState;
+import '../services/websocket_service.dart' show WebSocketConnectionState;
 import '../services/services.dart';
 import '../utils/utils.dart';
 
@@ -123,6 +124,29 @@ class CollectionStateNotifier
     final newModel = currentModel.copyWith(
       mqttRequestModel: mqttRequestModel ?? currentModel.mqttRequestModel,
       mqttConnectionState: mqttConnectionState ?? currentModel.mqttConnectionState,
+    );
+
+    var map = {...state!};
+    map[id] = newModel;
+    state = map;
+
+    if (isManualEdit) {
+      unsave();
+    }
+  }
+
+  void updateWebSocketState({
+    required String id,
+    WebSocketRequestModel? websocketRequestModel,
+    WebSocketConnectionState? websocketConnectionState,
+    bool isManualEdit = true,
+  }) {
+    if (state == null || !state!.containsKey(id)) return;
+    
+    final currentModel = state![id]!;
+    final newModel = currentModel.copyWith(
+      websocketRequestModel: websocketRequestModel ?? currentModel.websocketRequestModel,
+      websocketConnectionState: websocketConnectionState ?? currentModel.websocketConnectionState,
     );
 
     var map = {...state!};
@@ -290,6 +314,8 @@ class CollectionStateNotifier
           aiRequestModel: null,
           mqttRequestModel: null,
           mqttConnectionState: null,
+          websocketRequestModel: null,
+          websocketConnectionState: null,
         ),
         APIType.ai => currentModel.copyWith(
           apiType: apiType,
@@ -302,6 +328,8 @@ class CollectionStateNotifier
               : AIRequestModel.fromJson(defaultModel),
           mqttRequestModel: null,
           mqttConnectionState: null,
+          websocketRequestModel: null,
+          websocketConnectionState: null,
         ),
         APIType.mqtt => currentModel.copyWith(
           apiType: apiType,
@@ -312,6 +340,20 @@ class CollectionStateNotifier
           aiRequestModel: null,
           mqttRequestModel: const MQTTRequestModel(),
           mqttConnectionState: MQTTConnectionState(),
+          websocketRequestModel: null,
+          websocketConnectionState: null,
+        ),
+        APIType.websocket => currentModel.copyWith(
+          apiType: apiType,
+          requestTabIndex: 0,
+          name: name ?? currentModel.name,
+          description: description ?? currentModel.description,
+          httpRequestModel: null,
+          aiRequestModel: null,
+          mqttRequestModel: null,
+          mqttConnectionState: null,
+          websocketRequestModel: const WebSocketRequestModel(),
+          websocketConnectionState: WebSocketConnectionState(),
         ),
       };
     } else {
@@ -345,6 +387,8 @@ class CollectionStateNotifier
         aiRequestModel: aiRequestModel ?? currentModel.aiRequestModel,
         mqttRequestModel: currentModel.mqttRequestModel,
         mqttConnectionState: currentModel.mqttConnectionState,
+        websocketRequestModel: currentModel.websocketRequestModel,
+        websocketConnectionState: currentModel.websocketConnectionState,
       );
     }
 
@@ -365,11 +409,12 @@ class CollectionStateNotifier
     RequestModel? requestModel = state![requestId];
     if (requestModel?.httpRequestModel == null &&
         requestModel?.aiRequestModel == null &&
-        requestModel?.apiType != APIType.mqtt) {
+        requestModel?.apiType != APIType.mqtt &&
+        requestModel?.apiType != APIType.websocket) {
       return;
     }
 
-    if (requestModel?.apiType == APIType.mqtt) {
+    if (requestModel?.apiType == APIType.mqtt || requestModel?.apiType == APIType.websocket) {
       // For MQTT, sendRequest() is replaced by the custom publish logic 
       // in EditMQTTRequestPane. We just return here for simplicity.
       return;

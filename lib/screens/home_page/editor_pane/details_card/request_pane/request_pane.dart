@@ -12,6 +12,7 @@ import 'ai_request/request_pane_ai.dart';
 import 'request_pane_graphql.dart';
 import 'request_pane_rest.dart';
 import 'mqtt/mqtt_request_pane.dart';
+import 'websocket/websocket_request_pane.dart';
 
 class EditRequestPane extends ConsumerWidget {
   const EditRequestPane({
@@ -61,6 +62,8 @@ class EditRequestPane extends ConsumerWidget {
                           EditAIRequestPane(showViewCodeButton: false),
                         APIType.mqtt =>
                           const EditMQTTRequestPane(),
+                        APIType.websocket =>
+                          const EditWebSocketRequestPane(),
                         _ => kSizedBoxEmpty,
                       },
                       ResponsePane(),
@@ -87,6 +90,7 @@ class EditRequestPane extends ConsumerWidget {
           showViewCodeButton: showViewCodeButton,
         ),
       APIType.mqtt => const EditMQTTRequestPane(),
+      APIType.websocket => const EditWebSocketRequestPane(),
       _ => kSizedBoxEmpty,
     };
   }

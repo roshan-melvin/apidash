@@ -1,6 +1,8 @@
 import 'package:apidash_core/apidash_core.dart';
 import 'mqtt_request_model.dart';
 import '../services/mqtt_service.dart' show MQTTConnectionState;
+import 'websocket_request_model.dart';
+import '../services/websocket_service.dart' show WebSocketConnectionState;
 
 part 'request_model.freezed.dart';
 
@@ -31,6 +33,9 @@ abstract class RequestModel with _$RequestModel {
     MQTTRequestModel? mqttRequestModel,
     @JsonKey(includeFromJson: false, includeToJson: false)
     MQTTConnectionState? mqttConnectionState,
+    WebSocketRequestModel? websocketRequestModel,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    WebSocketConnectionState? websocketConnectionState,
   }) = _RequestModel;
 
   factory RequestModel.fromJson(Map<String, Object?> json) =>

@@ -38,6 +38,11 @@ class CodePane extends ConsumerWidget {
       return const ErrorMessage(message: kMsgCodegenMQTTNotAvailable);
     }
 
+    // TODO: Add WebSocket Codegen
+    if (selectedRequestModel?.apiType == APIType.websocket) {
+      return const ErrorMessage(message: 'Code generation for WebSocket is not available yet.');
+    }
+
     final defaultUriScheme = ref.watch(
       settingsProvider.select((value) => value.defaultUriScheme),
     );
