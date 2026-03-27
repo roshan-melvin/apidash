@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RequestModel {
 
- String get id; APIType get apiType; String get name; String get description;@JsonKey(includeToJson: false) dynamic get requestTabIndex; HttpRequestModel? get httpRequestModel; int? get responseStatus; String? get message; HttpResponseModel? get httpResponseModel;@JsonKey(includeToJson: false) bool get isWorking;@JsonKey(includeToJson: false) DateTime? get sendingTime;@JsonKey(includeToJson: false) bool get isStreaming; String? get preRequestScript; String? get postRequestScript; AIRequestModel? get aiRequestModel;@JsonKey(includeFromJson: false, includeToJson: false) MQTTRequestModel? get mqttRequestModel;@JsonKey(includeFromJson: false, includeToJson: false) MQTTConnectionState? get mqttConnectionState;
+ String get id; APIType get apiType; String get name; String get description;@JsonKey(includeToJson: false) dynamic get requestTabIndex; HttpRequestModel? get httpRequestModel; int? get responseStatus; String? get message; HttpResponseModel? get httpResponseModel;@JsonKey(includeToJson: false) bool get isWorking;@JsonKey(includeToJson: false) DateTime? get sendingTime;@JsonKey(includeToJson: false) bool get isStreaming; String? get preRequestScript; String? get postRequestScript; AIRequestModel? get aiRequestModel; MQTTRequestModel? get mqttRequestModel;@JsonKey(includeFromJson: false, includeToJson: false) MQTTConnectionState? get mqttConnectionState;
 /// Create a copy of RequestModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $RequestModelCopyWith<$Res>  {
   factory $RequestModelCopyWith(RequestModel value, $Res Function(RequestModel) _then) = _$RequestModelCopyWithImpl;
 @useResult
 $Res call({
- String id, APIType apiType, String name, String description,@JsonKey(includeToJson: false) dynamic requestTabIndex, HttpRequestModel? httpRequestModel, int? responseStatus, String? message, HttpResponseModel? httpResponseModel,@JsonKey(includeToJson: false) bool isWorking,@JsonKey(includeToJson: false) DateTime? sendingTime,@JsonKey(includeToJson: false) bool isStreaming, String? preRequestScript, String? postRequestScript, AIRequestModel? aiRequestModel,@JsonKey(includeFromJson: false, includeToJson: false) MQTTRequestModel? mqttRequestModel,@JsonKey(includeFromJson: false, includeToJson: false) MQTTConnectionState? mqttConnectionState
+ String id, APIType apiType, String name, String description,@JsonKey(includeToJson: false) dynamic requestTabIndex, HttpRequestModel? httpRequestModel, int? responseStatus, String? message, HttpResponseModel? httpResponseModel,@JsonKey(includeToJson: false) bool isWorking,@JsonKey(includeToJson: false) DateTime? sendingTime,@JsonKey(includeToJson: false) bool isStreaming, String? preRequestScript, String? postRequestScript, AIRequestModel? aiRequestModel, MQTTRequestModel? mqttRequestModel,@JsonKey(includeFromJson: false, includeToJson: false) MQTTConnectionState? mqttConnectionState
 });
 
 
@@ -217,7 +217,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  APIType apiType,  String name,  String description, @JsonKey(includeToJson: false)  dynamic requestTabIndex,  HttpRequestModel? httpRequestModel,  int? responseStatus,  String? message,  HttpResponseModel? httpResponseModel, @JsonKey(includeToJson: false)  bool isWorking, @JsonKey(includeToJson: false)  DateTime? sendingTime, @JsonKey(includeToJson: false)  bool isStreaming,  String? preRequestScript,  String? postRequestScript,  AIRequestModel? aiRequestModel, @JsonKey(includeFromJson: false, includeToJson: false)  MQTTRequestModel? mqttRequestModel, @JsonKey(includeFromJson: false, includeToJson: false)  MQTTConnectionState? mqttConnectionState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  APIType apiType,  String name,  String description, @JsonKey(includeToJson: false)  dynamic requestTabIndex,  HttpRequestModel? httpRequestModel,  int? responseStatus,  String? message,  HttpResponseModel? httpResponseModel, @JsonKey(includeToJson: false)  bool isWorking, @JsonKey(includeToJson: false)  DateTime? sendingTime, @JsonKey(includeToJson: false)  bool isStreaming,  String? preRequestScript,  String? postRequestScript,  AIRequestModel? aiRequestModel,  MQTTRequestModel? mqttRequestModel, @JsonKey(includeFromJson: false, includeToJson: false)  MQTTConnectionState? mqttConnectionState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RequestModel() when $default != null:
 return $default(_that.id,_that.apiType,_that.name,_that.description,_that.requestTabIndex,_that.httpRequestModel,_that.responseStatus,_that.message,_that.httpResponseModel,_that.isWorking,_that.sendingTime,_that.isStreaming,_that.preRequestScript,_that.postRequestScript,_that.aiRequestModel,_that.mqttRequestModel,_that.mqttConnectionState);case _:
@@ -238,7 +238,7 @@ return $default(_that.id,_that.apiType,_that.name,_that.description,_that.reques
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  APIType apiType,  String name,  String description, @JsonKey(includeToJson: false)  dynamic requestTabIndex,  HttpRequestModel? httpRequestModel,  int? responseStatus,  String? message,  HttpResponseModel? httpResponseModel, @JsonKey(includeToJson: false)  bool isWorking, @JsonKey(includeToJson: false)  DateTime? sendingTime, @JsonKey(includeToJson: false)  bool isStreaming,  String? preRequestScript,  String? postRequestScript,  AIRequestModel? aiRequestModel, @JsonKey(includeFromJson: false, includeToJson: false)  MQTTRequestModel? mqttRequestModel, @JsonKey(includeFromJson: false, includeToJson: false)  MQTTConnectionState? mqttConnectionState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  APIType apiType,  String name,  String description, @JsonKey(includeToJson: false)  dynamic requestTabIndex,  HttpRequestModel? httpRequestModel,  int? responseStatus,  String? message,  HttpResponseModel? httpResponseModel, @JsonKey(includeToJson: false)  bool isWorking, @JsonKey(includeToJson: false)  DateTime? sendingTime, @JsonKey(includeToJson: false)  bool isStreaming,  String? preRequestScript,  String? postRequestScript,  AIRequestModel? aiRequestModel,  MQTTRequestModel? mqttRequestModel, @JsonKey(includeFromJson: false, includeToJson: false)  MQTTConnectionState? mqttConnectionState)  $default,) {final _that = this;
 switch (_that) {
 case _RequestModel():
 return $default(_that.id,_that.apiType,_that.name,_that.description,_that.requestTabIndex,_that.httpRequestModel,_that.responseStatus,_that.message,_that.httpResponseModel,_that.isWorking,_that.sendingTime,_that.isStreaming,_that.preRequestScript,_that.postRequestScript,_that.aiRequestModel,_that.mqttRequestModel,_that.mqttConnectionState);case _:
@@ -258,7 +258,7 @@ return $default(_that.id,_that.apiType,_that.name,_that.description,_that.reques
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  APIType apiType,  String name,  String description, @JsonKey(includeToJson: false)  dynamic requestTabIndex,  HttpRequestModel? httpRequestModel,  int? responseStatus,  String? message,  HttpResponseModel? httpResponseModel, @JsonKey(includeToJson: false)  bool isWorking, @JsonKey(includeToJson: false)  DateTime? sendingTime, @JsonKey(includeToJson: false)  bool isStreaming,  String? preRequestScript,  String? postRequestScript,  AIRequestModel? aiRequestModel, @JsonKey(includeFromJson: false, includeToJson: false)  MQTTRequestModel? mqttRequestModel, @JsonKey(includeFromJson: false, includeToJson: false)  MQTTConnectionState? mqttConnectionState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  APIType apiType,  String name,  String description, @JsonKey(includeToJson: false)  dynamic requestTabIndex,  HttpRequestModel? httpRequestModel,  int? responseStatus,  String? message,  HttpResponseModel? httpResponseModel, @JsonKey(includeToJson: false)  bool isWorking, @JsonKey(includeToJson: false)  DateTime? sendingTime, @JsonKey(includeToJson: false)  bool isStreaming,  String? preRequestScript,  String? postRequestScript,  AIRequestModel? aiRequestModel,  MQTTRequestModel? mqttRequestModel, @JsonKey(includeFromJson: false, includeToJson: false)  MQTTConnectionState? mqttConnectionState)?  $default,) {final _that = this;
 switch (_that) {
 case _RequestModel() when $default != null:
 return $default(_that.id,_that.apiType,_that.name,_that.description,_that.requestTabIndex,_that.httpRequestModel,_that.responseStatus,_that.message,_that.httpResponseModel,_that.isWorking,_that.sendingTime,_that.isStreaming,_that.preRequestScript,_that.postRequestScript,_that.aiRequestModel,_that.mqttRequestModel,_that.mqttConnectionState);case _:
@@ -273,7 +273,7 @@ return $default(_that.id,_that.apiType,_that.name,_that.description,_that.reques
 
 @JsonSerializable(explicitToJson: true, anyMap: true)
 class _RequestModel implements RequestModel {
-  const _RequestModel({required this.id, this.apiType = APIType.rest, this.name = "", this.description = "", @JsonKey(includeToJson: false) this.requestTabIndex = 0, this.httpRequestModel, this.responseStatus, this.message, this.httpResponseModel, @JsonKey(includeToJson: false) this.isWorking = false, @JsonKey(includeToJson: false) this.sendingTime, @JsonKey(includeToJson: false) this.isStreaming = false, this.preRequestScript, this.postRequestScript, this.aiRequestModel, @JsonKey(includeFromJson: false, includeToJson: false) this.mqttRequestModel, @JsonKey(includeFromJson: false, includeToJson: false) this.mqttConnectionState});
+  const _RequestModel({required this.id, this.apiType = APIType.rest, this.name = "", this.description = "", @JsonKey(includeToJson: false) this.requestTabIndex = 0, this.httpRequestModel, this.responseStatus, this.message, this.httpResponseModel, @JsonKey(includeToJson: false) this.isWorking = false, @JsonKey(includeToJson: false) this.sendingTime, @JsonKey(includeToJson: false) this.isStreaming = false, this.preRequestScript, this.postRequestScript, this.aiRequestModel, this.mqttRequestModel, @JsonKey(includeFromJson: false, includeToJson: false) this.mqttConnectionState});
   factory _RequestModel.fromJson(Map<String, dynamic> json) => _$RequestModelFromJson(json);
 
 @override final  String id;
@@ -291,7 +291,7 @@ class _RequestModel implements RequestModel {
 @override final  String? preRequestScript;
 @override final  String? postRequestScript;
 @override final  AIRequestModel? aiRequestModel;
-@override@JsonKey(includeFromJson: false, includeToJson: false) final  MQTTRequestModel? mqttRequestModel;
+@override final  MQTTRequestModel? mqttRequestModel;
 @override@JsonKey(includeFromJson: false, includeToJson: false) final  MQTTConnectionState? mqttConnectionState;
 
 /// Create a copy of RequestModel
@@ -327,7 +327,7 @@ abstract mixin class _$RequestModelCopyWith<$Res> implements $RequestModelCopyWi
   factory _$RequestModelCopyWith(_RequestModel value, $Res Function(_RequestModel) _then) = __$RequestModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, APIType apiType, String name, String description,@JsonKey(includeToJson: false) dynamic requestTabIndex, HttpRequestModel? httpRequestModel, int? responseStatus, String? message, HttpResponseModel? httpResponseModel,@JsonKey(includeToJson: false) bool isWorking,@JsonKey(includeToJson: false) DateTime? sendingTime,@JsonKey(includeToJson: false) bool isStreaming, String? preRequestScript, String? postRequestScript, AIRequestModel? aiRequestModel,@JsonKey(includeFromJson: false, includeToJson: false) MQTTRequestModel? mqttRequestModel,@JsonKey(includeFromJson: false, includeToJson: false) MQTTConnectionState? mqttConnectionState
+ String id, APIType apiType, String name, String description,@JsonKey(includeToJson: false) dynamic requestTabIndex, HttpRequestModel? httpRequestModel, int? responseStatus, String? message, HttpResponseModel? httpResponseModel,@JsonKey(includeToJson: false) bool isWorking,@JsonKey(includeToJson: false) DateTime? sendingTime,@JsonKey(includeToJson: false) bool isStreaming, String? preRequestScript, String? postRequestScript, AIRequestModel? aiRequestModel, MQTTRequestModel? mqttRequestModel,@JsonKey(includeFromJson: false, includeToJson: false) MQTTConnectionState? mqttConnectionState
 });
 
 

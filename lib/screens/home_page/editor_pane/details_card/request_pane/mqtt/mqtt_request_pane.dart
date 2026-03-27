@@ -16,6 +16,7 @@ class EditMQTTRequestPane extends ConsumerStatefulWidget {
 
 class _EditMQTTRequestPaneState
     extends ConsumerState<EditMQTTRequestPane> {
+  bool _isConnecting = false;
   // Text controllers for connection config fields
   late final TextEditingController _brokerCtrl;
   late final TextEditingController _portCtrl;
@@ -72,9 +73,13 @@ class _EditMQTTRequestPaneState
   }
 
   Future<void> _connect() async {
+    setState(() => _isConnecting = true);
     final mqttService = ref.read(mqttServiceProvider);
     final request = ref.read(mqttRequestProvider);
     await mqttService.connect(request);
+    if (mounted) {
+      setState(() => _isConnecting = false);
+    }
   }
 
   Future<void> _disconnect() async {
@@ -100,6 +105,12 @@ class _EditMQTTRequestPaneState
   void _deleteTopic(int index) {
     _update((m) {
       final list = List<MQTTTopicModel>.from(m.topics);
+      final topic = list[index];
+      
+      if (topic.subscribe && topic.topic.isNotEmpty) {
+        ref.read(mqttServiceProvider).unsubscribe(topic.topic);
+      }
+      
       list.removeAt(index);
       return m.copyWith(topics: list);
     });
@@ -108,6 +119,20 @@ class _EditMQTTRequestPaneState
   void _updateTopic(int index, MQTTTopicModel updated) {
     _update((m) {
       final list = List<MQTTTopicModel>.from(m.topics);
+      final old = list[index];
+
+      // If the subscription state toggled, or the topic string/QoS changed while subscribed
+      if (old.subscribe != updated.subscribe || 
+          (updated.subscribe && (old.topic != updated.topic || old.qos != updated.qos))) {
+          
+          if (old.subscribe && old.topic.isNotEmpty) {
+            ref.read(mqttServiceProvider).unsubscribe(old.topic);
+          }
+          if (updated.subscribe && updated.topic.isNotEmpty) {
+            ref.read(mqttServiceProvider).subscribe(updated.topic, updated.qos);
+          }
+      }
+
       list[index] = updated;
       return m.copyWith(topics: list);
     });
@@ -120,8 +145,18 @@ class _EditMQTTRequestPaneState
     final connState =
         ref.watch(mqttConnectionStateProvider).value;
     final isConnected = connState?.isConnected ?? false;
+    final isReconnecting = connState?.isReconnecting ?? false;
+    final showLoading = _isConnecting || isReconnecting;
     final topics = ref.watch(mqttTopicsProvider);
     final model = ref.watch(mqttRequestProvider);
+
+    ref.listen(mqttRequestProvider, (previous, next) {
+      if (previous?.brokerUrl != next.brokerUrl &&
+          _brokerCtrl.text != next.brokerUrl) {
+        _brokerCtrl.text = next.brokerUrl;
+      }
+    });
+
     final clrScheme = Theme.of(context).colorScheme;
 
     final fieldDeco = InputDecoration(
@@ -181,16 +216,26 @@ class _EditMQTTRequestPaneState
                     padding: kPh12,
                     minimumSize: const Size(44, 36),
                   ),
-                  onPressed:
-                      isConnected ? _disconnect : _connect,
-                  icon: Icon(
-                    isConnected
-                        ? Icons.link_off_rounded
-                        : Icons.link_rounded,
-                    size: 18,
-                  ),
+                  onPressed: showLoading
+                      ? null
+                      : (isConnected ? _disconnect : _connect),
+                  icon: showLoading
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white70,
+                          ),
+                        )
+                      : Icon(
+                          isConnected
+                              ? Icons.link_off_rounded
+                              : Icons.link_rounded,
+                          size: 18,
+                        ),
                   label: Text(
-                      isConnected ? 'Disconnect' : 'Connect'),
+                      isConnected ? 'Disconnect' : (showLoading ? 'Connecting...' : 'Connect')),
                 ),
               ],
             ),
@@ -349,13 +394,51 @@ class _EditMQTTRequestPaneState
                         onChanged: (v) => _update((m) =>
                             m.copyWith(connectTimeout: v)),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Row(
+                          children: [
+                            const SizedBox(
+                              width: 150,
+                              child: Text('Protocol Version',
+                                  style: TextStyle(fontSize: 13)),
+                            ),
+                            Expanded(
+                              child: DropdownButtonFormField<MQTTProtocolVersion>(
+                                value: model.protocolVersion,
+                                isDense: true,
+                                decoration: fieldDeco,
+                                items: MQTTProtocolVersion.values.map((v) {
+                                  return DropdownMenuItem(
+                                    value: v,
+                                    child: Text(v.name.toUpperCase()),
+                                  );
+                                }).toList(),
+                                onChanged: isConnected ? null : (v) {
+                                  if (v != null) _update((m) => m.copyWith(protocolVersion: v));
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       SwitchListTile(
-                        title: const Text('Clean Session'),
+                        title: const Text('Clean Session', style: TextStyle(fontSize: 13)),
+                        contentPadding: EdgeInsets.zero,
                         value: model.cleanSession,
                         onChanged: isConnected
                             ? null
                             : (v) => _update((m) =>
                                 m.copyWith(cleanSession: v)),
+                      ),
+                      SwitchListTile(
+                        title: const Text('Use TLS (Secure)', style: TextStyle(fontSize: 13)),
+                        contentPadding: EdgeInsets.zero,
+                        value: model.useTls,
+                        onChanged: isConnected
+                            ? null
+                            : (v) => _update((m) =>
+                                m.copyWith(useTls: v)),
                       ),
                     ],
                   ),

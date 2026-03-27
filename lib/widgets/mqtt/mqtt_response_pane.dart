@@ -36,11 +36,16 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
 
   @override
   Widget build(BuildContext context) {
+    // Activate the sync listener — ensures messages/events auto-save to Hive
+    ref.watch(mqttStateSyncProvider);
     final messages = ref.watch(mqttMessagesProvider);
     final events = ref.watch(mqttEventLogProvider);
     final connState =
         ref.watch(mqttConnectionStateProvider).value;
     final isConnected = connState?.isConnected ?? false;
+
+    final inCount = messages.where((m) => m.isIncoming).length;
+    final outCount = messages.where((m) => !m.isIncoming).length;
 
     // Filter messages by topic if a filter is set
     final filtered = _filterTopic.isEmpty
@@ -53,7 +58,12 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ── Status bar ──────────────────────────────────────────────────
-        _StatusBar(isConnected: isConnected, error: connState?.error),
+        _StatusBar(
+          isConnected: isConnected,
+          error: connState?.error,
+          inCount: inCount,
+          outCount: outCount,
+        ),
         // ── Tabs ────────────────────────────────────────────────────────
         TabBar(
           controller: _tabCtrl,
@@ -134,13 +144,18 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
   }
 }
 
-// ── Status Bar ────────────────────────────────────────────────────────────────
-
 class _StatusBar extends StatelessWidget {
   final bool isConnected;
   final String? error;
+  final int inCount;
+  final int outCount;
 
-  const _StatusBar({required this.isConnected, this.error});
+  const _StatusBar({
+    required this.isConnected,
+    this.error,
+    this.inCount = 0,
+    this.outCount = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -161,15 +176,31 @@ class _StatusBar extends StatelessWidget {
             ),
           ),
           kHSpacer8,
-          Text(
-            isConnected ? 'Connected' : (error ?? 'Disconnected'),
-            style: TextStyle(
-              fontSize: 12,
-              color: isConnected
-                  ? Colors.greenAccent
-                  : (error != null ? clr.error : clr.outline),
+          Expanded(
+            child: Tooltip(
+              message: isConnected ? 'Connected' : (error ?? 'Disconnected'),
+              child: Text(
+                isConnected ? 'Connected' : (error ?? 'Disconnected'),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: isConnected
+                      ? Colors.greenAccent
+                      : (error != null ? clr.error : clr.outline),
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
+          if (isConnected) ...[
+            const Icon(Icons.download_rounded, size: 14, color: Color(0xFF8B5CF6)),
+            kHSpacer4,
+            Text('Rx: $inCount', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+            kHSpacer10,
+            const Icon(Icons.upload_rounded, size: 14, color: Colors.cyanAccent),
+            kHSpacer4,
+            Text('Tx: $outCount', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+          ]
         ],
       ),
     );
@@ -301,7 +332,7 @@ class _EventTile extends StatelessWidget {
 
   static const _typeColors = {
     MQTTEventType.connect: Colors.greenAccent,
-    MQTTEventType.disconnect: Colors.orangeAccent,
+    MQTTEventType.disconnect: Colors.redAccent,
     MQTTEventType.subscribe: Colors.blueAccent,
     MQTTEventType.unsubscribe: Colors.grey,
     MQTTEventType.send: Colors.cyanAccent,

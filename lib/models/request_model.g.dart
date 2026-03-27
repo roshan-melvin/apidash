@@ -37,6 +37,11 @@ _RequestModel _$RequestModelFromJson(Map json) => _RequestModel(
       : AIRequestModel.fromJson(
           Map<String, Object?>.from(json['aiRequestModel'] as Map),
         ),
+  mqttRequestModel: json['mqttRequestModel'] == null
+      ? null
+      : MQTTRequestModel.fromJson(
+          Map<String, Object?>.from(json['mqttRequestModel'] as Map),
+        ),
 );
 
 Map<String, dynamic> _$RequestModelToJson(_RequestModel instance) =>
@@ -52,6 +57,7 @@ Map<String, dynamic> _$RequestModelToJson(_RequestModel instance) =>
       'preRequestScript': instance.preRequestScript,
       'postRequestScript': instance.postRequestScript,
       'aiRequestModel': instance.aiRequestModel?.toJson(),
+      'mqttRequestModel': instance.mqttRequestModel?.toJson(),
     };
 
 const _$APITypeEnumMap = {

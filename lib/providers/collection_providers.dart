@@ -115,6 +115,7 @@ class CollectionStateNotifier
     required String id,
     MQTTRequestModel? mqttRequestModel,
     MQTTConnectionState? mqttConnectionState,
+    bool isManualEdit = true,
   }) {
     if (state == null || !state!.containsKey(id)) return;
     
@@ -127,7 +128,10 @@ class CollectionStateNotifier
     var map = {...state!};
     map[id] = newModel;
     state = map;
-    unsave();
+
+    if (isManualEdit) {
+      unsave();
+    }
   }
 
   void reorder(int oldIdx, int newIdx) {
@@ -685,6 +689,19 @@ class CollectionStateNotifier
     await hiveHandler.removeUnused();
     ref.read(saveDataStateProvider.notifier).state = false;
     ref.read(hasUnsavedChangesProvider.notifier).state = false;
+  }
+
+  /// Quietly saves a single request model to Hive disk without resetting 
+  /// the 'hasUnsavedChanges' UI flag or showing a saving indicator.
+  Future<void> saveRequestModel(String id) async {
+    if (state == null || !state!.containsKey(id)) return;
+    final saveResponse = ref.read(settingsProvider).saveResponses;
+    await hiveHandler.setRequestModel(
+      id,
+      saveResponse
+          ? (state![id])?.toJson()
+          : (state![id]?.copyWith(httpResponseModel: null))?.toJson(),
+    );
   }
 
   Future<Map<String, dynamic>> exportDataToHAR() async {

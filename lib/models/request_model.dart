@@ -28,7 +28,6 @@ abstract class RequestModel with _$RequestModel {
     String? preRequestScript,
     String? postRequestScript,
     AIRequestModel? aiRequestModel,
-    @JsonKey(includeFromJson: false, includeToJson: false)
     MQTTRequestModel? mqttRequestModel,
     @JsonKey(includeFromJson: false, includeToJson: false)
     MQTTConnectionState? mqttConnectionState,

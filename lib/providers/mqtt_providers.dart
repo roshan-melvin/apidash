@@ -35,20 +35,56 @@ final mqttTopicsProvider = Provider<List<MQTTTopicModel>>((ref) {
   return ref.watch(mqttRequestProvider).topics;
 });
 
-/// Messages received/sent in the current session.
+/// Messages for the current session — falls back to saved messages when disconnected.
 final mqttMessagesProvider = Provider<List<MQTTMessage>>((ref) {
-  final state = ref.watch(mqttConnectionStateProvider);
-  return state.value?.messages ?? [];
+  final liveState = ref.watch(mqttConnectionStateProvider);
+  final liveMessages = liveState.value?.messages;
+
+  // If the live stream has messages, use them
+  if (liveMessages != null && liveMessages.isNotEmpty) {
+    return liveMessages;
+  }
+
+  // Otherwise fall back to the last saved messages from Hive
+  final saved = ref.watch(mqttRequestProvider).savedMessages;
+  return saved
+      .map((s) => MQTTMessage(
+            topic: s.topic,
+            payload: s.payload,
+            timestamp: s.timestamp,
+            isIncoming: s.isIncoming,
+          ))
+      .toList();
 });
 
-/// Event log for the current session.
+/// Event log for the current session — falls back to saved events when disconnected.
 final mqttEventLogProvider = Provider<List<MQTTEvent>>((ref) {
-  final state = ref.watch(mqttConnectionStateProvider);
-  return state.value?.eventLog ?? [];
+  final liveState = ref.watch(mqttConnectionStateProvider);
+  final liveEvents = liveState.value?.eventLog;
+
+  // If the live stream has events, use them
+  if (liveEvents != null && liveEvents.isNotEmpty) {
+    return liveEvents;
+  }
+
+  // Otherwise fall back to the last saved event log from Hive
+  final saved = ref.watch(mqttRequestProvider).savedEventLog;
+  return saved
+      .map((e) => MQTTEvent(
+            timestamp: e.timestamp,
+            type: MQTTEventType.values.firstWhere(
+              (t) => t.name == e.eventType,
+              orElse: () => MQTTEventType.connect,
+            ),
+            topic: e.topic,
+            payload: e.payload,
+            description: e.description,
+          ))
+      .toList();
 });
 
 /// Syncs MQTT connection state back into the RequestModel collection
-/// so the sidebar badge and history work correctly.
+/// so the sidebar badge, messages, and event log survive app restarts.
 final mqttStateSyncProvider = Provider<void>((ref) {
   final selectedId = ref.watch(selectedIdStateProvider);
   final notifier =
@@ -60,10 +96,40 @@ final mqttStateSyncProvider = Provider<void>((ref) {
           .read(collectionStateNotifierProvider)
           ?[selectedId];
       if (model != null && model.apiType == APIType.mqtt) {
+        // Convert live MQTTMessage -> MQTTSavedMessage for persistence
+        final savedMsgs = next.value!.messages
+            .map((m) => MQTTSavedMessage(
+                  topic: m.topic,
+                  payload: m.payload,
+                  timestamp: m.timestamp,
+                  isIncoming: m.isIncoming,
+                ))
+            .toList();
+
+        // Convert live MQTTEvent -> MQTTSavedEvent for persistence
+        final savedEvents = next.value!.eventLog
+            .map((e) => MQTTSavedEvent(
+                  timestamp: e.timestamp,
+                  eventType: e.type.name,
+                  description: e.description,
+                  topic: e.topic,
+                  payload: e.payload,
+                ))
+            .toList();
+
+        final updatedMqtt = (model.mqttRequestModel ?? kMQTTRequestEmptyModel)
+            .copyWith(
+          savedMessages: savedMsgs,
+          savedEventLog: savedEvents,
+        );
+
         notifier.updateMQTTState(
           id: selectedId,
+          mqttRequestModel: updatedMqtt,
           mqttConnectionState: next.value,
+          isManualEdit: false,
         );
+        notifier.saveRequestModel(selectedId);
       }
     }
   });

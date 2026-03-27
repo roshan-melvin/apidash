@@ -115,6 +115,7 @@ class URLTextField extends ConsumerWidget {
       selectedId: selectedId,
       initialValue: switch (requestModel.apiType) {
         APIType.ai => requestModel.aiRequestModel?.url,
+        APIType.mqtt => requestModel.mqttRequestModel?.brokerUrl,
         _ => requestModel.httpRequestModel?.url,
       },
       onChanged: (value) {
@@ -122,6 +123,11 @@ class URLTextField extends ConsumerWidget {
           ref.read(collectionStateNotifierProvider.notifier).update(
               aiRequestModel:
                   requestModel.aiRequestModel?.copyWith(url: value));
+        } else if (requestModel.apiType == APIType.mqtt) {
+          ref.read(collectionStateNotifierProvider.notifier).updateMQTTState(
+              id: selectedId!,
+              mqttRequestModel:
+                  requestModel.mqttRequestModel?.copyWith(brokerUrl: value));
         } else {
           ref.read(collectionStateNotifierProvider.notifier).update(url: value);
         }

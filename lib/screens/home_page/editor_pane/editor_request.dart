@@ -6,11 +6,18 @@ import 'details_card/request_pane/request_pane.dart';
 import 'request_editor_top_bar.dart';
 import 'url_card.dart';
 
-class RequestEditor extends StatelessWidget {
+import 'package:apidash_core/apidash_core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:apidash/providers/providers.dart';
+
+class RequestEditor extends ConsumerWidget {
   const RequestEditor({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final apiType = ref.watch(
+        selectedRequestModelProvider.select((value) => value?.apiType));
+
     return context.isMediumWindow
         ? const Padding(
             padding: kPb10,
@@ -27,12 +34,12 @@ class RequestEditor extends StatelessWidget {
           )
         : Padding(
             padding: kIsMacOS ? kPt28o8 : kP8,
-            child: const Column(
+            child: Column(
               children: [
-                RequestEditorTopBar(),
-                EditorPaneRequestURLCard(),
-                kVSpacer10,
-                Expanded(
+                const RequestEditorTopBar(),
+                if (apiType != APIType.mqtt) const EditorPaneRequestURLCard(),
+                if (apiType != APIType.mqtt) kVSpacer10,
+                const Expanded(
                   child: EditorPaneRequestDetailsCard(),
                 ),
               ],
