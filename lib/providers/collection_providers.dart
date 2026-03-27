@@ -158,6 +158,33 @@ class CollectionStateNotifier
     }
   }
 
+  void updateWebSocketModel({
+    String? id,
+    int? requestTabIndex,
+    int? filterIndex,
+    int? pingInterval,
+  }) {
+    final rId = id ?? ref.read(selectedIdStateProvider);
+    if (rId == null || state?[rId] == null) return;
+
+    final currentModel = state![rId]!;
+    final currentWsModel = currentModel.websocketRequestModel;
+    
+    if (currentWsModel == null) return;
+
+    final updatedWsModel = currentWsModel.copyWith(
+      requestTabIndex: requestTabIndex ?? currentWsModel.requestTabIndex,
+      filterIndex: filterIndex ?? currentWsModel.filterIndex,
+      pingInterval: pingInterval ?? currentWsModel.pingInterval,
+    );
+
+    updateWebSocketState(
+      id: rId,
+      websocketRequestModel: updatedWsModel,
+      isManualEdit: false,
+    );
+  }
+
   void reorder(int oldIdx, int newIdx) {
     var itemIds = ref.read(requestSequenceProvider);
     final itemId = itemIds.removeAt(oldIdx);

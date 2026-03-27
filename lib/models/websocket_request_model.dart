@@ -1,6 +1,5 @@
 import 'package:apidash_core/apidash_core.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:seed/seed.dart';
 
 part 'websocket_request_model.freezed.dart';
 part 'websocket_request_model.g.dart';
@@ -40,6 +39,9 @@ abstract class WebSocketRequestModel with _$WebSocketRequestModel {
     List<NameValueModel>? requestHeaders,
     @Default([]) List<WebSocketSavedMessage> savedMessages,
     @Default([]) List<WebSocketSavedEvent> savedEventLog,
+    @Default(0) int requestTabIndex,
+    @Default(0) int filterIndex, 
+    @Default(0) int pingInterval,
   }) = _WebSocketRequestModel;
 
   factory WebSocketRequestModel.fromJson(Map<String, dynamic> json) =>

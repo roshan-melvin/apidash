@@ -64,6 +64,9 @@ _WebSocketRequestModel _$WebSocketRequestModelFromJson(Map json) =>
               )
               .toList() ??
           const [],
+      requestTabIndex: (json['requestTabIndex'] as num?)?.toInt() ?? 0,
+      filterIndex: (json['filterIndex'] as num?)?.toInt() ?? 0,
+      pingInterval: (json['pingInterval'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$WebSocketRequestModelToJson(
@@ -73,4 +76,7 @@ Map<String, dynamic> _$WebSocketRequestModelToJson(
   'requestHeaders': instance.requestHeaders?.map((e) => e.toJson()).toList(),
   'savedMessages': instance.savedMessages.map((e) => e.toJson()).toList(),
   'savedEventLog': instance.savedEventLog.map((e) => e.toJson()).toList(),
+  'requestTabIndex': instance.requestTabIndex,
+  'filterIndex': instance.filterIndex,
+  'pingInterval': instance.pingInterval,
 };
