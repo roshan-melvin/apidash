@@ -24,7 +24,8 @@ class EditWebSocketRequestPane extends ConsumerWidget {
       selectedId: selectedId,
       showViewCodeButton: false,
       codePaneVisible: codePaneVisible,
-      tabIndex: tabIndex,
+      // Adjust tabIndex handling
+      tabIndex: tabIndex ?? 0,
       onPressedCodeButton: () {
         ref.read(codePaneVisibleStateProvider.notifier).state =
             !codePaneVisible;
@@ -40,7 +41,7 @@ class EditWebSocketRequestPane extends ConsumerWidget {
         false, // Settings
       ],
       tabLabels: const [
-        'Messages',
+        'Send Message',
         'Headers',
         'Settings',
       ],

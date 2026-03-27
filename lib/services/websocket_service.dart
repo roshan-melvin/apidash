@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:logger/logger.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../models/websocket_request_model.dart';
+import 'get_channel.dart';
+import 'get_channel.dart';
 
 final _log = Logger();
 
@@ -115,8 +117,8 @@ class WebSocketService {
     try {
       final uri = Uri.parse(request.url);
       
-      // web_socket_channel handles both VM and web platforms seamlessly
-      _channel = WebSocketChannel.connect(uri);
+      // Use factory to support headers on IO and gracefully degrade on Web
+      _channel = getChannel(uri, request);
 
       // Successfully connected since connection is established synchronously or via Future depending on platform but stream opens connection automatically.
       // Wait for at least ready state or first event

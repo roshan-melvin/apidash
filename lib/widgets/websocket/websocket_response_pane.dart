@@ -48,11 +48,25 @@ class _WebSocketResponsePaneState extends ConsumerState<WebSocketResponsePane>
     final inCount = messages.where((m) => m.isIncoming).length;
     final outCount = messages.where((m) => !m.isIncoming).length;
 
+    // Adding filter for Sent/Received/All
+    final requestModel = ref.watch(selectedRequestModelProvider);
+    final wsModel = requestModel?.websocketRequestModel;
+    final filterIndex = wsModel?.filterIndex ?? 0;
+    
+    // 0: all, 1: sent, 2: received
+    var typeFiltered = messages;
+    if (filterIndex == 1) {
+      typeFiltered = messages.where((m) => !m.isIncoming).toList();
+    } else if (filterIndex == 2) {
+      typeFiltered = messages.where((m) => m.isIncoming).toList();
+    }
+
     final filtered = _filterString.isEmpty
-        ? messages
-        : messages
+        ? typeFiltered
+        : typeFiltered
             .where((m) => m.payload.toString().contains(_filterString))
             .toList();
+
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,17 +107,61 @@ class _WebSocketResponsePaneState extends ConsumerState<WebSocketResponsePane>
           builder: (_, __) => _tabCtrl.index == 0
               ? Padding(
                   padding: kPh8v4,
-                  child: TextField(
-                    onChanged: (v) => setState(() => _filterString = v),
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search, size: 16),
-                      hintText: 'Filter payload...',
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      border: OutlineInputBorder(
-                        borderRadius: kBorderRadius8,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          onChanged: (v) => setState(() => _filterString = v),
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.search, size: 16),
+                            hintText: 'Filter payload...',
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            border: OutlineInputBorder(
+                              borderRadius: kBorderRadius8,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      kHSpacer8,
+                      SegmentedButton<int>(
+                        segments: const [
+                          ButtonSegment<int>(
+                            value: 0,
+                            label: Text('All', style: TextStyle(fontSize: 12)),
+                          ),
+                          ButtonSegment<int>(
+                            value: 2, // Map to received
+                            label: Row(
+                              children: [
+                                Icon(Icons.arrow_downward, size: 12),
+                                SizedBox(width: 4),
+                                Text('In', style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                          ButtonSegment<int>(
+                            value: 1, // Map to sent
+                            label: Row(
+                              children: [
+                                Icon(Icons.arrow_upward, size: 12),
+                                SizedBox(width: 4),
+                                Text('Out', style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                        ],
+                        selected: {filterIndex},
+                        style: const ButtonStyle(
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        onSelectionChanged: (Set<int> newSelection) {
+                          ref.read(collectionStateNotifierProvider.notifier).updateWebSocketModel(
+                                filterIndex: newSelection.first,
+                              );
+                        },
+                      ),
+                    ],
                   ),
                 )
               : kSizedBoxEmpty,
@@ -188,17 +246,22 @@ class _StatusBar extends StatelessWidget {
               ),
             ],
           ),
-          Row(
-            children: [
-              Icon(Icons.arrow_downward,
-                  size: 14, color: clrScheme.primary),
-              kHSpacer4,
-              Text('Rx: $inCount'),
-              const SizedBox(width: 16),
-              Icon(Icons.arrow_upward, size: 14, color: clrScheme.primary),
-              kHSpacer4,
-              Text('Tx: $outCount'),
-            ],
+          Flexible(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Icon(Icons.arrow_downward,
+                      size: 14, color: clrScheme.primary),
+                  kHSpacer4,
+                  Text('Rx: $inCount'),
+                  const SizedBox(width: 16),
+                  Icon(Icons.arrow_upward, size: 14, color: clrScheme.primary),
+                  kHSpacer4,
+                  Text('Tx: $outCount'),
+                ],
+              ),
+            ),
           ),
         ],
       ),

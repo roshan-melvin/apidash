@@ -37,6 +37,7 @@ abstract class WebSocketRequestModel with _$WebSocketRequestModel {
   const factory WebSocketRequestModel({
     @Default("") String url,
     List<NameValueModel>? requestHeaders,
+    List<bool>? isHeaderEnabledList,
     @Default([]) List<WebSocketSavedMessage> savedMessages,
     @Default([]) List<WebSocketSavedEvent> savedEventLog,
     @Default(0) int requestTabIndex,

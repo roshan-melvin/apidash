@@ -46,6 +46,9 @@ _WebSocketRequestModel _$WebSocketRequestModelFromJson(Map json) =>
             (e) => NameValueModel.fromJson(Map<String, Object?>.from(e as Map)),
           )
           .toList(),
+      isHeaderEnabledList: (json['isHeaderEnabledList'] as List<dynamic>?)
+          ?.map((e) => e as bool)
+          .toList(),
       savedMessages:
           (json['savedMessages'] as List<dynamic>?)
               ?.map(
@@ -74,6 +77,7 @@ Map<String, dynamic> _$WebSocketRequestModelToJson(
 ) => <String, dynamic>{
   'url': instance.url,
   'requestHeaders': instance.requestHeaders?.map((e) => e.toJson()).toList(),
+  'isHeaderEnabledList': instance.isHeaderEnabledList,
   'savedMessages': instance.savedMessages.map((e) => e.toJson()).toList(),
   'savedEventLog': instance.savedEventLog.map((e) => e.toJson()).toList(),
   'requestTabIndex': instance.requestTabIndex,

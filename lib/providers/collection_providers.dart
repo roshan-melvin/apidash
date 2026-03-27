@@ -160,6 +160,8 @@ class CollectionStateNotifier
 
   void updateWebSocketModel({
     String? id,
+    List<NameValueModel>? requestHeaders,
+    List<bool>? isHeaderEnabledList,
     int? requestTabIndex,
     int? filterIndex,
     int? pingInterval,
@@ -173,6 +175,8 @@ class CollectionStateNotifier
     if (currentWsModel == null) return;
 
     final updatedWsModel = currentWsModel.copyWith(
+      requestHeaders: requestHeaders ?? currentWsModel.requestHeaders,
+      isHeaderEnabledList: isHeaderEnabledList ?? currentWsModel.isHeaderEnabledList,
       requestTabIndex: requestTabIndex ?? currentWsModel.requestTabIndex,
       filterIndex: filterIndex ?? currentWsModel.filterIndex,
       pingInterval: pingInterval ?? currentWsModel.pingInterval,
@@ -303,6 +307,7 @@ class CollectionStateNotifier
     String? url,
     String? name,
     String? description,
+    List<NameValueModel>? requestHeaders,
     int? requestTabIndex,
     List<NameValueModel>? headers,
     List<NameValueModel>? params,
