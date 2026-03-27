@@ -74,11 +74,87 @@ class _EditWebSocketMessagesPaneState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Send Message Section
+          Container(
+            padding: kP8,
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: kBorderRadius8,
+              border: Border.all(color: Colors.blue.shade200),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.send, size: 18, color: Colors.blue),
+                    kHSpacer8,
+                    Text(
+                      'Send Message',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: Colors.blue.shade900,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    kHSpacer8,
+                    if (!isConnected)
+                      const Icon(Icons.info_outline, size: 16, color: Colors.orange),
+                    if (!isConnected)
+                      const Text('(Connect first)',
+                          style: TextStyle(color: Colors.orange, fontSize: 11)),
+                  ],
+                ),
+                kVSpacer8,
+                SizedBox(
+                  height: 100,
+                  child: TextField(
+                    controller: _msgCtrl,
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    enabled: isConnected,
+                    decoration: InputDecoration(
+                      hintText: isConnected
+                          ? 'Enter your message to server here...'
+                          : 'Connect to session to send messages',
+                      border: OutlineInputBorder(
+                        borderRadius: kBorderRadius8,
+                      ),
+                      isDense: true,
+                      contentPadding: kP8,
+                    ),
+                    onSubmitted: (_) => _send(),
+                  ),
+                ),
+                kVSpacer8,
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FilledButton.icon(
+                    onPressed: isConnected ? _send : null,
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: kBorderRadius8,
+                      ),
+                    ),
+                    icon: const Icon(Icons.send, size: 16),
+                    label: const Text('Send'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Message History Section
           Row(
             children: [
+              const Icon(Icons.history, size: 18),
+              kHSpacer8,
               Text(
-                'Messages',
-                style: Theme.of(context).textTheme.titleMedium,
+                'Message History',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
               kHSpacer8,
               Expanded(
@@ -92,8 +168,12 @@ class _EditWebSocketMessagesPaneState
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: FilterChip(
                             selected: isSelected,
-                            label: Text(e.$2.name[0].toUpperCase() +
-                                e.$2.name.substring(1)),
+                            backgroundColor: Colors.grey.shade100,
+                            selectedColor: Colors.blue.shade100,
+                            label: Text(
+                              e.$2.name[0].toUpperCase() +
+                                  e.$2.name.substring(1),
+                            ),
                             onSelected: (selected) {
                               ref
                                   .read(
@@ -111,7 +191,7 @@ class _EditWebSocketMessagesPaneState
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          kVSpacer8,
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -120,9 +200,17 @@ class _EditWebSocketMessagesPaneState
               ),
               child: filteredMessages.isEmpty
                   ? Center(
-                      child: Text(
-                        'No messages yet',
-                        style: TextStyle(color: Colors.grey.shade600),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.message_outlined,
+                              size: 32, color: Colors.grey.shade400),
+                          kVSpacer8,
+                          Text(
+                            'No ${messageFilter.name} messages',
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                        ],
                       ),
                     )
                   : ListView.separated(
@@ -152,9 +240,9 @@ class _EditWebSocketMessagesPaneState
                                       borderRadius: kBorderRadius4,
                                     ),
                                     child: Text(
-                                      msg.isIncoming ? 'Received' : 'Sent',
+                                      msg.isIncoming ? '↓ Received' : '↑ Sent',
                                       style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 11,
                                         fontWeight: FontWeight.w600,
                                         color: msg.isIncoming
                                             ? Colors.green.shade900
@@ -187,58 +275,6 @@ class _EditWebSocketMessagesPaneState
                         );
                       },
                     ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Text('Send Message',
-                  style: Theme.of(context).textTheme.titleMedium),
-              kHSpacer8,
-              if (!isConnected)
-                const Icon(Icons.info_outline, size: 16, color: Colors.orange),
-              if (!isConnected)
-                kHSpacer4,
-              if (!isConnected)
-                const Text('Connect to session to send messages',
-                    style: TextStyle(color: Colors.orange, fontSize: 12)),
-            ],
-          ),
-          kVSpacer8,
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _msgCtrl,
-                    maxLines: null,
-                    expands: true,
-                    textAlignVertical: TextAlignVertical.top,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter your message to server here...',
-                      border: OutlineInputBorder(
-                        borderRadius: kBorderRadius8,
-                      ),
-                      isDense: true,
-                    ),
-                    onSubmitted: (_) => _send(),
-                  ),
-                ),
-                kHSpacer12,
-                FilledButton.icon(
-                  onPressed: isConnected ? _send : null,
-                  style: FilledButton.styleFrom(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: kBorderRadius8,
-                    ),
-                  ),
-                  icon: const Icon(Icons.send, size: 18),
-                  label: const Text('Send'),
-                ),
-              ],
             ),
           ),
         ],
