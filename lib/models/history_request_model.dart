@@ -1,5 +1,8 @@
 import 'package:apidash_core/apidash_core.dart';
 import 'models.dart';
+import 'mqtt_request_model.dart';
+import 'websocket_request_model.dart';
+import 'grpc_request_model.dart';
 
 part 'history_request_model.freezed.dart';
 
@@ -16,6 +19,9 @@ abstract class HistoryRequestModel with _$HistoryRequestModel {
     required HistoryMetaModel metaData,
     HttpRequestModel? httpRequestModel,
     AIRequestModel? aiRequestModel,
+    MQTTRequestModel? mqttRequestModel,
+    WebSocketRequestModel? websocketRequestModel,
+    GrpcRequestModel? grpcRequestModel,
     required HttpResponseModel httpResponseModel,
     String? preRequestScript,
     String? postRequestScript,

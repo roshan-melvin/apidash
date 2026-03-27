@@ -3,6 +3,8 @@ import 'mqtt_request_model.dart';
 import '../services/mqtt_service.dart' show MQTTConnectionState;
 import 'websocket_request_model.dart';
 import '../services/websocket_service.dart' show WebSocketConnectionState;
+import 'grpc_request_model.dart';
+import '../services/grpc_service.dart' show GrpcConnectionState;
 
 part 'request_model.freezed.dart';
 
@@ -36,6 +38,9 @@ abstract class RequestModel with _$RequestModel {
     WebSocketRequestModel? websocketRequestModel,
     @JsonKey(includeFromJson: false, includeToJson: false)
     WebSocketConnectionState? websocketConnectionState,
+    GrpcRequestModel? grpcRequestModel,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    GrpcConnectionState? grpcConnectionState,
   }) = _RequestModel;
 
   factory RequestModel.fromJson(Map<String, Object?> json) =>

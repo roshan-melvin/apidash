@@ -14,12 +14,8 @@ class EditMQTTRequestPane extends ConsumerStatefulWidget {
       _EditMQTTRequestPaneState();
 }
 
-class _EditMQTTRequestPaneState
-    extends ConsumerState<EditMQTTRequestPane> {
-  bool _isConnecting = false;
+class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
   // Text controllers for connection config fields
-  late final TextEditingController _brokerCtrl;
-  late final TextEditingController _portCtrl;
   late final TextEditingController _clientIdCtrl;
   late final TextEditingController _userCtrl;
   late final TextEditingController _passCtrl;
@@ -30,21 +26,16 @@ class _EditMQTTRequestPaneState
   void initState() {
     super.initState();
     final m = ref.read(mqttRequestProvider);
-    _brokerCtrl = TextEditingController(text: m.brokerUrl);
-    _portCtrl = TextEditingController(text: m.port.toString());
     _clientIdCtrl = TextEditingController(text: m.clientId);
     _userCtrl = TextEditingController(text: m.username);
     _passCtrl = TextEditingController(text: m.password);
     _publishTopicCtrl = TextEditingController(text: m.publishTopic);
-    _publishPayloadCtrl =
-        TextEditingController(text: m.publishPayload);
+    _publishPayloadCtrl = TextEditingController(text: m.publishPayload);
   }
 
   @override
   void dispose() {
     for (final c in [
-      _brokerCtrl,
-      _portCtrl,
       _clientIdCtrl,
       _userCtrl,
       _passCtrl,
@@ -61,34 +52,21 @@ class _EditMQTTRequestPaneState
   void _update(MQTTRequestModel Function(MQTTRequestModel) fn) {
     final updated = fn(ref.read(mqttRequestProvider));
     ref.read(mqttRequestProvider.notifier).state = updated;
-    
+
     // Also save to global persistent collection
     final selectedId = ref.read(selectedIdStateProvider);
     if (selectedId != null) {
-      ref.read(collectionStateNotifierProvider.notifier).updateMQTTState(
-        id: selectedId,
-        mqttRequestModel: updated,
-      );
+      ref
+          .read(collectionStateNotifierProvider.notifier)
+          .updateMQTTState(id: selectedId, mqttRequestModel: updated);
     }
-  }
-
-  Future<void> _connect() async {
-    setState(() => _isConnecting = true);
-    final mqttService = ref.read(mqttServiceProvider);
-    final request = ref.read(mqttRequestProvider);
-    await mqttService.connect(request);
-    if (mounted) {
-      setState(() => _isConnecting = false);
-    }
-  }
-
-  Future<void> _disconnect() async {
-    await ref.read(mqttServiceProvider).disconnect();
   }
 
   Future<void> _publish() async {
     final model = ref.read(mqttRequestProvider);
-    await ref.read(mqttServiceProvider).publish(
+    await ref
+        .read(mqttServiceProvider)
+        .publish(
           model.publishTopic,
           model.publishPayload,
           qos: model.publishQos,
@@ -97,20 +75,18 @@ class _EditMQTTRequestPaneState
   }
 
   void _addTopic() {
-    _update((m) => m.copyWith(
-          topics: [...m.topics, kMQTTTopicEmptyModel],
-        ));
+    _update((m) => m.copyWith(topics: [...m.topics, kMQTTTopicEmptyModel]));
   }
 
   void _deleteTopic(int index) {
     _update((m) {
       final list = List<MQTTTopicModel>.from(m.topics);
       final topic = list[index];
-      
+
       if (topic.subscribe && topic.topic.isNotEmpty) {
         ref.read(mqttServiceProvider).unsubscribe(topic.topic);
       }
-      
+
       list.removeAt(index);
       return m.copyWith(topics: list);
     });
@@ -119,18 +95,27 @@ class _EditMQTTRequestPaneState
   void _updateTopic(int index, MQTTTopicModel updated) {
     _update((m) {
       final list = List<MQTTTopicModel>.from(m.topics);
+      if (index >= list.length) {
+        final newTopic = updated.copyWith(subscribe: true);
+        list.add(newTopic);
+        // also call subscribe since we toggle to true
+        if (newTopic.topic.isNotEmpty) {
+          ref.read(mqttServiceProvider).subscribe(newTopic.topic, newTopic.qos);
+        }
+        return m.copyWith(topics: list);
+      }
       final old = list[index];
 
       // If the subscription state toggled, or the topic string/QoS changed while subscribed
-      if (old.subscribe != updated.subscribe || 
-          (updated.subscribe && (old.topic != updated.topic || old.qos != updated.qos))) {
-          
-          if (old.subscribe && old.topic.isNotEmpty) {
-            ref.read(mqttServiceProvider).unsubscribe(old.topic);
-          }
-          if (updated.subscribe && updated.topic.isNotEmpty) {
-            ref.read(mqttServiceProvider).subscribe(updated.topic, updated.qos);
-          }
+      if (old.subscribe != updated.subscribe ||
+          (updated.subscribe &&
+              (old.topic != updated.topic || old.qos != updated.qos))) {
+        if (old.subscribe && old.topic.isNotEmpty) {
+          ref.read(mqttServiceProvider).unsubscribe(old.topic);
+        }
+        if (updated.subscribe && updated.topic.isNotEmpty) {
+          ref.read(mqttServiceProvider).subscribe(updated.topic, updated.qos);
+        }
       }
 
       list[index] = updated;
@@ -142,30 +127,18 @@ class _EditMQTTRequestPaneState
 
   @override
   Widget build(BuildContext context) {
-    final connState =
-        ref.watch(mqttConnectionStateProvider).value;
+    final connState = ref.watch(mqttConnectionStateProvider).value;
     final isConnected = connState?.isConnected ?? false;
-    final isReconnecting = connState?.isReconnecting ?? false;
-    final showLoading = _isConnecting || isReconnecting;
     final topics = ref.watch(mqttTopicsProvider);
     final model = ref.watch(mqttRequestProvider);
-
-    ref.listen(mqttRequestProvider, (previous, next) {
-      if (previous?.brokerUrl != next.brokerUrl &&
-          _brokerCtrl.text != next.brokerUrl) {
-        _brokerCtrl.text = next.brokerUrl;
-      }
-    });
 
     final clrScheme = Theme.of(context).colorScheme;
 
     final fieldDeco = InputDecoration(
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       border: OutlineInputBorder(
         borderRadius: kBorderRadius8,
-        borderSide:
-            BorderSide(color: clrScheme.outlineVariant),
+        borderSide: BorderSide(color: clrScheme.outlineVariant),
       ),
       isDense: true,
     );
@@ -175,81 +148,6 @@ class _EditMQTTRequestPaneState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Connection bar ────────────────────────────────────────────
-          Padding(
-            padding: kPh8v4,
-            child: Row(
-              children: [
-                // Broker URL
-                Expanded(
-                  flex: 3,
-                  child: TextFormField(
-                    controller: _brokerCtrl,
-                    enabled: !isConnected,
-                    decoration: fieldDeco.copyWith(
-                        hintText: 'broker.hivemq.com'),
-                    onChanged: (v) =>
-                        _update((m) => m.copyWith(brokerUrl: v)),
-                  ),
-                ),
-                kHSpacer8,
-                // Port
-                SizedBox(
-                  width: 72,
-                  child: TextFormField(
-                    controller: _portCtrl,
-                    enabled: !isConnected,
-                    keyboardType: TextInputType.number,
-                    decoration:
-                        fieldDeco.copyWith(hintText: '1883'),
-                    onChanged: (v) => _update((m) =>
-                        m.copyWith(port: int.tryParse(v) ?? 1883)),
-                  ),
-                ),
-                kHSpacer8,
-                // Connect / Disconnect button
-                FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: isConnected
-                        ? clrScheme.error
-                        : const Color(0xFF8B5CF6),
-                    padding: kPh12,
-                    minimumSize: const Size(44, 36),
-                  ),
-                  onPressed: showLoading
-                      ? null
-                      : (isConnected ? _disconnect : _connect),
-                  icon: showLoading
-                      ? const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white70,
-                          ),
-                        )
-                      : Icon(
-                          isConnected
-                              ? Icons.link_off_rounded
-                              : Icons.link_rounded,
-                          size: 18,
-                        ),
-                  label: Text(
-                      isConnected ? 'Disconnect' : (showLoading ? 'Connecting...' : 'Connect')),
-                ),
-              ],
-            ),
-          ),
-          // Connection status badge
-          if (connState?.error != null)
-            Padding(
-              padding: kPh8v4,
-              child: Text(
-                connState!.error!,
-                style: TextStyle(
-                    color: clrScheme.error, fontSize: 12),
-              ),
-            ),
           // ── Tabs ──────────────────────────────────────────────────────
           const TabBar(
             tabs: [
@@ -274,73 +172,88 @@ class _EditMQTTRequestPaneState
                 Padding(
                   padding: kPh8v4,
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Topic',
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelSmall),
+                      Text(
+                        'Topic',
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
                       kVSpacer4,
                       TextFormField(
                         controller: _publishTopicCtrl,
                         decoration: fieldDeco.copyWith(
-                            hintText: 'home/sensor/temp'),
-                        onChanged: (v) => _update(
-                            (m) => m.copyWith(publishTopic: v)),
+                          hintText: 'home/sensor/temp',
+                        ),
+                        onChanged: (v) =>
+                            _update((m) => m.copyWith(publishTopic: v)),
                       ),
                       kVSpacer8,
-                      Text('Payload',
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelSmall),
+                      Text(
+                        'Payload',
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
                       kVSpacer4,
-                      TextFormField(
-                        controller: _publishPayloadCtrl,
-                        maxLines: 4,
-                        decoration: fieldDeco.copyWith(
-                            hintText: '{"value": 23.5}'),
-                        onChanged: (v) => _update((m) =>
-                            m.copyWith(publishPayload: v)),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _publishPayloadCtrl,
+                          maxLines: null,
+                          expands: true,
+                          textAlignVertical: TextAlignVertical.top,
+                          decoration: fieldDeco.copyWith(
+                            hintText: '{"value": 23.5}',
+                            contentPadding: kP8,
+                          ),
+                          onChanged: (v) =>
+                              _update((m) => m.copyWith(publishPayload: v)),
+                        ),
                       ),
                       kVSpacer8,
                       Row(
                         children: [
-                          Text('QoS',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall),
+                          Text(
+                            'QoS',
+                            style: Theme.of(context).textTheme.labelSmall,
+                          ),
                           kHSpacer8,
                           for (int q in [0, 1, 2])
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(right: 4),
+                              padding: const EdgeInsets.only(right: 4),
                               child: ChoiceChip(
                                 label: Text('$q'),
                                 selected: model.publishQos == q,
-                                onSelected: (_) => _update((m) =>
-                                    m.copyWith(publishQos: q)),
+                                onSelected: (_) =>
+                                    _update((m) => m.copyWith(publishQos: q)),
                               ),
                             ),
                           const Spacer(),
-                          Row(children: [
-                            const Text('Retain'),
-                            Switch(
-                              value: model.publishRetain,
-                              onChanged: (v) => _update((m) =>
-                                  m.copyWith(publishRetain: v)),
-                            ),
-                          ]),
+                          Row(
+                            children: [
+                              const Text('Retain'),
+                              Switch(
+                                value: model.publishRetain,
+                                onChanged: (v) => _update(
+                                  (m) => m.copyWith(publishRetain: v),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       kVSpacer8,
-                      SizedBox(
-                        width: double.infinity,
+                      Align(
+                        alignment: Alignment.centerRight,
                         child: FilledButton.icon(
-                          onPressed:
-                              isConnected ? _publish : null,
-                          icon: const Icon(
-                              Icons.send_rounded, size: 18),
+                          onPressed: isConnected ? _publish : null,
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: kBorderRadius8,
+                            ),
+                          ),
+                          icon: Icon(Icons.send_rounded, size: 16),
                           label: const Text('Publish'),
                         ),
                       ),
@@ -357,8 +270,8 @@ class _EditMQTTRequestPaneState
                         controller: _clientIdCtrl,
                         enabled: !isConnected,
                         hint: 'apidash_client',
-                        onChanged: (v) => _update(
-                            (m) => m.copyWith(clientId: v)),
+                        onChanged: (v) =>
+                            _update((m) => m.copyWith(clientId: v)),
                         fieldDeco: fieldDeco,
                       ),
                       _ConfigRow(
@@ -366,8 +279,8 @@ class _EditMQTTRequestPaneState
                         controller: _userCtrl,
                         enabled: !isConnected,
                         hint: 'Optional',
-                        onChanged: (v) => _update(
-                            (m) => m.copyWith(username: v)),
+                        onChanged: (v) =>
+                            _update((m) => m.copyWith(username: v)),
                         fieldDeco: fieldDeco,
                       ),
                       _ConfigRow(
@@ -376,23 +289,23 @@ class _EditMQTTRequestPaneState
                         enabled: !isConnected,
                         hint: 'Optional',
                         obscure: true,
-                        onChanged: (v) => _update(
-                            (m) => m.copyWith(password: v)),
+                        onChanged: (v) =>
+                            _update((m) => m.copyWith(password: v)),
                         fieldDeco: fieldDeco,
                       ),
                       _ConfigRowInt(
                         label: 'Keep Alive (s)',
                         value: model.keepAlive,
                         enabled: !isConnected,
-                        onChanged: (v) => _update(
-                            (m) => m.copyWith(keepAlive: v)),
+                        onChanged: (v) =>
+                            _update((m) => m.copyWith(keepAlive: v)),
                       ),
                       _ConfigRowInt(
                         label: 'Connect Timeout (s)',
                         value: model.connectTimeout,
                         enabled: !isConnected,
-                        onChanged: (v) => _update((m) =>
-                            m.copyWith(connectTimeout: v)),
+                        onChanged: (v) =>
+                            _update((m) => m.copyWith(connectTimeout: v)),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6),
@@ -400,45 +313,60 @@ class _EditMQTTRequestPaneState
                           children: [
                             const SizedBox(
                               width: 150,
-                              child: Text('Protocol Version',
-                                  style: TextStyle(fontSize: 13)),
+                              child: Text(
+                                'Protocol Version',
+                                style: TextStyle(fontSize: 13),
+                              ),
                             ),
                             Expanded(
-                              child: DropdownButtonFormField<MQTTProtocolVersion>(
-                                value: model.protocolVersion,
-                                isDense: true,
-                                decoration: fieldDeco,
-                                items: MQTTProtocolVersion.values.map((v) {
-                                  return DropdownMenuItem(
-                                    value: v,
-                                    child: Text(v.name.toUpperCase()),
-                                  );
-                                }).toList(),
-                                onChanged: isConnected ? null : (v) {
-                                  if (v != null) _update((m) => m.copyWith(protocolVersion: v));
-                                },
-                              ),
+                              child:
+                                  DropdownButtonFormField<MQTTProtocolVersion>(
+                                    value: model.protocolVersion,
+                                    isDense: true,
+                                    decoration: fieldDeco,
+                                    items: MQTTProtocolVersion.values.map((v) {
+                                      return DropdownMenuItem(
+                                        value: v,
+                                        child: Text(v.name.toUpperCase()),
+                                      );
+                                    }).toList(),
+                                    onChanged: isConnected
+                                        ? null
+                                        : (v) {
+                                            if (v != null)
+                                              _update(
+                                                (m) => m.copyWith(
+                                                  protocolVersion: v,
+                                                ),
+                                              );
+                                          },
+                                  ),
                             ),
                           ],
                         ),
                       ),
                       SwitchListTile(
-                        title: const Text('Clean Session', style: TextStyle(fontSize: 13)),
+                        title: const Text(
+                          'Clean Session',
+                          style: TextStyle(fontSize: 13),
+                        ),
                         contentPadding: EdgeInsets.zero,
                         value: model.cleanSession,
                         onChanged: isConnected
                             ? null
-                            : (v) => _update((m) =>
-                                m.copyWith(cleanSession: v)),
+                            : (v) =>
+                                  _update((m) => m.copyWith(cleanSession: v)),
                       ),
                       SwitchListTile(
-                        title: const Text('Use TLS (Secure)', style: TextStyle(fontSize: 13)),
+                        title: const Text(
+                          'Use TLS (Secure)',
+                          style: TextStyle(fontSize: 13),
+                        ),
                         contentPadding: EdgeInsets.zero,
                         value: model.useTls,
                         onChanged: isConnected
                             ? null
-                            : (v) => _update((m) =>
-                                m.copyWith(useTls: v)),
+                            : (v) => _update((m) => m.copyWith(useTls: v)),
                       ),
                     ],
                   ),
@@ -473,14 +401,23 @@ class _TopicsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Container(
-            margin: kPh10t10,
+    return Padding(
+      padding: kP12,
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: kBorderRadius12,
+            ),
+            margin: kP5,
             child: Theme(
               data: Theme.of(context).copyWith(
-                  scrollbarTheme: kDataTableScrollbarTheme),
+                scrollbarTheme: kDataTableScrollbarTheme,
+                iconTheme: Theme.of(context).iconTheme.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
               child: DataTable2(
                 columnSpacing: 12,
                 dividerThickness: 0,
@@ -490,102 +427,123 @@ class _TopicsTab extends StatelessWidget {
                 bottomMargin: kDataTableBottomPadding,
                 isVerticalScrollBarVisible: true,
                 columns: const [
+                  DataColumn2(label: Text(kNameCheckbox), fixedWidth: 30),
                   DataColumn2(
-                      label: Text('Topic',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold))),
+                    label: Text(
+                      'Topic',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
                   DataColumn2(
-                      label: Text('QoS',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold)),
-                      fixedWidth: 60),
+                    label: Text(
+                      'QoS',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    fixedWidth: 60,
+                  ),
                   DataColumn2(
-                      label: Text('Sub',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold)),
-                      fixedWidth: 56),
-                  DataColumn2(
-                      label: Text('Description',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold))),
-                  DataColumn2(
-                      label: const Text(''), fixedWidth: 36),
+                    label: Text(
+                      'Description',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  DataColumn2(label: const Text(''), fixedWidth: 36),
                 ],
-                rows: topics.isEmpty
-                    ? [
-                        const DataRow(cells: [
-                          DataCell(
-                              Text('No topics — tap Add below')),
-                          DataCell.empty,
-                          DataCell.empty,
-                          DataCell.empty,
-                          DataCell.empty,
-                        ])
-                      ]
-                    : List.generate(topics.length, (i) {
-                        final t = topics[i];
-                        return DataRow(cells: [
-                          DataCell(TextFormField(
-                            initialValue: t.topic,
-                            decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'home/sensor'),
-                            onChanged: (v) =>
-                                onUpdate(i, t.copyWith(topic: v)),
-                          )),
-                          DataCell(DropdownButton<int>(
-                            value: t.qos,
-                            underline: const SizedBox.shrink(),
-                            items: const [
-                              DropdownMenuItem(
-                                  value: 0,
-                                  child: Text('0')),
-                              DropdownMenuItem(
-                                  value: 1,
-                                  child: Text('1')),
-                              DropdownMenuItem(
-                                  value: 2,
-                                  child: Text('2')),
-                            ],
-                            onChanged: (v) {
-                              if (v != null)
-                                onUpdate(i, t.copyWith(qos: v));
-                            },
-                          )),
-                          DataCell(Switch(
-                            value: t.subscribe,
-                            onChanged: (v) =>
-                                onUpdate(i, t.copyWith(subscribe: v)),
-                          )),
-                          DataCell(TextFormField(
-                            initialValue: t.description,
-                            decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'Add description'),
-                            onChanged: (v) => onUpdate(
-                                i, t.copyWith(description: v)),
-                          )),
-                          DataCell(IconButton(
-                            icon: const Icon(Icons.delete_outline,
-                                size: 18),
-                            color: Colors.redAccent,
-                            onPressed: () => onDelete(i),
-                          )),
-                        ]);
-                      }),
+                rows: List.generate(topics.length + 1, (i) {
+                  bool isLast = i == topics.length;
+                  final t = isLast ? kMQTTTopicEmptyModel : topics[i];
+                  return DataRow(
+                    cells: [
+                      DataCell(
+                        ADCheckBox(
+                          keyId: "mqtt-topic-sub-$i",
+                          value: t.subscribe,
+                          onChanged: isLast
+                              ? null
+                              : (v) => onUpdate(
+                                  i,
+                                  t.copyWith(subscribe: v ?? false),
+                                ),
+                          colorScheme: Theme.of(context).colorScheme,
+                        ),
+                      ),
+                      DataCell(
+                        TextFormField(
+                          initialValue: t.topic,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'home/sensor',
+                          ),
+                          onChanged: (v) => onUpdate(i, t.copyWith(topic: v)),
+                        ),
+                      ),
+                      DataCell(
+                        DropdownButton<int>(
+                          value: t.qos,
+                          underline: const SizedBox.shrink(),
+                          items: const [
+                            DropdownMenuItem(value: 0, child: Text('0')),
+                            DropdownMenuItem(value: 1, child: Text('1')),
+                            DropdownMenuItem(value: 2, child: Text('2')),
+                          ],
+                          onChanged: (v) {
+                            if (v != null) {
+                              onUpdate(i, t.copyWith(qos: v));
+                            }
+                          },
+                        ),
+                      ),
+                      DataCell(
+                        TextFormField(
+                          initialValue: t.description,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Add description',
+                          ),
+                          onChanged: (v) =>
+                              onUpdate(i, t.copyWith(description: v)),
+                        ),
+                      ),
+                      DataCell(
+                        InkWell(
+                          onTap: isLast ? null : () => onDelete(i),
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              hoverColor: kColorTransparent,
+                              splashColor: kColorTransparent,
+                              highlightColor: kColorTransparent,
+                            ),
+                            child: Icon(
+                              Icons.remove_circle,
+                              size: 16,
+                              color: isLast
+                                  ? Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHighest
+                                  : Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
               ),
             ),
           ),
-        ),
-        Padding(
-          padding: kPb15,
-          child: ElevatedButton.icon(
-            onPressed: onAdd,
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text('Add Topic'),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: kPb15,
+              child: ElevatedButton.icon(
+                onPressed: onAdd,
+                icon: Icon(Icons.add),
+                label: const Text('Add Topic', style: kTextStyleButton),
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -619,16 +577,14 @@ class _ConfigRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 150,
-            child: Text(label,
-                style: const TextStyle(fontSize: 13)),
+            child: Text(label, style: const TextStyle(fontSize: 13)),
           ),
           Expanded(
             child: TextFormField(
               controller: controller,
               enabled: enabled,
               obscureText: obscure,
-              decoration:
-                  fieldDeco.copyWith(hintText: hint),
+              decoration: fieldDeco.copyWith(hintText: hint),
               onChanged: onChanged,
             ),
           ),
@@ -659,8 +615,7 @@ class _ConfigRowInt extends StatelessWidget {
         children: [
           SizedBox(
             width: 150,
-            child: Text(label,
-                style: const TextStyle(fontSize: 13)),
+            child: Text(label, style: const TextStyle(fontSize: 13)),
           ),
           SizedBox(
             width: 80,
@@ -671,8 +626,10 @@ class _ConfigRowInt extends StatelessWidget {
               decoration: const InputDecoration(
                 isDense: true,
                 border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
               ),
               onChanged: (v) {
                 final parsed = int.tryParse(v);

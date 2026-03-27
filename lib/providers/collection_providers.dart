@@ -8,8 +8,10 @@ import 'package:apidash/terminal/terminal.dart';
 import 'providers.dart';
 import '../models/models.dart';
 import '../models/mqtt_request_model.dart';
+import '../models/grpc_request_model.dart';
 import '../services/mqtt_service.dart' show MQTTConnectionState;
 import '../services/websocket_service.dart' show WebSocketConnectionState;
+import '../services/grpc_service.dart' show GrpcConnectionState;
 import '../services/services.dart';
 import '../utils/utils.dart';
 
@@ -135,6 +137,70 @@ class CollectionStateNotifier
     }
   }
 
+    void updateGrpcState({
+    required String id,
+    GrpcRequestModel? grpcRequestModel,
+    GrpcConnectionState? grpcConnectionState,
+    bool isManualEdit = true,
+  }) {
+    if (state == null || !state!.containsKey(id)) return;
+    
+    final currentModel = state![id]!;
+    final newModel = currentModel.copyWith(
+      grpcRequestModel: grpcRequestModel ?? currentModel.grpcRequestModel,
+      grpcConnectionState: grpcConnectionState ?? currentModel.grpcConnectionState,
+    );
+
+    var map = {...state!};
+    map[id] = newModel;
+    state = map;
+
+    if (isManualEdit) {
+      unsave();
+    }
+  }
+
+  void updateGrpcModel({
+    String? id,
+    String? url,
+    bool? useTls,
+    String? serviceName,
+    String? methodName,
+    GrpcCallType? callType,
+    GrpcDescriptorSource? descriptorSource,
+    List<NameValueModel>? metadata,
+    List<bool>? isMetadataEnabledList,
+    String? requestJson,
+    int? requestTabIndex,
+  }) {
+    final rId = id ?? ref.read(selectedIdStateProvider);
+    if (rId == null || state?[rId] == null) return;
+
+    final currentModel = state![rId]!;
+    final currentGrpcModel = currentModel.grpcRequestModel;
+    
+    if (currentGrpcModel == null) return;
+
+    final updatedGrpcModel = currentGrpcModel.copyWith(
+      url: url ?? currentGrpcModel.url,
+      useTls: useTls ?? currentGrpcModel.useTls,
+      serviceName: serviceName ?? currentGrpcModel.serviceName,
+      methodName: methodName ?? currentGrpcModel.methodName,
+      callType: callType ?? currentGrpcModel.callType,
+      descriptorSource: descriptorSource ?? currentGrpcModel.descriptorSource,
+      metadata: metadata ?? currentGrpcModel.metadata,
+      isMetadataEnabledList: isMetadataEnabledList ?? currentGrpcModel.isMetadataEnabledList,
+      requestJson: requestJson ?? currentGrpcModel.requestJson,
+      requestTabIndex: requestTabIndex ?? currentGrpcModel.requestTabIndex,
+    );
+
+    updateGrpcState(
+      id: rId,
+      grpcRequestModel: updatedGrpcModel,
+      isManualEdit: false,
+    );
+  }
+
   void updateWebSocketState({
     required String id,
     WebSocketRequestModel? websocketRequestModel,
@@ -254,6 +320,9 @@ class CollectionStateNotifier
       message: null,
       httpRequestModel: currentModel.httpRequestModel?.copyWith(),
       aiRequestModel: currentModel.aiRequestModel?.copyWith(),
+      mqttRequestModel: currentModel.mqttRequestModel?.copyWith(),
+      websocketRequestModel: currentModel.websocketRequestModel?.copyWith(),
+      grpcRequestModel: currentModel.grpcRequestModel?.copyWith(),
       httpResponseModel: null,
       isWorking: false,
       sendingTime: null,
@@ -280,6 +349,9 @@ class CollectionStateNotifier
       id: newId,
       name: "${currentModel.metaData.name} (history)",
       aiRequestModel: currentModel.aiRequestModel?.copyWith(),
+      mqttRequestModel: currentModel.mqttRequestModel?.copyWith(),
+      websocketRequestModel: currentModel.websocketRequestModel?.copyWith(),
+      grpcRequestModel: currentModel.grpcRequestModel?.copyWith(),
       httpRequestModel:
           currentModel.httpRequestModel?.copyWith() ?? HttpRequestModel(),
       responseStatus: currentModel.metaData.responseStatus,
@@ -337,6 +409,20 @@ class CollectionStateNotifier
     if (apiType != null && currentModel.apiType != apiType) {
       final defaultModel = ref.read(settingsProvider).defaultAIModel;
       newModel = switch (apiType) {
+        APIType.grpc => currentModel.copyWith(
+          apiType: apiType,
+          requestTabIndex: 0,
+          name: name ?? currentModel.name,
+          description: description ?? currentModel.description,
+          httpRequestModel: null,
+          aiRequestModel: null,
+          mqttRequestModel: null,
+          mqttConnectionState: null,
+          websocketRequestModel: null,
+          websocketConnectionState: null,
+          grpcRequestModel: const GrpcRequestModel(),
+          grpcConnectionState: const GrpcConnectionState(),
+        ),
         APIType.rest || APIType.graphql => currentModel.copyWith(
           apiType: apiType,
           requestTabIndex: 0,
@@ -442,11 +528,11 @@ class CollectionStateNotifier
     if (requestModel?.httpRequestModel == null &&
         requestModel?.aiRequestModel == null &&
         requestModel?.apiType != APIType.mqtt &&
-        requestModel?.apiType != APIType.websocket) {
+        requestModel?.apiType != APIType.websocket && requestModel?.apiType != APIType.grpc) {
       return;
     }
 
-    if (requestModel?.apiType == APIType.mqtt || requestModel?.apiType == APIType.websocket) {
+    if (requestModel?.apiType == APIType.mqtt || requestModel?.apiType == APIType.websocket || requestModel?.apiType == APIType.grpc) {
       // For MQTT, sendRequest() is replaced by the custom publish logic 
       // in EditMQTTRequestPane. We just return here for simplicity.
       return;

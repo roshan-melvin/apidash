@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HistoryRequestModel {
 
- String get historyId; HistoryMetaModel get metaData; HttpRequestModel? get httpRequestModel; AIRequestModel? get aiRequestModel; HttpResponseModel get httpResponseModel; String? get preRequestScript; String? get postRequestScript; AuthModel? get authModel;
+ String get historyId; HistoryMetaModel get metaData; HttpRequestModel? get httpRequestModel; AIRequestModel? get aiRequestModel; MQTTRequestModel? get mqttRequestModel; WebSocketRequestModel? get websocketRequestModel; GrpcRequestModel? get grpcRequestModel; HttpResponseModel get httpResponseModel; String? get preRequestScript; String? get postRequestScript; AuthModel? get authModel;
 /// Create a copy of HistoryRequestModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $HistoryRequestModelCopyWith<HistoryRequestModel> get copyWith => _$HistoryReque
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HistoryRequestModel&&(identical(other.historyId, historyId) || other.historyId == historyId)&&(identical(other.metaData, metaData) || other.metaData == metaData)&&(identical(other.httpRequestModel, httpRequestModel) || other.httpRequestModel == httpRequestModel)&&(identical(other.aiRequestModel, aiRequestModel) || other.aiRequestModel == aiRequestModel)&&(identical(other.httpResponseModel, httpResponseModel) || other.httpResponseModel == httpResponseModel)&&(identical(other.preRequestScript, preRequestScript) || other.preRequestScript == preRequestScript)&&(identical(other.postRequestScript, postRequestScript) || other.postRequestScript == postRequestScript)&&(identical(other.authModel, authModel) || other.authModel == authModel));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HistoryRequestModel&&(identical(other.historyId, historyId) || other.historyId == historyId)&&(identical(other.metaData, metaData) || other.metaData == metaData)&&(identical(other.httpRequestModel, httpRequestModel) || other.httpRequestModel == httpRequestModel)&&(identical(other.aiRequestModel, aiRequestModel) || other.aiRequestModel == aiRequestModel)&&(identical(other.mqttRequestModel, mqttRequestModel) || other.mqttRequestModel == mqttRequestModel)&&(identical(other.websocketRequestModel, websocketRequestModel) || other.websocketRequestModel == websocketRequestModel)&&(identical(other.grpcRequestModel, grpcRequestModel) || other.grpcRequestModel == grpcRequestModel)&&(identical(other.httpResponseModel, httpResponseModel) || other.httpResponseModel == httpResponseModel)&&(identical(other.preRequestScript, preRequestScript) || other.preRequestScript == preRequestScript)&&(identical(other.postRequestScript, postRequestScript) || other.postRequestScript == postRequestScript)&&(identical(other.authModel, authModel) || other.authModel == authModel));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,historyId,metaData,httpRequestModel,aiRequestModel,httpResponseModel,preRequestScript,postRequestScript,authModel);
+int get hashCode => Object.hash(runtimeType,historyId,metaData,httpRequestModel,aiRequestModel,mqttRequestModel,websocketRequestModel,grpcRequestModel,httpResponseModel,preRequestScript,postRequestScript,authModel);
 
 @override
 String toString() {
-  return 'HistoryRequestModel(historyId: $historyId, metaData: $metaData, httpRequestModel: $httpRequestModel, aiRequestModel: $aiRequestModel, httpResponseModel: $httpResponseModel, preRequestScript: $preRequestScript, postRequestScript: $postRequestScript, authModel: $authModel)';
+  return 'HistoryRequestModel(historyId: $historyId, metaData: $metaData, httpRequestModel: $httpRequestModel, aiRequestModel: $aiRequestModel, mqttRequestModel: $mqttRequestModel, websocketRequestModel: $websocketRequestModel, grpcRequestModel: $grpcRequestModel, httpResponseModel: $httpResponseModel, preRequestScript: $preRequestScript, postRequestScript: $postRequestScript, authModel: $authModel)';
 }
 
 
@@ -48,11 +48,11 @@ abstract mixin class $HistoryRequestModelCopyWith<$Res>  {
   factory $HistoryRequestModelCopyWith(HistoryRequestModel value, $Res Function(HistoryRequestModel) _then) = _$HistoryRequestModelCopyWithImpl;
 @useResult
 $Res call({
- String historyId, HistoryMetaModel metaData, HttpRequestModel? httpRequestModel, AIRequestModel? aiRequestModel, HttpResponseModel httpResponseModel, String? preRequestScript, String? postRequestScript, AuthModel? authModel
+ String historyId, HistoryMetaModel metaData, HttpRequestModel? httpRequestModel, AIRequestModel? aiRequestModel, MQTTRequestModel? mqttRequestModel, WebSocketRequestModel? websocketRequestModel, GrpcRequestModel? grpcRequestModel, HttpResponseModel httpResponseModel, String? preRequestScript, String? postRequestScript, AuthModel? authModel
 });
 
 
-$HistoryMetaModelCopyWith<$Res> get metaData;$HttpRequestModelCopyWith<$Res>? get httpRequestModel;$AIRequestModelCopyWith<$Res>? get aiRequestModel;$HttpResponseModelCopyWith<$Res> get httpResponseModel;$AuthModelCopyWith<$Res>? get authModel;
+$HistoryMetaModelCopyWith<$Res> get metaData;$HttpRequestModelCopyWith<$Res>? get httpRequestModel;$AIRequestModelCopyWith<$Res>? get aiRequestModel;$MQTTRequestModelCopyWith<$Res>? get mqttRequestModel;$WebSocketRequestModelCopyWith<$Res>? get websocketRequestModel;$GrpcRequestModelCopyWith<$Res>? get grpcRequestModel;$HttpResponseModelCopyWith<$Res> get httpResponseModel;$AuthModelCopyWith<$Res>? get authModel;
 
 }
 /// @nodoc
@@ -65,13 +65,16 @@ class _$HistoryRequestModelCopyWithImpl<$Res>
 
 /// Create a copy of HistoryRequestModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? historyId = null,Object? metaData = null,Object? httpRequestModel = freezed,Object? aiRequestModel = freezed,Object? httpResponseModel = null,Object? preRequestScript = freezed,Object? postRequestScript = freezed,Object? authModel = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? historyId = null,Object? metaData = null,Object? httpRequestModel = freezed,Object? aiRequestModel = freezed,Object? mqttRequestModel = freezed,Object? websocketRequestModel = freezed,Object? grpcRequestModel = freezed,Object? httpResponseModel = null,Object? preRequestScript = freezed,Object? postRequestScript = freezed,Object? authModel = freezed,}) {
   return _then(_self.copyWith(
 historyId: null == historyId ? _self.historyId : historyId // ignore: cast_nullable_to_non_nullable
 as String,metaData: null == metaData ? _self.metaData : metaData // ignore: cast_nullable_to_non_nullable
 as HistoryMetaModel,httpRequestModel: freezed == httpRequestModel ? _self.httpRequestModel : httpRequestModel // ignore: cast_nullable_to_non_nullable
 as HttpRequestModel?,aiRequestModel: freezed == aiRequestModel ? _self.aiRequestModel : aiRequestModel // ignore: cast_nullable_to_non_nullable
-as AIRequestModel?,httpResponseModel: null == httpResponseModel ? _self.httpResponseModel : httpResponseModel // ignore: cast_nullable_to_non_nullable
+as AIRequestModel?,mqttRequestModel: freezed == mqttRequestModel ? _self.mqttRequestModel : mqttRequestModel // ignore: cast_nullable_to_non_nullable
+as MQTTRequestModel?,websocketRequestModel: freezed == websocketRequestModel ? _self.websocketRequestModel : websocketRequestModel // ignore: cast_nullable_to_non_nullable
+as WebSocketRequestModel?,grpcRequestModel: freezed == grpcRequestModel ? _self.grpcRequestModel : grpcRequestModel // ignore: cast_nullable_to_non_nullable
+as GrpcRequestModel?,httpResponseModel: null == httpResponseModel ? _self.httpResponseModel : httpResponseModel // ignore: cast_nullable_to_non_nullable
 as HttpResponseModel,preRequestScript: freezed == preRequestScript ? _self.preRequestScript : preRequestScript // ignore: cast_nullable_to_non_nullable
 as String?,postRequestScript: freezed == postRequestScript ? _self.postRequestScript : postRequestScript // ignore: cast_nullable_to_non_nullable
 as String?,authModel: freezed == authModel ? _self.authModel : authModel // ignore: cast_nullable_to_non_nullable
@@ -110,6 +113,42 @@ $AIRequestModelCopyWith<$Res>? get aiRequestModel {
 
   return $AIRequestModelCopyWith<$Res>(_self.aiRequestModel!, (value) {
     return _then(_self.copyWith(aiRequestModel: value));
+  });
+}/// Create a copy of HistoryRequestModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MQTTRequestModelCopyWith<$Res>? get mqttRequestModel {
+    if (_self.mqttRequestModel == null) {
+    return null;
+  }
+
+  return $MQTTRequestModelCopyWith<$Res>(_self.mqttRequestModel!, (value) {
+    return _then(_self.copyWith(mqttRequestModel: value));
+  });
+}/// Create a copy of HistoryRequestModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebSocketRequestModelCopyWith<$Res>? get websocketRequestModel {
+    if (_self.websocketRequestModel == null) {
+    return null;
+  }
+
+  return $WebSocketRequestModelCopyWith<$Res>(_self.websocketRequestModel!, (value) {
+    return _then(_self.copyWith(websocketRequestModel: value));
+  });
+}/// Create a copy of HistoryRequestModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$GrpcRequestModelCopyWith<$Res>? get grpcRequestModel {
+    if (_self.grpcRequestModel == null) {
+    return null;
+  }
+
+  return $GrpcRequestModelCopyWith<$Res>(_self.grpcRequestModel!, (value) {
+    return _then(_self.copyWith(grpcRequestModel: value));
   });
 }/// Create a copy of HistoryRequestModel
 /// with the given fields replaced by the non-null parameter values.
@@ -214,10 +253,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String historyId,  HistoryMetaModel metaData,  HttpRequestModel? httpRequestModel,  AIRequestModel? aiRequestModel,  HttpResponseModel httpResponseModel,  String? preRequestScript,  String? postRequestScript,  AuthModel? authModel)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String historyId,  HistoryMetaModel metaData,  HttpRequestModel? httpRequestModel,  AIRequestModel? aiRequestModel,  MQTTRequestModel? mqttRequestModel,  WebSocketRequestModel? websocketRequestModel,  GrpcRequestModel? grpcRequestModel,  HttpResponseModel httpResponseModel,  String? preRequestScript,  String? postRequestScript,  AuthModel? authModel)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HistoryRequestModel() when $default != null:
-return $default(_that.historyId,_that.metaData,_that.httpRequestModel,_that.aiRequestModel,_that.httpResponseModel,_that.preRequestScript,_that.postRequestScript,_that.authModel);case _:
+return $default(_that.historyId,_that.metaData,_that.httpRequestModel,_that.aiRequestModel,_that.mqttRequestModel,_that.websocketRequestModel,_that.grpcRequestModel,_that.httpResponseModel,_that.preRequestScript,_that.postRequestScript,_that.authModel);case _:
   return orElse();
 
 }
@@ -235,10 +274,10 @@ return $default(_that.historyId,_that.metaData,_that.httpRequestModel,_that.aiRe
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String historyId,  HistoryMetaModel metaData,  HttpRequestModel? httpRequestModel,  AIRequestModel? aiRequestModel,  HttpResponseModel httpResponseModel,  String? preRequestScript,  String? postRequestScript,  AuthModel? authModel)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String historyId,  HistoryMetaModel metaData,  HttpRequestModel? httpRequestModel,  AIRequestModel? aiRequestModel,  MQTTRequestModel? mqttRequestModel,  WebSocketRequestModel? websocketRequestModel,  GrpcRequestModel? grpcRequestModel,  HttpResponseModel httpResponseModel,  String? preRequestScript,  String? postRequestScript,  AuthModel? authModel)  $default,) {final _that = this;
 switch (_that) {
 case _HistoryRequestModel():
-return $default(_that.historyId,_that.metaData,_that.httpRequestModel,_that.aiRequestModel,_that.httpResponseModel,_that.preRequestScript,_that.postRequestScript,_that.authModel);case _:
+return $default(_that.historyId,_that.metaData,_that.httpRequestModel,_that.aiRequestModel,_that.mqttRequestModel,_that.websocketRequestModel,_that.grpcRequestModel,_that.httpResponseModel,_that.preRequestScript,_that.postRequestScript,_that.authModel);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -255,10 +294,10 @@ return $default(_that.historyId,_that.metaData,_that.httpRequestModel,_that.aiRe
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String historyId,  HistoryMetaModel metaData,  HttpRequestModel? httpRequestModel,  AIRequestModel? aiRequestModel,  HttpResponseModel httpResponseModel,  String? preRequestScript,  String? postRequestScript,  AuthModel? authModel)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String historyId,  HistoryMetaModel metaData,  HttpRequestModel? httpRequestModel,  AIRequestModel? aiRequestModel,  MQTTRequestModel? mqttRequestModel,  WebSocketRequestModel? websocketRequestModel,  GrpcRequestModel? grpcRequestModel,  HttpResponseModel httpResponseModel,  String? preRequestScript,  String? postRequestScript,  AuthModel? authModel)?  $default,) {final _that = this;
 switch (_that) {
 case _HistoryRequestModel() when $default != null:
-return $default(_that.historyId,_that.metaData,_that.httpRequestModel,_that.aiRequestModel,_that.httpResponseModel,_that.preRequestScript,_that.postRequestScript,_that.authModel);case _:
+return $default(_that.historyId,_that.metaData,_that.httpRequestModel,_that.aiRequestModel,_that.mqttRequestModel,_that.websocketRequestModel,_that.grpcRequestModel,_that.httpResponseModel,_that.preRequestScript,_that.postRequestScript,_that.authModel);case _:
   return null;
 
 }
@@ -270,13 +309,16 @@ return $default(_that.historyId,_that.metaData,_that.httpRequestModel,_that.aiRe
 
 @JsonSerializable(explicitToJson: true, anyMap: true)
 class _HistoryRequestModel implements HistoryRequestModel {
-  const _HistoryRequestModel({required this.historyId, required this.metaData, this.httpRequestModel, this.aiRequestModel, required this.httpResponseModel, this.preRequestScript, this.postRequestScript, this.authModel});
+  const _HistoryRequestModel({required this.historyId, required this.metaData, this.httpRequestModel, this.aiRequestModel, this.mqttRequestModel, this.websocketRequestModel, this.grpcRequestModel, required this.httpResponseModel, this.preRequestScript, this.postRequestScript, this.authModel});
   factory _HistoryRequestModel.fromJson(Map<String, dynamic> json) => _$HistoryRequestModelFromJson(json);
 
 @override final  String historyId;
 @override final  HistoryMetaModel metaData;
 @override final  HttpRequestModel? httpRequestModel;
 @override final  AIRequestModel? aiRequestModel;
+@override final  MQTTRequestModel? mqttRequestModel;
+@override final  WebSocketRequestModel? websocketRequestModel;
+@override final  GrpcRequestModel? grpcRequestModel;
 @override final  HttpResponseModel httpResponseModel;
 @override final  String? preRequestScript;
 @override final  String? postRequestScript;
@@ -295,16 +337,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HistoryRequestModel&&(identical(other.historyId, historyId) || other.historyId == historyId)&&(identical(other.metaData, metaData) || other.metaData == metaData)&&(identical(other.httpRequestModel, httpRequestModel) || other.httpRequestModel == httpRequestModel)&&(identical(other.aiRequestModel, aiRequestModel) || other.aiRequestModel == aiRequestModel)&&(identical(other.httpResponseModel, httpResponseModel) || other.httpResponseModel == httpResponseModel)&&(identical(other.preRequestScript, preRequestScript) || other.preRequestScript == preRequestScript)&&(identical(other.postRequestScript, postRequestScript) || other.postRequestScript == postRequestScript)&&(identical(other.authModel, authModel) || other.authModel == authModel));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HistoryRequestModel&&(identical(other.historyId, historyId) || other.historyId == historyId)&&(identical(other.metaData, metaData) || other.metaData == metaData)&&(identical(other.httpRequestModel, httpRequestModel) || other.httpRequestModel == httpRequestModel)&&(identical(other.aiRequestModel, aiRequestModel) || other.aiRequestModel == aiRequestModel)&&(identical(other.mqttRequestModel, mqttRequestModel) || other.mqttRequestModel == mqttRequestModel)&&(identical(other.websocketRequestModel, websocketRequestModel) || other.websocketRequestModel == websocketRequestModel)&&(identical(other.grpcRequestModel, grpcRequestModel) || other.grpcRequestModel == grpcRequestModel)&&(identical(other.httpResponseModel, httpResponseModel) || other.httpResponseModel == httpResponseModel)&&(identical(other.preRequestScript, preRequestScript) || other.preRequestScript == preRequestScript)&&(identical(other.postRequestScript, postRequestScript) || other.postRequestScript == postRequestScript)&&(identical(other.authModel, authModel) || other.authModel == authModel));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,historyId,metaData,httpRequestModel,aiRequestModel,httpResponseModel,preRequestScript,postRequestScript,authModel);
+int get hashCode => Object.hash(runtimeType,historyId,metaData,httpRequestModel,aiRequestModel,mqttRequestModel,websocketRequestModel,grpcRequestModel,httpResponseModel,preRequestScript,postRequestScript,authModel);
 
 @override
 String toString() {
-  return 'HistoryRequestModel(historyId: $historyId, metaData: $metaData, httpRequestModel: $httpRequestModel, aiRequestModel: $aiRequestModel, httpResponseModel: $httpResponseModel, preRequestScript: $preRequestScript, postRequestScript: $postRequestScript, authModel: $authModel)';
+  return 'HistoryRequestModel(historyId: $historyId, metaData: $metaData, httpRequestModel: $httpRequestModel, aiRequestModel: $aiRequestModel, mqttRequestModel: $mqttRequestModel, websocketRequestModel: $websocketRequestModel, grpcRequestModel: $grpcRequestModel, httpResponseModel: $httpResponseModel, preRequestScript: $preRequestScript, postRequestScript: $postRequestScript, authModel: $authModel)';
 }
 
 
@@ -315,11 +357,11 @@ abstract mixin class _$HistoryRequestModelCopyWith<$Res> implements $HistoryRequ
   factory _$HistoryRequestModelCopyWith(_HistoryRequestModel value, $Res Function(_HistoryRequestModel) _then) = __$HistoryRequestModelCopyWithImpl;
 @override @useResult
 $Res call({
- String historyId, HistoryMetaModel metaData, HttpRequestModel? httpRequestModel, AIRequestModel? aiRequestModel, HttpResponseModel httpResponseModel, String? preRequestScript, String? postRequestScript, AuthModel? authModel
+ String historyId, HistoryMetaModel metaData, HttpRequestModel? httpRequestModel, AIRequestModel? aiRequestModel, MQTTRequestModel? mqttRequestModel, WebSocketRequestModel? websocketRequestModel, GrpcRequestModel? grpcRequestModel, HttpResponseModel httpResponseModel, String? preRequestScript, String? postRequestScript, AuthModel? authModel
 });
 
 
-@override $HistoryMetaModelCopyWith<$Res> get metaData;@override $HttpRequestModelCopyWith<$Res>? get httpRequestModel;@override $AIRequestModelCopyWith<$Res>? get aiRequestModel;@override $HttpResponseModelCopyWith<$Res> get httpResponseModel;@override $AuthModelCopyWith<$Res>? get authModel;
+@override $HistoryMetaModelCopyWith<$Res> get metaData;@override $HttpRequestModelCopyWith<$Res>? get httpRequestModel;@override $AIRequestModelCopyWith<$Res>? get aiRequestModel;@override $MQTTRequestModelCopyWith<$Res>? get mqttRequestModel;@override $WebSocketRequestModelCopyWith<$Res>? get websocketRequestModel;@override $GrpcRequestModelCopyWith<$Res>? get grpcRequestModel;@override $HttpResponseModelCopyWith<$Res> get httpResponseModel;@override $AuthModelCopyWith<$Res>? get authModel;
 
 }
 /// @nodoc
@@ -332,13 +374,16 @@ class __$HistoryRequestModelCopyWithImpl<$Res>
 
 /// Create a copy of HistoryRequestModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? historyId = null,Object? metaData = null,Object? httpRequestModel = freezed,Object? aiRequestModel = freezed,Object? httpResponseModel = null,Object? preRequestScript = freezed,Object? postRequestScript = freezed,Object? authModel = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? historyId = null,Object? metaData = null,Object? httpRequestModel = freezed,Object? aiRequestModel = freezed,Object? mqttRequestModel = freezed,Object? websocketRequestModel = freezed,Object? grpcRequestModel = freezed,Object? httpResponseModel = null,Object? preRequestScript = freezed,Object? postRequestScript = freezed,Object? authModel = freezed,}) {
   return _then(_HistoryRequestModel(
 historyId: null == historyId ? _self.historyId : historyId // ignore: cast_nullable_to_non_nullable
 as String,metaData: null == metaData ? _self.metaData : metaData // ignore: cast_nullable_to_non_nullable
 as HistoryMetaModel,httpRequestModel: freezed == httpRequestModel ? _self.httpRequestModel : httpRequestModel // ignore: cast_nullable_to_non_nullable
 as HttpRequestModel?,aiRequestModel: freezed == aiRequestModel ? _self.aiRequestModel : aiRequestModel // ignore: cast_nullable_to_non_nullable
-as AIRequestModel?,httpResponseModel: null == httpResponseModel ? _self.httpResponseModel : httpResponseModel // ignore: cast_nullable_to_non_nullable
+as AIRequestModel?,mqttRequestModel: freezed == mqttRequestModel ? _self.mqttRequestModel : mqttRequestModel // ignore: cast_nullable_to_non_nullable
+as MQTTRequestModel?,websocketRequestModel: freezed == websocketRequestModel ? _self.websocketRequestModel : websocketRequestModel // ignore: cast_nullable_to_non_nullable
+as WebSocketRequestModel?,grpcRequestModel: freezed == grpcRequestModel ? _self.grpcRequestModel : grpcRequestModel // ignore: cast_nullable_to_non_nullable
+as GrpcRequestModel?,httpResponseModel: null == httpResponseModel ? _self.httpResponseModel : httpResponseModel // ignore: cast_nullable_to_non_nullable
 as HttpResponseModel,preRequestScript: freezed == preRequestScript ? _self.preRequestScript : preRequestScript // ignore: cast_nullable_to_non_nullable
 as String?,postRequestScript: freezed == postRequestScript ? _self.postRequestScript : postRequestScript // ignore: cast_nullable_to_non_nullable
 as String?,authModel: freezed == authModel ? _self.authModel : authModel // ignore: cast_nullable_to_non_nullable
@@ -378,6 +423,42 @@ $AIRequestModelCopyWith<$Res>? get aiRequestModel {
 
   return $AIRequestModelCopyWith<$Res>(_self.aiRequestModel!, (value) {
     return _then(_self.copyWith(aiRequestModel: value));
+  });
+}/// Create a copy of HistoryRequestModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MQTTRequestModelCopyWith<$Res>? get mqttRequestModel {
+    if (_self.mqttRequestModel == null) {
+    return null;
+  }
+
+  return $MQTTRequestModelCopyWith<$Res>(_self.mqttRequestModel!, (value) {
+    return _then(_self.copyWith(mqttRequestModel: value));
+  });
+}/// Create a copy of HistoryRequestModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WebSocketRequestModelCopyWith<$Res>? get websocketRequestModel {
+    if (_self.websocketRequestModel == null) {
+    return null;
+  }
+
+  return $WebSocketRequestModelCopyWith<$Res>(_self.websocketRequestModel!, (value) {
+    return _then(_self.copyWith(websocketRequestModel: value));
+  });
+}/// Create a copy of HistoryRequestModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$GrpcRequestModelCopyWith<$Res>? get grpcRequestModel {
+    if (_self.grpcRequestModel == null) {
+    return null;
+  }
+
+  return $GrpcRequestModelCopyWith<$Res>(_self.grpcRequestModel!, (value) {
+    return _then(_self.copyWith(grpcRequestModel: value));
   });
 }/// Create a copy of HistoryRequestModel
 /// with the given fields replaced by the non-null parameter values.

@@ -59,11 +59,9 @@ class _EditWebSocketMessagesPaneState
             child: Container(
               padding: kP8,
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark 
-                    ? Colors.blue.withOpacity(0.1) 
-                    : Colors.blue.shade50,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: kBorderRadius8,
-                border: Border.all(color: Colors.blue.shade200),
+                border: Border.all(color: Theme.of(context).colorScheme.surfaceContainerHighest),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

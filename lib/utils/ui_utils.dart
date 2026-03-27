@@ -39,6 +39,7 @@ Color getAPIColor(
     APIType.ai => Colors.amber,
     APIType.mqtt => const Color(0xFF8B5CF6), // purple for MQTT
     APIType.websocket => const Color(0xFF0891B2), // cyan-700 for WebSocket
+    APIType.grpc => const Color(0xFF14B8A6), // teal for gRPC
   };
   if (brightness == Brightness.dark) {
     col = col.toDark;

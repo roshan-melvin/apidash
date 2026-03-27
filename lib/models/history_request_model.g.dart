@@ -22,6 +22,21 @@ _HistoryRequestModel _$HistoryRequestModelFromJson(Map json) =>
           : AIRequestModel.fromJson(
               Map<String, Object?>.from(json['aiRequestModel'] as Map),
             ),
+      mqttRequestModel: json['mqttRequestModel'] == null
+          ? null
+          : MQTTRequestModel.fromJson(
+              Map<String, Object?>.from(json['mqttRequestModel'] as Map),
+            ),
+      websocketRequestModel: json['websocketRequestModel'] == null
+          ? null
+          : WebSocketRequestModel.fromJson(
+              Map<String, dynamic>.from(json['websocketRequestModel'] as Map),
+            ),
+      grpcRequestModel: json['grpcRequestModel'] == null
+          ? null
+          : GrpcRequestModel.fromJson(
+              Map<String, dynamic>.from(json['grpcRequestModel'] as Map),
+            ),
       httpResponseModel: HttpResponseModel.fromJson(
         Map<String, Object?>.from(json['httpResponseModel'] as Map),
       ),
@@ -41,6 +56,9 @@ Map<String, dynamic> _$HistoryRequestModelToJson(
   'metaData': instance.metaData.toJson(),
   'httpRequestModel': instance.httpRequestModel?.toJson(),
   'aiRequestModel': instance.aiRequestModel?.toJson(),
+  'mqttRequestModel': instance.mqttRequestModel?.toJson(),
+  'websocketRequestModel': instance.websocketRequestModel?.toJson(),
+  'grpcRequestModel': instance.grpcRequestModel?.toJson(),
   'httpResponseModel': instance.httpResponseModel.toJson(),
   'preRequestScript': instance.preRequestScript,
   'postRequestScript': instance.postRequestScript,

@@ -16,7 +16,8 @@ class RequestEditor extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final apiType = ref.watch(
-        selectedRequestModelProvider.select((value) => value?.apiType));
+      selectedRequestModelProvider.select((value) => value?.apiType),
+    );
 
     return context.isMediumWindow
         ? const Padding(
@@ -24,11 +25,7 @@ class RequestEditor extends ConsumerWidget {
             child: Column(
               children: [
                 kVSpacer20,
-                Expanded(
-                  child: EditRequestPane(
-                    showViewCodeButton: false,
-                  ),
-                ),
+                Expanded(child: EditRequestPane(showViewCodeButton: false)),
               ],
             ),
           )
@@ -37,11 +34,9 @@ class RequestEditor extends ConsumerWidget {
             child: Column(
               children: [
                 const RequestEditorTopBar(),
-                if (apiType != APIType.mqtt) const EditorPaneRequestURLCard(),
-                if (apiType != APIType.mqtt) kVSpacer10,
-                const Expanded(
-                  child: EditorPaneRequestDetailsCard(),
-                ),
+                const EditorPaneRequestURLCard(),
+                kVSpacer10,
+                const Expanded(child: EditorPaneRequestDetailsCard()),
               ],
             ),
           );

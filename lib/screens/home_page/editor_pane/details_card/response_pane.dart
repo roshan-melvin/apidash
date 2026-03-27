@@ -7,6 +7,7 @@ import 'package:apidash/consts.dart';
 
 import 'package:apidash/widgets/mqtt/mqtt_response_pane.dart';
 import 'package:apidash/widgets/websocket/websocket_response_pane.dart';
+import 'package:apidash/widgets/grpc_response_pane.dart';
 
 class ResponsePane extends ConsumerWidget {
   const ResponsePane({super.key});
@@ -21,6 +22,9 @@ class ResponsePane extends ConsumerWidget {
     }
     if (apiType == APIType.websocket) {
       return const WebSocketResponsePane();
+    }
+    if (apiType == APIType.grpc) {
+      return const GrpcResponsePane();
     }
 
     final isWorking = ref.watch(

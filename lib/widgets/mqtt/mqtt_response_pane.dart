@@ -1,3 +1,4 @@
+import 'package:data_table_2/data_table_2.dart';
 import 'package:apidash_design_system/apidash_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,8 +14,7 @@ class MQTTResponsePane extends ConsumerStatefulWidget {
   const MQTTResponsePane({super.key});
 
   @override
-  ConsumerState<MQTTResponsePane> createState() =>
-      _MQTTResponsePaneState();
+  ConsumerState<MQTTResponsePane> createState() => _MQTTResponsePaneState();
 }
 
 class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
@@ -40,8 +40,7 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
     ref.watch(mqttStateSyncProvider);
     final messages = ref.watch(mqttMessagesProvider);
     final events = ref.watch(mqttEventLogProvider);
-    final connState =
-        ref.watch(mqttConnectionStateProvider).value;
+    final connState = ref.watch(mqttConnectionStateProvider).value;
     final isConnected = connState?.isConnected ?? false;
 
     final inCount = messages.where((m) => m.isIncoming).length;
@@ -50,9 +49,7 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
     // Filter messages by topic if a filter is set
     final filtered = _filterTopic.isEmpty
         ? messages
-        : messages
-            .where((m) => m.topic.contains(_filterTopic))
-            .toList();
+        : messages.where((m) => m.topic.contains(_filterTopic)).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,8 +71,7 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
                 children: [
                   const Text('Messages'),
                   kHSpacer8,
-                  if (messages.isNotEmpty)
-                    _Badge(count: messages.length),
+                  if (messages.isNotEmpty) _Badge(count: messages.length),
                 ],
               ),
             ),
@@ -85,8 +81,7 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
                 children: [
                   const Text('Events'),
                   kHSpacer8,
-                  if (events.isNotEmpty)
-                    _Badge(count: events.length),
+                  if (events.isNotEmpty) _Badge(count: events.length),
                 ],
               ),
             ),
@@ -102,15 +97,17 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
                     decoration: InputDecoration(
                       isDense: true,
                       hintText: 'Filter by topic…',
-                      prefixIcon:
-                          const Icon(Icons.filter_list_rounded, size: 18),
-                      border: OutlineInputBorder(
-                          borderRadius: kBorderRadius8),
+                      prefixIcon: const Icon(
+                        Icons.filter_list_rounded,
+                        size: 18,
+                      ),
+                      border: OutlineInputBorder(borderRadius: kBorderRadius8),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 6),
+                        horizontal: 8,
+                        vertical: 6,
+                      ),
                     ),
-                    onChanged: (v) =>
-                        setState(() => _filterTopic = v),
+                    onChanged: (v) => setState(() => _filterTopic = v),
                   ),
                 )
               : const SizedBox.shrink(),
@@ -153,54 +150,82 @@ class _StatusBar extends StatelessWidget {
   const _StatusBar({
     required this.isConnected,
     this.error,
-    this.inCount = 0,
-    this.outCount = 0,
+    required this.inCount,
+    required this.outCount,
   });
 
   @override
   Widget build(BuildContext context) {
-    final clr = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      color: isConnected
-          ? const Color(0xFF8B5CF6).withOpacity(0.08)
-          : clr.surfaceContainerHighest.withOpacity(0.4),
-      child: Row(
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isConnected ? Colors.greenAccent : clr.outline,
-            ),
-          ),
-          kHSpacer8,
-          Expanded(
-            child: Tooltip(
-              message: isConnected ? 'Connected' : (error ?? 'Disconnected'),
+    final clrScheme = Theme.of(context).colorScheme;
+
+    if (error != null) {
+      return Container(
+        color: clrScheme.errorContainer,
+        width: double.infinity,
+        padding: kP8,
+        child: Row(
+          children: [
+            Icon(Icons.error, color: clrScheme.error, size: 18),
+            kHSpacer8,
+            Expanded(
               child: Text(
-                isConnected ? 'Connected' : (error ?? 'Disconnected'),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: isConnected
-                      ? Colors.greenAccent
-                      : (error != null ? clr.error : clr.outline),
+                error!,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: clrScheme.onErrorContainer,
                 ),
-                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      padding: kP8,
+      decoration: BoxDecoration(
+        color: clrScheme.surfaceContainerHighest.withAlpha(50),
+        border: Border(bottom: BorderSide(color: clrScheme.outlineVariant)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isConnected ? Colors.green : Colors.grey,
+                ),
+              ),
+              kHSpacer8,
+              Text(
+                isConnected ? 'Connected' : 'Disconnected',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          Flexible(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.arrow_downward,
+                    size: 14,
+                    color: clrScheme.primary,
+                  ),
+                  kHSpacer4,
+                  Text('Rx: $inCount'),
+                  const SizedBox(width: 16),
+                  Icon(Icons.arrow_upward, size: 14, color: clrScheme.primary),
+                  kHSpacer4,
+                  Text('Tx: $outCount'),
+                ],
               ),
             ),
           ),
-          if (isConnected) ...[
-            const Icon(Icons.download_rounded, size: 14, color: Color(0xFF8B5CF6)),
-            kHSpacer4,
-            Text('Rx: $inCount', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-            kHSpacer10,
-            const Icon(Icons.upload_rounded, size: 14, color: Colors.cyanAccent),
-            kHSpacer4,
-            Text('Tx: $outCount', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-          ]
         ],
       ),
     );
@@ -216,15 +241,16 @@ class _MessageList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Show newest first
+    if (messages.isEmpty) return const Center(child: Text('No messages yet.'));
+
     final reversed = messages.reversed.toList();
     return ListView.separated(
-      padding: kPh8v4,
+      padding: kP12,
       itemCount: reversed.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
-      itemBuilder: (context, i) {
-        final msg = reversed[i];
-        return _MessageTile(message: msg);
+      separatorBuilder: (_, __) => kVSpacer8,
+      itemBuilder: (ctx, idx) {
+        final m = reversed[idx];
+        return _MessageTile(message: m);
       },
     );
   }
@@ -238,34 +264,44 @@ class _MessageTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clr = Theme.of(context).colorScheme;
-    final isIn = message.isIncoming;
+    final bg = message.isIncoming
+        ? clr.secondaryContainer.withAlpha(150)
+        : clr.primaryContainer.withAlpha(150);
+    final borderClr = message.isIncoming ? clr.secondary : clr.primary;
+    final icon = message.isIncoming ? Icons.arrow_downward : Icons.arrow_upward;
+    final label = message.isIncoming ? 'IN' : 'OUT';
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+    return Container(
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: kBorderRadius8,
+        border: Border.all(color: borderClr.withAlpha(50)),
+      ),
+      padding: kP8,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Topic + direction badge + time
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 decoration: BoxDecoration(
-                  color: isIn
-                      ? const Color(0xFF8B5CF6).withOpacity(0.15)
-                      : clr.primaryContainer,
+                  color: borderClr.withAlpha(200),
                   borderRadius: kBorderRadius4,
                 ),
-                child: Text(
-                  isIn ? '↓ IN' : '↑ OUT',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: isIn
-                        ? const Color(0xFF8B5CF6)
-                        : clr.onPrimaryContainer,
-                  ),
+                child: Row(
+                  children: [
+                    Icon(icon, size: 10, color: clr.onPrimary),
+                    kHSpacer4,
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: clr.onPrimary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               kHSpacer8,
@@ -273,31 +309,23 @@ class _MessageTile extends StatelessWidget {
                 child: Text(
                   message.topic,
                   style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 13),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const Spacer(),
               Text(
                 _timeFmt.format(message.timestamp),
-                style:
-                    TextStyle(fontSize: 11, color: clr.outline),
+                style: TextStyle(fontSize: 10, color: clr.outline),
               ),
             ],
           ),
-          kVSpacer4,
-          // Payload
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: clr.surfaceContainerHighest.withOpacity(0.5),
-              borderRadius: kBorderRadius8,
-            ),
-            child: SelectableText(
-              message.payload.isEmpty ? '(empty)' : message.payload,
-              style: const TextStyle(
-                  fontSize: 12, fontFamily: 'monospace'),
-            ),
+          kVSpacer8,
+          SelectableText(
+            message.payload.isEmpty ? '(empty)' : message.payload,
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
           ),
         ],
       ),
@@ -314,80 +342,61 @@ class _EventList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reversed = events.reversed.toList();
-    return ListView.builder(
-      padding: kPh8v4,
-      itemCount: reversed.length,
-      itemBuilder: (context, i) {
-        final e = reversed[i];
-        return _EventTile(event: e);
-      },
-    );
-  }
-}
+    if (events.isEmpty) return const Center(child: Text('No events.'));
 
-class _EventTile extends StatelessWidget {
-  final MQTTEvent event;
-  const _EventTile({required this.event});
-
-  static const _typeColors = {
-    MQTTEventType.connect: Colors.greenAccent,
-    MQTTEventType.disconnect: Colors.redAccent,
-    MQTTEventType.subscribe: Colors.blueAccent,
-    MQTTEventType.unsubscribe: Colors.grey,
-    MQTTEventType.send: Colors.cyanAccent,
-    MQTTEventType.receive: Color(0xFF8B5CF6),
-    MQTTEventType.error: Colors.redAccent,
-  };
-
-  static const _typeIcons = {
-    MQTTEventType.connect: Icons.link_rounded,
-    MQTTEventType.disconnect: Icons.link_off_rounded,
-    MQTTEventType.subscribe: Icons.bookmark_add_rounded,
-    MQTTEventType.unsubscribe: Icons.bookmark_remove_rounded,
-    MQTTEventType.send: Icons.upload_rounded,
-    MQTTEventType.receive: Icons.download_rounded,
-    MQTTEventType.error: Icons.error_outline_rounded,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    final col = _typeColors[event.type] ?? Colors.grey;
-    final icon = _typeIcons[event.type] ?? Icons.circle;
     final clr = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 16, color: col),
-          kHSpacer8,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  event.description,
-                  style: const TextStyle(fontSize: 12),
+    return DataTable2(
+      columnSpacing: 12,
+      horizontalMargin: 12,
+      headingRowHeight: 0,
+      columns: const [
+        DataColumn2(label: Text(''), fixedWidth: 100),
+        DataColumn2(label: Text(''), fixedWidth: 100),
+        DataColumn2(label: Text('')),
+      ],
+      rows: events.reversed.map((e) {
+        return DataRow(
+          cells: [
+            DataCell(
+              Text(
+                _timeFmt.format(e.timestamp),
+                style: TextStyle(color: clr.outline, fontSize: 12),
+              ),
+            ),
+            DataCell(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: clr.surfaceContainerHighest,
+                  borderRadius: kBorderRadius4,
                 ),
-                if (event.topic != null)
-                  Text(
-                    event.topic!,
-                    style: TextStyle(
+                child: Text(
+                  e.type.name.toUpperCase(),
+                  style: const TextStyle(fontSize: 10),
+                ),
+              ),
+            ),
+            DataCell(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(e.description, style: const TextStyle(fontSize: 12)),
+                  if (e.topic != null)
+                    Text(
+                      e.topic!,
+                      style: TextStyle(
                         fontSize: 11,
                         color: clr.outline,
-                        fontStyle: FontStyle.italic),
-                  ),
-              ],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          Text(
-            _timeFmt.format(event.timestamp),
-            style: TextStyle(fontSize: 10, color: clr.outline),
-          ),
-        ],
-      ),
+          ],
+        );
+      }).toList(),
     );
   }
 }
@@ -403,13 +412,12 @@ class _Badge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
       decoration: BoxDecoration(
-        color: const Color(0xFF8B5CF6),
+        color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         count > 99 ? '99+' : '$count',
-        style:
-            const TextStyle(color: Colors.white, fontSize: 10),
+        style: const TextStyle(color: Colors.white, fontSize: 10),
       ),
     );
   }
@@ -427,12 +435,12 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 40,
-              color: Theme.of(context).colorScheme.outline),
+          Icon(icon, size: 40, color: Theme.of(context).colorScheme.outline),
           kVSpacer8,
-          Text(label,
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.outline)),
+          Text(
+            label,
+            style: TextStyle(color: Theme.of(context).colorScheme.outline),
+          ),
         ],
       ),
     );

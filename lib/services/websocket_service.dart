@@ -47,6 +47,7 @@ class WebSocketConnectionState {
   final bool isConnected;
   final bool isConnecting;
   final String? error;
+  final String? connectedUrl;
   final List<WebSocketMessage> messages;
   final List<WebSocketEvent> eventLog;
 
@@ -54,6 +55,7 @@ class WebSocketConnectionState {
     this.isConnected = false,
     this.isConnecting = false,
     this.error,
+    this.connectedUrl,
     this.messages = const [],
     this.eventLog = const [],
   });
@@ -62,13 +64,17 @@ class WebSocketConnectionState {
     bool? isConnected,
     bool? isConnecting,
     String? error,
+    bool clearError = false,
+    String? connectedUrl,
+    bool clearUrl = false,
     List<WebSocketMessage>? messages,
     List<WebSocketEvent>? eventLog,
   }) {
     return WebSocketConnectionState(
       isConnected: isConnected ?? this.isConnected,
       isConnecting: isConnecting ?? this.isConnecting,
-      error: error ?? this.error,
+      error: clearError ? null : (error ?? this.error),
+      connectedUrl: clearUrl ? null : (connectedUrl ?? this.connectedUrl),
       messages: messages ?? this.messages,
       eventLog: eventLog ?? this.eventLog,
     );
@@ -103,7 +109,8 @@ class WebSocketService {
     _pushState(_state.copyWith(
       isConnecting: true,
       isConnected: false,
-      error: null,
+      clearError: true,
+      clearUrl: true,
       messages: [],
       eventLog: [],
     ));
@@ -124,7 +131,7 @@ class WebSocketService {
       // Wait for at least ready state or first event
       await _channel!.ready;
       
-      _pushState(_state.copyWith(isConnected: true, isConnecting: false));
+      _pushState(_state.copyWith(isConnected: true, isConnecting: false, connectedUrl: request.url));
       _addEvent(WebSocketEvent(
         timestamp: DateTime.now(),
         type: WebSocketEventType.connect,
@@ -190,7 +197,7 @@ class WebSocketService {
       _addEvent(WebSocketEvent(
         timestamp: DateTime.now(),
         type: isText ? WebSocketEventType.sendText : WebSocketEventType.sendBinary,
-        description: 'Sent ${isText ? "text" : "binary"} message',
+        description: 'Sent ${isText ? "text" : "binary"} message (${payload.toString().length} bytes)',
       ));
     } else {
       _pushState(_state.copyWith(error: 'Cannot send message. Not connected to socket.'));
@@ -204,8 +211,16 @@ class WebSocketService {
         type: WebSocketEventType.disconnect,
         description: 'Disconnected by user.',
       ));
-      await _channel!.sink.close(1000, 'Normal Closure');
-      await _subscription?.cancel();
+      try {
+        await _channel!.sink.close(1000, 'Normal Closure');
+      } catch (e) {
+        _log.w("[WS] Error closing channel: $e");
+      }
+      try {
+        await _subscription?.cancel();
+      } catch (e) {
+        _log.w("[WS] Error canceling subscription: $e");
+      }
       _channel = null;
       _subscription = null;
       _pushState(_state.copyWith(isConnected: false, isConnecting: false, messages: [], eventLog: []));
