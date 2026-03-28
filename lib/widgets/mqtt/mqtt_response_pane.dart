@@ -19,18 +19,33 @@ class MQTTResponsePane extends ConsumerStatefulWidget {
 
 class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
     with SingleTickerProviderStateMixin {
+  int _filterTypeIndex = 0; // 0: All, 1: Sent, 2: Received
+  int _filterEventIndex = 0; // 0: All, 1: Error, 2: No Error
+  late final TextEditingController _topicFilterCtrl;
+
   late final TabController _tabCtrl;
   String _filterTopic = '';
+  String _filterEvent = '';
+  late final TextEditingController _eventFilterCtrl;
 
   @override
   void initState() {
     super.initState();
+    _topicFilterCtrl = TextEditingController(text: _filterTopic);
+    _eventFilterCtrl = TextEditingController(text: _filterEvent);
+
     _tabCtrl = TabController(length: 2, vsync: this);
+    _tabCtrl.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _tabCtrl.dispose();
+    _topicFilterCtrl.dispose();
+    _eventFilterCtrl.dispose();
+
     super.dispose();
   }
 
@@ -46,10 +61,39 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
     final inCount = messages.where((m) => m.isIncoming).length;
     final outCount = messages.where((m) => !m.isIncoming).length;
 
+    // Filter messages by type (All, Sent, Received)
+    var typeFiltered = messages;
+    if (_filterTypeIndex == 1) {
+      typeFiltered = messages.where((m) => !m.isIncoming).toList();
+    } else if (_filterTypeIndex == 2) {
+      typeFiltered = messages.where((m) => m.isIncoming).toList();
+    }
+
     // Filter messages by topic if a filter is set
     final filtered = _filterTopic.isEmpty
-        ? messages
-        : messages.where((m) => m.topic.contains(_filterTopic)).toList();
+        ? typeFiltered
+        : typeFiltered.where((m) => m.topic.contains(_filterTopic)).toList();
+
+    var typeFilteredEvents = events;
+    if (_filterEventIndex == 1) {
+      typeFilteredEvents = events
+          .where((e) => e.type == MQTTEventType.error)
+          .toList();
+    } else if (_filterEventIndex == 2) {
+      typeFilteredEvents = events
+          .where((e) => e.type != MQTTEventType.error)
+          .toList();
+    }
+
+    final filteredEvents = _filterEvent.isEmpty
+        ? typeFilteredEvents
+        : typeFilteredEvents
+              .where(
+                (e) => e.description.toLowerCase().contains(
+                  _filterEvent.toLowerCase(),
+                ),
+              )
+              .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,29 +132,132 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
           ],
         ),
         // ── Topic filter (Messages tab only) ────────────────────────────
-        AnimatedBuilder(
-          animation: _tabCtrl,
-          builder: (_, __) => _tabCtrl.index == 0
-              ? Padding(
-                  padding: kPh8v4,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      isDense: true,
-                      hintText: 'Filter by topic…',
-                      prefixIcon: const Icon(
-                        Icons.filter_list_rounded,
-                        size: 18,
-                      ),
-                      border: OutlineInputBorder(borderRadius: kBorderRadius8),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6,
+        IndexedStack(
+          index: _tabCtrl.index,
+          children: [
+            Padding(
+              padding: kPh8v4,
+              child: Row(
+                children: [
+                  ADDropdownButton<int>(
+                    value: _filterTypeIndex,
+                    onChanged: (int? value) {
+                      if (value != null) {
+                        setState(() {
+                          _filterTypeIndex = value;
+                        });
+                      }
+                    },
+                    values: const [(0, 'All'), (1, 'Sent'), (2, 'Received')],
+                  ),
+                  kHSpacer8,
+                  Expanded(
+                    child: TextField(
+                      controller: _topicFilterCtrl,
+                      onChanged: (v) => setState(() => _filterTopic = v),
+
+                      decoration: InputDecoration(
+                        isDense: true,
+                        hintText: 'Filter by topic...',
+                        prefixIcon: const Icon(Icons.search, size: 16),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        filled: true,
+                        fillColor:
+                            Theme.of(context).brightness == Brightness.light
+                            ? Colors.white
+                            : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        suffixIcon: _topicFilterCtrl.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 16),
+                                onPressed: () {
+                                  _topicFilterCtrl.clear();
+                                  setState(() => _filterTopic = '');
+                                },
+                              )
+                            : null,
                       ),
                     ),
-                    onChanged: (v) => setState(() => _filterTopic = v),
                   ),
-                )
-              : const SizedBox.shrink(),
+                ],
+              ),
+            ),
+            Padding(
+              padding: kPh8v4,
+              child: Row(
+                children: [
+                  ADDropdownButton<int>(
+                    value: _filterEventIndex,
+                    onChanged: (int? value) {
+                      if (value != null) {
+                        setState(() {
+                          _filterEventIndex = value;
+                        });
+                      }
+                    },
+                    values: const [(0, 'All'), (1, 'Error'), (2, 'No Error')],
+                  ),
+                  kHSpacer8,
+                  Expanded(
+                    child: TextField(
+                      controller: _eventFilterCtrl,
+                      onChanged: (v) => setState(() => _filterEvent = v),
+
+                      decoration: InputDecoration(
+                        isDense: true,
+                        hintText: 'Filter events...',
+                        prefixIcon: const Icon(Icons.search, size: 16),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        filled: true,
+                        fillColor:
+                            Theme.of(context).brightness == Brightness.light
+                            ? Colors.white
+                            : null,
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        suffixIcon: _eventFilterCtrl.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 16),
+                                onPressed: () {
+                                  _eventFilterCtrl.clear();
+                                  setState(() => _filterEvent = '');
+                                },
+                              )
+                            : null,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         // ── Tab content ─────────────────────────────────────────────────
         Expanded(
@@ -132,7 +279,7 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
                       icon: Icons.article_outlined,
                       label: 'No events yet',
                     )
-                  : _EventList(events: events),
+                  : _EventList(events: filteredEvents),
             ],
           ),
         ),
@@ -232,8 +379,7 @@ class _StatusBar extends StatelessWidget {
   }
 }
 
-// ── Message List ──────────────────────────────────────────────────────────────
-
+// ── Message List ─────────────────────────────────────────────────────────────
 class _MessageList extends StatelessWidget {
   final List<MQTTMessage> messages;
 
@@ -247,7 +393,7 @@ class _MessageList extends StatelessWidget {
     return ListView.separated(
       padding: kP12,
       itemCount: reversed.length,
-      separatorBuilder: (_, __) => kVSpacer8,
+      separatorBuilder: (_, _) => kVSpacer8,
       itemBuilder: (ctx, idx) {
         final m = reversed[idx];
         return _MessageTile(message: m);
@@ -271,70 +417,83 @@ class _MessageTile extends StatelessWidget {
     final icon = message.isIncoming ? Icons.arrow_downward : Icons.arrow_upward;
     final label = message.isIncoming ? 'IN' : 'OUT';
 
-    return Container(
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: kBorderRadius8,
-        border: Border.all(color: borderClr.withAlpha(50)),
-      ),
-      padding: kP8,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: borderClr.withAlpha(200),
-                  borderRadius: kBorderRadius4,
-                ),
-                child: Row(
-                  children: [
-                    Icon(icon, size: 10, color: clr.onPrimary),
-                    kHSpacer4,
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: clr.onPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              kHSpacer8,
-              Expanded(
-                child: Text(
-                  message.topic,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
+    return FractionallySizedBox(
+      alignment: message.isIncoming
+          ? Alignment.centerLeft
+          : Alignment.centerRight,
+      widthFactor: 0.85,
+      child: Container(
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(12),
+            topRight: const Radius.circular(12),
+            bottomLeft: Radius.circular(message.isIncoming ? 2 : 12),
+            bottomRight: Radius.circular(message.isIncoming ? 12 : 2),
+          ),
+          border: Border.all(color: borderClr.withAlpha(50)),
+        ),
+        padding: kP8,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
                   ),
-                  overflow: TextOverflow.ellipsis,
+                  decoration: BoxDecoration(
+                    color: borderClr.withAlpha(200),
+                    borderRadius: kBorderRadius4,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(icon, size: 10, color: clr.onPrimary),
+                      kHSpacer4,
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: clr.onPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const Spacer(),
-              Text(
-                _timeFmt.format(message.timestamp),
-                style: TextStyle(fontSize: 10, color: clr.outline),
-              ),
-            ],
-          ),
-          kVSpacer8,
-          SelectableText(
-            message.payload.isEmpty ? '(empty)' : message.payload,
-            style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-          ),
-        ],
+                kHSpacer8,
+                Expanded(
+                  child: Text(
+                    message.topic,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  _timeFmt.format(message.timestamp),
+                  style: TextStyle(fontSize: 10, color: clr.outline),
+                ),
+              ],
+            ),
+            kVSpacer8,
+            SelectableText(
+              message.payload.isEmpty ? '(empty)' : message.payload,
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-// ── Event Log ─────────────────────────────────────────────────────────────────
-
+// ── Event Log ────────────────────────────────────────────────────────────────
 class _EventList extends StatelessWidget {
   final List<MQTTEvent> events;
 
@@ -367,12 +526,25 @@ class _EventList extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: clr.surfaceContainerHighest,
+                  color:
+                      (e.type == MQTTEventType.error ||
+                          e.type == MQTTEventType.disconnect ||
+                          e.type == MQTTEventType.unsubscribe)
+                      ? clr.errorContainer
+                      : Colors.green.withAlpha(50),
                   borderRadius: kBorderRadius4,
                 ),
                 child: Text(
                   e.type.name.toUpperCase(),
-                  style: const TextStyle(fontSize: 10),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color:
+                        (e.type == MQTTEventType.error ||
+                            e.type == MQTTEventType.disconnect ||
+                            e.type == MQTTEventType.unsubscribe)
+                        ? clr.onErrorContainer
+                        : Colors.green,
+                  ),
                 ),
               ),
             ),
@@ -401,8 +573,7 @@ class _EventList extends StatelessWidget {
   }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
+// ── Helpers ──────────────────────────────────────────────────────────────────
 class _Badge extends StatelessWidget {
   final int count;
   const _Badge({required this.count});

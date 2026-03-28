@@ -2,6 +2,8 @@ import 'package:apidash_design_system/apidash_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apidash/providers/providers.dart';
+import 'package:apidash/consts.dart';
+import 'package:apidash/widgets/widgets.dart';
 
 class EditWebSocketMessagesPane extends ConsumerStatefulWidget {
   const EditWebSocketMessagesPane({super.key});
@@ -13,30 +15,33 @@ class EditWebSocketMessagesPane extends ConsumerStatefulWidget {
 
 class _EditWebSocketMessagesPaneState
     extends ConsumerState<EditWebSocketMessagesPane> {
-  late final TextEditingController _msgCtrl;
+  String _msg = '';
+  String _contentType = 'text';
+  int _clearCounter = 0;
 
   @override
   void initState() {
     super.initState();
-    _msgCtrl = TextEditingController(text: '');
   }
 
   @override
   void dispose() {
-    _msgCtrl.dispose();
     super.dispose();
   }
 
   void _send() {
-    if (_msgCtrl.text.isEmpty) return;
+    if (_msg.isEmpty) return;
 
     final connState = ref.read(webSocketStateProvider).value;
     final isConnected = connState?.isConnected ?? false;
 
     if (isConnected) {
-      ref.read(webSocketServiceProvider).sendMessage(_msgCtrl.text);
+      ref.read(webSocketServiceProvider).sendMessage(_msg);
       ref.read(collectionStateNotifierProvider.notifier).unsave();
-      _msgCtrl.clear();
+      setState(() {
+        _msg = '';
+        _clearCounter++;
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Connect before sending messages")),
@@ -54,73 +59,57 @@ class _EditWebSocketMessagesPaneState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Send Message Section
+          SizedBox(
+            height: kHeaderHeight,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(kLabelSelectContentType),
+                kHSpacer8,
+                ADDropdownButton<String>(
+                  value: _contentType,
+                  values: const [('text', 'Text'), ('json', 'JSON')],
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(() {
+                        _contentType = v;
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          kVSpacer8,
           Expanded(
-            child: Container(
-              padding: kP8,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: kBorderRadius8,
-                border: Border.all(color: Theme.of(context).colorScheme.surfaceContainerHighest),
+            child: _contentType == 'json'
+                ? JsonTextFieldEditor(
+                    key: ValueKey("ws-json-body-$_clearCounter"),
+                    fieldKey: "ws-json-body-editor",
+                    isDark: Theme.of(context).brightness == Brightness.dark,
+                    initialValue: _msg,
+                    onChanged: (String value) => _msg = value,
+                  )
+                : TextFieldEditor(
+                    key: ValueKey("ws-text-body-$_clearCounter"),
+                    fieldKey: "ws-text-body-editor",
+                    initialValue: _msg,
+                    onChanged: (String value) => _msg = value,
+                  ),
+          ),
+          kVSpacer8,
+          Align(
+            alignment: Alignment.centerRight,
+            child: FilledButton.icon(
+              onPressed: isConnected ? _send : null,
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: kBorderRadius8,
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.send, size: 18, color: Theme.of(context).colorScheme.primary),
-                      kHSpacer8,
-                      Text(
-                        'Send Message',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                      kHSpacer8,
-                      if (!isConnected)
-                        const Icon(Icons.info_outline, size: 16, color: Colors.orange),
-                      if (!isConnected)
-                        const Text(' (Connect first)',
-                            style: TextStyle(color: Colors.orange, fontSize: 12)),
-                    ],
-                  ),
-                  kVSpacer8,
-                  Expanded(
-                    child: TextField(
-                      controller: _msgCtrl,
-                      maxLines: null,
-                      expands: true,
-                      textAlignVertical: TextAlignVertical.top,
-                      enabled: isConnected,
-                      decoration: InputDecoration(
-                        hintText: isConnected
-                            ? 'Enter your message to server here...'
-                            : 'Connect to session to send messages',
-                        border: OutlineInputBorder(
-                          borderRadius: kBorderRadius8,
-                        ),
-                        isDense: true,
-                        contentPadding: kP8,
-                      ),
-                    ),
-                  ),
-                  kVSpacer8,
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: FilledButton.icon(
-                      onPressed: isConnected ? _send : null,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: kBorderRadius8,
-                        ),
-                      ),
-                      icon: const Icon(Icons.send, size: 16),
-                      label: const Text('Send'),
-                    ),
-                  ),
-                ],
-              ),
+              icon: const Icon(Icons.send, size: 16),
+              label: const Text('Send'),
             ),
           ),
         ],

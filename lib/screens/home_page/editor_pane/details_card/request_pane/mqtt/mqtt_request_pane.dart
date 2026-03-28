@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apidash/consts.dart';
 import 'package:apidash/providers/providers.dart';
 import 'package:apidash/models/mqtt_request_model.dart';
+import 'package:apidash/widgets/widgets.dart';
 
 class EditMQTTRequestPane extends ConsumerStatefulWidget {
   const EditMQTTRequestPane({super.key});
@@ -15,12 +16,14 @@ class EditMQTTRequestPane extends ConsumerStatefulWidget {
 }
 
 class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
-  // Text controllers for connection config fields
   late final TextEditingController _clientIdCtrl;
   late final TextEditingController _userCtrl;
   late final TextEditingController _passCtrl;
   late final TextEditingController _publishTopicCtrl;
   late final TextEditingController _publishPayloadCtrl;
+  late final TextEditingController _lastWillTopicCtrl;
+  late final TextEditingController _lastWillMessageCtrl;
+  String _publishContentType = 'json';
 
   @override
   void initState() {
@@ -31,6 +34,8 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
     _passCtrl = TextEditingController(text: m.password);
     _publishTopicCtrl = TextEditingController(text: m.publishTopic);
     _publishPayloadCtrl = TextEditingController(text: m.publishPayload);
+    _lastWillTopicCtrl = TextEditingController(text: m.lastWillTopic);
+    _lastWillMessageCtrl = TextEditingController(text: m.lastWillMessage);
   }
 
   @override
@@ -41,19 +46,18 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
       _passCtrl,
       _publishTopicCtrl,
       _publishPayloadCtrl,
+      _lastWillTopicCtrl,
+      _lastWillMessageCtrl,
     ]) {
       c.dispose();
     }
     super.dispose();
   }
 
-  // ── Helpers ──────────────────────────────────────────────────────────────────
-
   void _update(MQTTRequestModel Function(MQTTRequestModel) fn) {
     final updated = fn(ref.read(mqttRequestProvider));
     ref.read(mqttRequestProvider.notifier).state = updated;
 
-    // Also save to global persistent collection
     final selectedId = ref.read(selectedIdStateProvider);
     if (selectedId != null) {
       ref
@@ -98,7 +102,6 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
       if (index >= list.length) {
         final newTopic = updated.copyWith(subscribe: true);
         list.add(newTopic);
-        // also call subscribe since we toggle to true
         if (newTopic.topic.isNotEmpty) {
           ref.read(mqttServiceProvider).subscribe(newTopic.topic, newTopic.qos);
         }
@@ -106,7 +109,6 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
       }
       final old = list[index];
 
-      // If the subscription state toggled, or the topic string/QoS changed while subscribed
       if (old.subscribe != updated.subscribe ||
           (updated.subscribe &&
               (old.topic != updated.topic || old.qos != updated.qos))) {
@@ -123,8 +125,6 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
     });
   }
 
-  // ── Build ─────────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
     final connState = ref.watch(mqttConnectionStateProvider).value;
@@ -135,31 +135,42 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
     final clrScheme = Theme.of(context).colorScheme;
 
     final fieldDeco = InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      border: OutlineInputBorder(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      hintStyle: TextStyle(color: clrScheme.outlineVariant),
+      focusedBorder: OutlineInputBorder(
         borderRadius: kBorderRadius8,
         borderSide: BorderSide(color: clrScheme.outlineVariant),
       ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: kBorderRadius8,
+        borderSide: BorderSide(color: clrScheme.surfaceContainerHighest),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: kBorderRadius8,
+        borderSide: BorderSide(color: clrScheme.surfaceContainerHighest),
+      ),
+      filled: true,
+      fillColor: clrScheme.surfaceContainerLowest,
+      hoverColor: kColorTransparent,
       isDense: true,
     );
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Tabs ──────────────────────────────────────────────────────
           const TabBar(
             tabs: [
               Tab(text: 'Topics'),
               Tab(text: 'Publish'),
+              Tab(text: 'Last Will'),
               Tab(text: 'Config'),
             ],
           ),
           Expanded(
             child: TabBarView(
               children: [
-                // ── Topics Tab ───────────────────────────────────────────
                 _TopicsTab(
                   topics: topics,
                   isConnected: isConnected,
@@ -168,101 +179,190 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                   onUpdate: _updateTopic,
                   mqttService: ref.read(mqttServiceProvider),
                 ),
-                // ── Publish Tab ──────────────────────────────────────────
-                Padding(
-                  padding: kPh8v4,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Topic',
-                        style: Theme.of(context).textTheme.labelSmall,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: kHeaderHeight,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(kLabelSelectContentType),
+                          kHSpacer8,
+                          ADDropdownButton<String>(
+                            value: _publishContentType,
+                            values: const [('json', 'json'), ('text', 'text')],
+                            onChanged: (v) {
+                              if (v != null) {
+                                setState(() {
+                                  _publishContentType = v;
+                                });
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                      kVSpacer4,
-                      TextFormField(
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: 5.0,
+                        left: 10.0,
+                        right: 10.0,
+                      ),
+                      child: TextFormField(
                         controller: _publishTopicCtrl,
                         decoration: fieldDeco.copyWith(
-                          hintText: 'home/sensor/temp',
+                          hintText: 'Topic (e.g. apidash/tele)',
                         ),
                         onChanged: (v) =>
                             _update((m) => m.copyWith(publishTopic: v)),
                       ),
-                      kVSpacer8,
-                      Text(
-                        'Payload',
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                      kVSpacer4,
-                      Expanded(
-                        child: TextFormField(
-                          controller: _publishPayloadCtrl,
-                          maxLines: null,
-                          expands: true,
-                          textAlignVertical: TextAlignVertical.top,
-                          decoration: fieldDeco.copyWith(
-                            hintText: '{"value": 23.5}',
-                            contentPadding: kP8,
-                          ),
-                          onChanged: (v) =>
-                              _update((m) => m.copyWith(publishPayload: v)),
-                        ),
-                      ),
-                      kVSpacer8,
-                      Row(
-                        children: [
-                          Text(
-                            'QoS',
-                            style: Theme.of(context).textTheme.labelSmall,
-                          ),
-                          kHSpacer8,
-                          for (int q in [0, 1, 2])
-                            Padding(
-                              padding: const EdgeInsets.only(right: 4),
-                              child: ChoiceChip(
-                                label: Text('$q'),
-                                selected: model.publishQos == q,
-                                onSelected: (_) =>
-                                    _update((m) => m.copyWith(publishQos: q)),
-                              ),
-                            ),
-                          const Spacer(),
-                          Row(
-                            children: [
-                              const Text('Retain'),
-                              Switch(
-                                value: model.publishRetain,
-                                onChanged: (v) => _update(
-                                  (m) => m.copyWith(publishRetain: v),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: kPt5o10,
+                        child: _publishContentType == 'json'
+                            ? JsonTextFieldEditor(
+                                key: const Key("mqtt-json-body"),
+                                fieldKey: "mqtt-json-body-editor",
+                                isDark:
+                                    Theme.of(context).brightness ==
+                                    Brightness.dark,
+                                initialValue: model.publishPayload,
+                                onChanged: (String value) => _update(
+                                  (m) => m.copyWith(publishPayload: value),
+                                ),
+                              )
+                            : TextFieldEditor(
+                                key: const Key("mqtt-text-body"),
+                                fieldKey: "mqtt-text-body-editor",
+                                initialValue: model.publishPayload,
+                                onChanged: (String value) => _update(
+                                  (m) => m.copyWith(publishPayload: value),
                                 ),
                               ),
-                            ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 10,
+                        right: 10,
+                        bottom: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          const Text('QoS: '),
+                          kHSpacer8,
+                          ADDropdownButton<int>(
+                            value: model.publishQos,
+                            values: const [(0, '0'), (1, '1'), (2, '2')],
+                            onChanged: (int? v) {
+                              if (v != null) {
+                                _update((m) => m.copyWith(publishQos: v));
+                              }
+                            },
+                          ),
+                          const Spacer(),
+                          const Text('Retain: '),
+                          Switch(
+                            value: model.publishRetain,
+                            onChanged: (v) =>
+                                _update((m) => m.copyWith(publishRetain: v)),
+                            activeThumbColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                          ),
+                          kHSpacer12,
+                          FilledButton.icon(
+                            onPressed: isConnected ? _publish : null,
+                            style: FilledButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: kBorderRadius8,
+                              ),
+                            ),
+                            icon: const Icon(Icons.send_rounded, size: 16),
+                            label: const Text('Publish'),
                           ),
                         ],
                       ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: kPt5o10,
+                  child: ListView(
+                    children: [
+                      Text('Last Will Topic',
+                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: isConnected ? Theme.of(context).disabledColor : null,
+                          )),
                       kVSpacer8,
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: FilledButton.icon(
-                          onPressed: isConnected ? _publish : null,
-                          style: FilledButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: kBorderRadius8,
-                            ),
-                          ),
-                          icon: Icon(Icons.send_rounded, size: 16),
-                          label: const Text('Publish'),
+                      TextFormField(
+                        controller: _lastWillTopicCtrl,
+                        enabled: !isConnected,
+                        decoration: fieldDeco.copyWith(
+                          hintText: 'e.g. client/disconnected',
                         ),
+                        onChanged: (v) =>
+                            _update((m) => m.copyWith(lastWillTopic: v)),
+                      ),
+                      kVSpacer16,
+                      Text('Last Will Message',
+                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: isConnected ? Theme.of(context).disabledColor : null,
+                          )),
+                      kVSpacer8,
+                      TextFormField(
+                        controller: _lastWillMessageCtrl,
+                        enabled: !isConnected,
+                        maxLines: 4,
+                        decoration: fieldDeco.copyWith(
+                          hintText: 'Offline payload...',
+                        ),
+                        onChanged: (v) =>
+                            _update((m) => m.copyWith(lastWillMessage: v)),
+                      ),
+                      kVSpacer16,
+                      Row(
+                        children: [
+                          Text('Last Will QoS: ', style: TextStyle(color: isConnected ? Theme.of(context).disabledColor : null)),
+                          kHSpacer8,
+                          ADDropdownButton<int>(
+                            value: model.lastWillQos,
+                            values: const [(0, '0'), (1, '1'), (2, '2')],
+                            onChanged: !isConnected
+                                ? (v) {
+                                    if (v != null)
+                                      _update(
+                                        (m) => m.copyWith(lastWillQos: v),
+                                      );
+                                  }
+                                : null,
+                          ),
+                          const Spacer(),
+                          Text('Retain Last Will: ', style: TextStyle(color: isConnected ? Theme.of(context).disabledColor : null)),
+                          Switch(
+                            value: model.lastWillRetain,
+                            onChanged: !isConnected
+                                ? (v) => _update(
+                                    (m) => m.copyWith(lastWillRetain: v),
+                                  )
+                                : null,
+                            activeThumbColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                // ── Config Tab ───────────────────────────────────────────
                 Padding(
-                  padding: kPh8v4,
+                  padding: kPt5o10,
                   child: ListView(
                     children: [
                       _ConfigRow(
@@ -299,6 +399,7 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                         enabled: !isConnected,
                         onChanged: (v) =>
                             _update((m) => m.copyWith(keepAlive: v)),
+                        fieldDeco: fieldDeco,
                       ),
                       _ConfigRowInt(
                         label: 'Connect Timeout (s)',
@@ -306,44 +407,7 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                         enabled: !isConnected,
                         onChanged: (v) =>
                             _update((m) => m.copyWith(connectTimeout: v)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Row(
-                          children: [
-                            const SizedBox(
-                              width: 150,
-                              child: Text(
-                                'Protocol Version',
-                                style: TextStyle(fontSize: 13),
-                              ),
-                            ),
-                            Expanded(
-                              child:
-                                  DropdownButtonFormField<MQTTProtocolVersion>(
-                                    value: model.protocolVersion,
-                                    isDense: true,
-                                    decoration: fieldDeco,
-                                    items: MQTTProtocolVersion.values.map((v) {
-                                      return DropdownMenuItem(
-                                        value: v,
-                                        child: Text(v.name.toUpperCase()),
-                                      );
-                                    }).toList(),
-                                    onChanged: isConnected
-                                        ? null
-                                        : (v) {
-                                            if (v != null)
-                                              _update(
-                                                (m) => m.copyWith(
-                                                  protocolVersion: v,
-                                                ),
-                                              );
-                                          },
-                                  ),
-                            ),
-                          ],
-                        ),
+                        fieldDeco: fieldDeco,
                       ),
                       SwitchListTile(
                         title: const Text(
@@ -379,8 +443,6 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
     );
   }
 }
-
-// ── Topic Table ───────────────────────────────────────────────────────────────
 
 class _TopicsTab extends StatelessWidget {
   final List<MQTTTopicModel> topics;
@@ -427,7 +489,6 @@ class _TopicsTab extends StatelessWidget {
                 bottomMargin: kDataTableBottomPadding,
                 isVerticalScrollBarVisible: true,
                 columns: const [
-                  DataColumn2(label: Text(kNameCheckbox), fixedWidth: 30),
                   DataColumn2(
                     label: Text(
                       'Topic',
@@ -443,11 +504,18 @@ class _TopicsTab extends StatelessWidget {
                   ),
                   DataColumn2(
                     label: Text(
+                      'Subscribe',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    fixedWidth: 80,
+                  ),
+                  DataColumn2(
+                    label: Text(
                       'Description',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                  DataColumn2(label: const Text(''), fixedWidth: 36),
+                  DataColumn2(label: Text(''), fixedWidth: 36),
                 ],
                 rows: List.generate(topics.length + 1, (i) {
                   bool isLast = i == topics.length;
@@ -455,37 +523,17 @@ class _TopicsTab extends StatelessWidget {
                   return DataRow(
                     cells: [
                       DataCell(
-                        ADCheckBox(
-                          keyId: "mqtt-topic-sub-$i",
-                          value: t.subscribe,
-                          onChanged: isLast
-                              ? null
-                              : (v) => onUpdate(
-                                  i,
-                                  t.copyWith(subscribe: v ?? false),
-                                ),
-                          colorScheme: Theme.of(context).colorScheme,
-                        ),
-                      ),
-                      DataCell(
-                        TextFormField(
+                        CellField(
+                          keyId: "mqtt-topic-$i",
                           initialValue: t.topic,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'home/sensor',
-                          ),
+                          hintText: 'home/sensor',
                           onChanged: (v) => onUpdate(i, t.copyWith(topic: v)),
                         ),
                       ),
                       DataCell(
-                        DropdownButton<int>(
+                        ADDropdownButton<int>(
                           value: t.qos,
-                          underline: const SizedBox.shrink(),
-                          items: const [
-                            DropdownMenuItem(value: 0, child: Text('0')),
-                            DropdownMenuItem(value: 1, child: Text('1')),
-                            DropdownMenuItem(value: 2, child: Text('2')),
-                          ],
+                          values: const [(0, '0'), (1, '1'), (2, '2')],
                           onChanged: (v) {
                             if (v != null) {
                               onUpdate(i, t.copyWith(qos: v));
@@ -494,12 +542,21 @@ class _TopicsTab extends StatelessWidget {
                         ),
                       ),
                       DataCell(
-                        TextFormField(
+                        Switch(
+                          value: t.subscribe,
+                          onChanged: isLast
+                              ? null
+                              : (v) => onUpdate(i, t.copyWith(subscribe: v)),
+                          activeThumbColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
+                        ),
+                      ),
+                      DataCell(
+                        CellField(
+                          keyId: "mqtt-desc-$i",
                           initialValue: t.description,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Add description',
-                          ),
+                          hintText: 'Add description',
                           onChanged: (v) =>
                               onUpdate(i, t.copyWith(description: v)),
                         ),
@@ -537,7 +594,7 @@ class _TopicsTab extends StatelessWidget {
               padding: kPb15,
               child: ElevatedButton.icon(
                 onPressed: onAdd,
-                icon: Icon(Icons.add),
+                icon: const Icon(Icons.add),
                 label: const Text('Add Topic', style: kTextStyleButton),
               ),
             ),
@@ -547,8 +604,6 @@ class _TopicsTab extends StatelessWidget {
     );
   }
 }
-
-// ── Config helpers ────────────────────────────────────────────────────────────
 
 class _ConfigRow extends StatelessWidget {
   final String label;
@@ -577,7 +632,13 @@ class _ConfigRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 150,
-            child: Text(label, style: const TextStyle(fontSize: 13)),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: enabled ? null : Theme.of(context).disabledColor,
+              ),
+            ),
           ),
           Expanded(
             child: TextFormField(
@@ -599,12 +660,14 @@ class _ConfigRowInt extends StatelessWidget {
   final int value;
   final bool enabled;
   final void Function(int) onChanged;
+  final InputDecoration fieldDeco;
 
   const _ConfigRowInt({
     required this.label,
     required this.value,
     required this.enabled,
     required this.onChanged,
+    required this.fieldDeco,
   });
 
   @override
@@ -615,7 +678,13 @@ class _ConfigRowInt extends StatelessWidget {
         children: [
           SizedBox(
             width: 150,
-            child: Text(label, style: const TextStyle(fontSize: 13)),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: enabled ? null : Theme.of(context).disabledColor,
+              ),
+            ),
           ),
           SizedBox(
             width: 80,
@@ -623,14 +692,7 @@ class _ConfigRowInt extends StatelessWidget {
               initialValue: value.toString(),
               enabled: enabled,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                isDense: true,
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-              ),
+              decoration: fieldDeco,
               onChanged: (v) {
                 final parsed = int.tryParse(v);
                 if (parsed != null) onChanged(parsed);

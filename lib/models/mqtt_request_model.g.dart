@@ -33,6 +33,10 @@ _MQTTRequestModel _$MQTTRequestModelFromJson(Map json) => _MQTTRequestModel(
   publishPayload: json['publishPayload'] as String? ?? "",
   publishQos: (json['publishQos'] as num?)?.toInt() ?? 0,
   publishRetain: json['publishRetain'] as bool? ?? false,
+  lastWillTopic: json['lastWillTopic'] as String? ?? "",
+  lastWillMessage: json['lastWillMessage'] as String? ?? "",
+  lastWillQos: (json['lastWillQos'] as num?)?.toInt() ?? 0,
+  lastWillRetain: json['lastWillRetain'] as bool? ?? false,
   savedMessages:
       (json['savedMessages'] as List<dynamic>?)
           ?.map(
@@ -68,6 +72,10 @@ Map<String, dynamic> _$MQTTRequestModelToJson(
   'publishPayload': instance.publishPayload,
   'publishQos': instance.publishQos,
   'publishRetain': instance.publishRetain,
+  'lastWillTopic': instance.lastWillTopic,
+  'lastWillMessage': instance.lastWillMessage,
+  'lastWillQos': instance.lastWillQos,
+  'lastWillRetain': instance.lastWillRetain,
   'savedMessages': instance.savedMessages.map((e) => e.toJson()).toList(),
   'savedEventLog': instance.savedEventLog.map((e) => e.toJson()).toList(),
 };

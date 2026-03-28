@@ -2,10 +2,11 @@ import 'package:apidash_design_system/apidash_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apidash/providers/providers.dart';
-import 'package:apidash/models/models.dart';
 
 import 'grpc_metadata.dart';
 import 'grpc_body.dart';
+import 'grpc_service_def.dart';
+import 'grpc_settings.dart';
 
 class EditGrpcRequestPane extends ConsumerStatefulWidget {
   const EditGrpcRequestPane({super.key});
@@ -15,25 +16,6 @@ class EditGrpcRequestPane extends ConsumerStatefulWidget {
 }
 
 class _EditGrpcRequestPaneState extends ConsumerState<EditGrpcRequestPane> {
-  final TextEditingController _serviceCtrl = TextEditingController();
-  final TextEditingController _methodCtrl = TextEditingController();
-
-  String? _lastId;
-
-  @override
-  void dispose() {
-    _serviceCtrl.dispose();
-    _methodCtrl.dispose();
-    super.dispose();
-  }
-
-  void _updateControllers(String selectedId, GrpcRequestModel model) {
-    if (_lastId != selectedId) {
-      _serviceCtrl.text = model.serviceName;
-      _methodCtrl.text = model.methodName;
-      _lastId = selectedId;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +26,12 @@ class _EditGrpcRequestPaneState extends ConsumerState<EditGrpcRequestPane> {
       return const SizedBox.shrink();
     }
 
-    _updateControllers(selectedId!, requestModel.grpcRequestModel!);
+
 
     final currentIndex = requestModel.grpcRequestModel!.requestTabIndex;
 
     return DefaultTabController(
-      length: 2,
+      length: 4,
       initialIndex: currentIndex,
       child: Column(
       children: [
@@ -61,8 +43,10 @@ class _EditGrpcRequestPaneState extends ConsumerState<EditGrpcRequestPane> {
           indicatorSize: TabBarIndicatorSize.label,
           dividerHeight: 0,
           tabs: const [
-            Tab(text: "Body"),
-            Tab(text: "Metadata (Headers)"),
+            Tab(text: "Message"),
+            Tab(text: "Metadata"),
+            Tab(text: "Server Ref"),
+            Tab(text: "Settings"),
           ],
           onTap: (index) {
             ref
@@ -77,55 +61,11 @@ class _EditGrpcRequestPaneState extends ConsumerState<EditGrpcRequestPane> {
             children: const [
               GrpcBody(),
               GrpcMetadata(),
+              GrpcServiceDef(),
+              GrpcSettings(),
             ],
           ),
         ),
-        kVSpacer10,
-        Padding(
-          padding: kPh20,
-          child: Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  key: Key("serviceName-$selectedId"),
-                  controller: _serviceCtrl,
-                  decoration: const InputDecoration(
-                    labelText: "Service Name",
-                    hintText: "helloworld.Greeter",
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                  ),
-                  onChanged: (val) {
-                    ref.read(collectionStateNotifierProvider.notifier).updateGrpcModel(
-                      id: selectedId,
-                      serviceName: val,
-                    );
-                  },
-                ),
-              ),
-              kHSpacer10,
-              Expanded(
-                child: TextFormField(
-                  key: Key("methodName-$selectedId"),
-                  controller: _methodCtrl,
-                  decoration: const InputDecoration(
-                    labelText: "Method Name",
-                    hintText: "SayHello",
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                  ),
-                  onChanged: (val) {
-                    ref.read(collectionStateNotifierProvider.notifier).updateGrpcModel(
-                      id: selectedId,
-                      methodName: val,
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-        kVSpacer10,
       ],
     ));
   }

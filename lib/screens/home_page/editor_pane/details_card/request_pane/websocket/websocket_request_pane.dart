@@ -4,6 +4,7 @@ import 'package:apidash/providers/providers.dart';
 import 'package:apidash/widgets/widgets.dart';
 import 'websocket_messages_pane.dart';
 import 'websocket_request_headers.dart';
+import 'websocket_request_params.dart';
 import 'websocket_settings_pane.dart';
 
 class EditWebSocketRequestPane extends ConsumerWidget {
@@ -19,12 +20,12 @@ class EditWebSocketRequestPane extends ConsumerWidget {
     final wsModel = requestModel?.websocketRequestModel;
 
     final headerLength = wsModel?.requestHeaders?.length ?? 0;
+    final paramLength = wsModel?.requestParams?.length ?? 0;
 
     return RequestPane(
       selectedId: selectedId,
       showViewCodeButton: false,
       codePaneVisible: codePaneVisible,
-      // Adjust tabIndex handling
       tabIndex: tabIndex ?? 0,
       onPressedCodeButton: () {
         ref.read(codePaneVisibleStateProvider.notifier).state =
@@ -37,16 +38,19 @@ class EditWebSocketRequestPane extends ConsumerWidget {
       },
       showIndicators: [
         false, // Messages
+        paramLength > 0, // URL Params
         headerLength > 0, // Headers
         false, // Settings
       ],
       tabLabels: const [
-        'Send Message',
+        'Message',
+        'URL Params',
         'Headers',
         'Settings',
       ],
       children: const [
         EditWebSocketMessagesPane(),
+        EditWebSocketURLParams(),
         EditWebSocketRequestHeaders(),
         EditWebSocketSettingsPane(),
       ],

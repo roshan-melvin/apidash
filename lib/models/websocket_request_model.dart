@@ -36,6 +36,8 @@ abstract class WebSocketRequestModel with _$WebSocketRequestModel {
   @JsonSerializable(explicitToJson: true, anyMap: true)
   const factory WebSocketRequestModel({
     @Default("") String url,
+    List<NameValueModel>? requestParams,
+    List<bool>? isParamEnabledList,
     List<NameValueModel>? requestHeaders,
     List<bool>? isHeaderEnabledList,
     @Default([]) List<WebSocketSavedMessage> savedMessages,

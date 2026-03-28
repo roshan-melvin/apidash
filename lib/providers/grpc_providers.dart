@@ -11,8 +11,10 @@ final grpcServiceProvider = Provider<GrpcService>((ref) {
   return service;
 });
 
-final grpcStateProvider = StreamProvider.autoDispose<GrpcConnectionState>((ref) {
-  return ref.watch(grpcServiceProvider).stateStream;
+final grpcStateProvider = StreamProvider.autoDispose<GrpcConnectionState>((ref) async* {
+  final service = ref.watch(grpcServiceProvider);
+  yield service.currentState;
+  yield* service.stateStream;
 });
 
 final grpcRequestProvider = StateProvider<GrpcRequestModel>((ref) {

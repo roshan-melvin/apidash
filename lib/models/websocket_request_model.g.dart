@@ -38,44 +38,51 @@ Map<String, dynamic> _$WebSocketSavedEventToJson(
   'description': instance.description,
 };
 
-_WebSocketRequestModel _$WebSocketRequestModelFromJson(Map json) =>
-    _WebSocketRequestModel(
-      url: json['url'] as String? ?? "",
-      requestHeaders: (json['requestHeaders'] as List<dynamic>?)
+_WebSocketRequestModel _$WebSocketRequestModelFromJson(
+  Map json,
+) => _WebSocketRequestModel(
+  url: json['url'] as String? ?? "",
+  requestParams: (json['requestParams'] as List<dynamic>?)
+      ?.map((e) => NameValueModel.fromJson(Map<String, Object?>.from(e as Map)))
+      .toList(),
+  isParamEnabledList: (json['isParamEnabledList'] as List<dynamic>?)
+      ?.map((e) => e as bool)
+      .toList(),
+  requestHeaders: (json['requestHeaders'] as List<dynamic>?)
+      ?.map((e) => NameValueModel.fromJson(Map<String, Object?>.from(e as Map)))
+      .toList(),
+  isHeaderEnabledList: (json['isHeaderEnabledList'] as List<dynamic>?)
+      ?.map((e) => e as bool)
+      .toList(),
+  savedMessages:
+      (json['savedMessages'] as List<dynamic>?)
           ?.map(
-            (e) => NameValueModel.fromJson(Map<String, Object?>.from(e as Map)),
+            (e) => WebSocketSavedMessage.fromJson(
+              Map<String, dynamic>.from(e as Map),
+            ),
           )
-          .toList(),
-      isHeaderEnabledList: (json['isHeaderEnabledList'] as List<dynamic>?)
-          ?.map((e) => e as bool)
-          .toList(),
-      savedMessages:
-          (json['savedMessages'] as List<dynamic>?)
-              ?.map(
-                (e) => WebSocketSavedMessage.fromJson(
-                  Map<String, dynamic>.from(e as Map),
-                ),
-              )
-              .toList() ??
-          const [],
-      savedEventLog:
-          (json['savedEventLog'] as List<dynamic>?)
-              ?.map(
-                (e) => WebSocketSavedEvent.fromJson(
-                  Map<String, dynamic>.from(e as Map),
-                ),
-              )
-              .toList() ??
-          const [],
-      requestTabIndex: (json['requestTabIndex'] as num?)?.toInt() ?? 0,
-      filterIndex: (json['filterIndex'] as num?)?.toInt() ?? 0,
-      pingInterval: (json['pingInterval'] as num?)?.toInt() ?? 0,
-    );
+          .toList() ??
+      const [],
+  savedEventLog:
+      (json['savedEventLog'] as List<dynamic>?)
+          ?.map(
+            (e) => WebSocketSavedEvent.fromJson(
+              Map<String, dynamic>.from(e as Map),
+            ),
+          )
+          .toList() ??
+      const [],
+  requestTabIndex: (json['requestTabIndex'] as num?)?.toInt() ?? 0,
+  filterIndex: (json['filterIndex'] as num?)?.toInt() ?? 0,
+  pingInterval: (json['pingInterval'] as num?)?.toInt() ?? 0,
+);
 
 Map<String, dynamic> _$WebSocketRequestModelToJson(
   _WebSocketRequestModel instance,
 ) => <String, dynamic>{
   'url': instance.url,
+  'requestParams': instance.requestParams?.map((e) => e.toJson()).toList(),
+  'isParamEnabledList': instance.isParamEnabledList,
   'requestHeaders': instance.requestHeaders?.map((e) => e.toJson()).toList(),
   'isHeaderEnabledList': instance.isHeaderEnabledList,
   'savedMessages': instance.savedMessages.map((e) => e.toJson()).toList(),

@@ -28,6 +28,10 @@ abstract class MQTTRequestModel with _$MQTTRequestModel {
     @Default("") String publishPayload,
     @Default(0) int publishQos,
     @Default(false) bool publishRetain,
+    @Default("") String lastWillTopic,
+    @Default("") String lastWillMessage,
+    @Default(0) int lastWillQos,
+    @Default(false) bool lastWillRetain,
     @Default([]) List<MQTTSavedMessage> savedMessages,
     @Default([]) List<MQTTSavedEvent> savedEventLog,
   }) = _MQTTRequestModel;

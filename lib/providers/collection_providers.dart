@@ -226,6 +226,8 @@ class CollectionStateNotifier
 
   void updateWebSocketModel({
     String? id,
+    List<NameValueModel>? requestParams,
+    List<bool>? isParamEnabledList,
     List<NameValueModel>? requestHeaders,
     List<bool>? isHeaderEnabledList,
     int? requestTabIndex,
@@ -241,6 +243,8 @@ class CollectionStateNotifier
     if (currentWsModel == null) return;
 
     final updatedWsModel = currentWsModel.copyWith(
+      requestParams: requestParams ?? currentWsModel.requestParams,
+      isParamEnabledList: isParamEnabledList ?? currentWsModel.isParamEnabledList,
       requestHeaders: requestHeaders ?? currentWsModel.requestHeaders,
       isHeaderEnabledList: isHeaderEnabledList ?? currentWsModel.isHeaderEnabledList,
       requestTabIndex: requestTabIndex ?? currentWsModel.requestTabIndex,
@@ -379,12 +383,13 @@ class CollectionStateNotifier
     String? url,
     String? name,
     String? description,
+    List<NameValueModel>? requestParams,
+    List<bool>? isParamEnabledList,
     List<NameValueModel>? requestHeaders,
     int? requestTabIndex,
     List<NameValueModel>? headers,
     List<NameValueModel>? params,
     List<bool>? isHeaderEnabledList,
-    List<bool>? isParamEnabledList,
     ContentType? bodyContentType,
     String? body,
     String? query,

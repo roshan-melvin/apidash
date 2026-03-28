@@ -19,17 +19,30 @@ class _GrpcResponsePaneState extends ConsumerState<GrpcResponsePane>
     with SingleTickerProviderStateMixin {
   late final TabController _tabCtrl;
   String _filterString = '';
+  String _filterEventString = '';
+  int _filterEventIndex = 0;
+  late final TextEditingController _msgFilterCtrl;
+  late final TextEditingController _eventFilterCtrl;
   int _filterIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _msgFilterCtrl = TextEditingController(text: _filterString);
+    _eventFilterCtrl = TextEditingController(text: _filterEventString);
+
     _tabCtrl = TabController(length: 2, vsync: this);
+    _tabCtrl.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _tabCtrl.dispose();
+    _msgFilterCtrl.dispose();
+    _eventFilterCtrl.dispose();
+
     super.dispose();
   }
 
@@ -54,12 +67,41 @@ class _GrpcResponsePaneState extends ConsumerState<GrpcResponsePane>
       typeFiltered = messages.where((m) => m.isIncoming).toList();
     }
     // Local filter state implementation if we want
-    
+
+    var typeFilteredEvents = events;
+    if (_filterEventIndex == 1) {
+      typeFilteredEvents = events
+          .where(
+            (e) =>
+                e.type == GrpcEventType.error ||
+                e.type == GrpcEventType.disconnect,
+          )
+          .toList();
+    } else if (_filterEventIndex == 2) {
+      typeFilteredEvents = events
+          .where(
+            (e) =>
+                e.type != GrpcEventType.error &&
+                e.type != GrpcEventType.disconnect,
+          )
+          .toList();
+    }
+
+    final filteredEvents = _filterEventString.isEmpty
+        ? typeFilteredEvents
+        : typeFilteredEvents
+              .where(
+                (e) => e.description.toLowerCase().contains(
+                  _filterEventString.toLowerCase(),
+                ),
+              )
+              .toList();
+
     final filtered = _filterString.isEmpty
         ? typeFiltered
         : typeFiltered
-            .where((m) => m.payload.toString().contains(_filterString))
-            .toList();
+              .where((m) => m.payload.toString().contains(_filterString))
+              .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,76 +137,137 @@ class _GrpcResponsePaneState extends ConsumerState<GrpcResponsePane>
             ),
           ],
         ),
-        AnimatedBuilder(
-          animation: _tabCtrl,
-          builder: (_, __) => _tabCtrl.index == 0
-              ? Padding(
-                  padding: kPh8v4,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          onChanged: (v) => setState(() => _filterString = v),
-                          decoration: InputDecoration(
-                            prefixIcon: const Icon(Icons.search, size: 16),
-                            hintText: 'Filter payload...',
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            border: OutlineInputBorder(
-                              borderRadius: kBorderRadius8,
-                            ),
-                          ),
-                        ),
-                      ),
-                      kHSpacer8,
-                      SegmentedButton<int>(
-                        segments: const [
-                          ButtonSegment<int>(
-                            value: 0,
-                            label: Text('All', style: TextStyle(fontSize: 12)),
-                          ),
-                          ButtonSegment<int>(
-                            value: 2, // received
-                            label: Row(
-                              children: [
-                                Icon(Icons.arrow_downward, size: 12),
-                                SizedBox(width: 4),
-                                Text('In', style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
-                          ),
-                          ButtonSegment<int>(
-                            value: 1, // sent
-                            label: Row(
-                              children: [
-                                Icon(Icons.arrow_upward, size: 12),
-                                SizedBox(width: 4),
-                                Text('Out', style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
-                          ),
-                        ],
-                        selected: {_filterIndex},
-                        style: const ButtonStyle(
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        onSelectionChanged: (Set<int> newSelection) {
-                          setState(() {
-                            _filterIndex = newSelection.first;
-                          });
-                        },
-                      ),
-                    ],
+        IndexedStack(
+          index: _tabCtrl.index,
+          children: [
+            Padding(
+              padding: kPh8v4,
+              child: Row(
+                children: [
+                  ADDropdownButton<int>(
+                    value: _filterIndex,
+                    onChanged: (int? value) {
+                      if (value != null) {
+                        setState(() {
+                          _filterIndex = value;
+                        });
+                      }
+                    },
+                    values: const [(0, 'All'), (1, 'Sent'), (2, 'Received')],
                   ),
-                )
-              : kSizedBoxEmpty,
+                  kHSpacer8,
+                  Expanded(
+                    child: TextField(
+                      controller: _msgFilterCtrl,
+                      onChanged: (v) => setState(() => _filterString = v),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor:
+                            Theme.of(context).brightness == Brightness.light
+                            ? Colors.white
+                            : null,
+                        isDense: true,
+                        hintText: 'Filter payload...',
+                        prefixIcon: const Icon(Icons.search, size: 16),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        suffixIcon: _msgFilterCtrl.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 16),
+                                onPressed: () {
+                                  _msgFilterCtrl.clear();
+                                  setState(() => _filterString = '');
+                                },
+                              )
+                            : null,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: kPh8v4,
+              child: Row(
+                children: [
+                  ADDropdownButton<int>(
+                    value: _filterEventIndex,
+                    onChanged: (int? value) {
+                      if (value != null) {
+                        setState(() {
+                          _filterEventIndex = value;
+                        });
+                      }
+                    },
+                    values: const [(0, 'All'), (1, 'Error'), (2, 'No Error')],
+                  ),
+                  kHSpacer8,
+                  Expanded(
+                    child: TextField(
+                      controller: _eventFilterCtrl,
+                      onChanged: (v) => setState(() => _filterEventString = v),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor:
+                            Theme.of(context).brightness == Brightness.light
+                            ? Colors.white
+                            : null,
+                        isDense: true,
+                        hintText: 'Filter events...',
+                        prefixIcon: const Icon(Icons.search, size: 16),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        suffixIcon: _eventFilterCtrl.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 16),
+                                onPressed: () {
+                                  _eventFilterCtrl.clear();
+                                  setState(() => _filterEventString = '');
+                                },
+                              )
+                            : null,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         Expanded(
           child: TabBarView(
             controller: _tabCtrl,
             children: [
               _MessageStream(messages: filtered),
-              _EventLog(events: events),
+              _EventLog(events: filteredEvents),
             ],
           ),
         ),
@@ -202,10 +305,9 @@ class _StatusBar extends StatelessWidget {
             Expanded(
               child: Text(
                 error!,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(color: clrScheme.onErrorContainer),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: clrScheme.onErrorContainer,
+                ),
               ),
             ),
           ],
@@ -244,7 +346,11 @@ class _StatusBar extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  Icon(Icons.arrow_downward, size: 14, color: clrScheme.primary),
+                  Icon(
+                    Icons.arrow_downward,
+                    size: 14,
+                    color: clrScheme.primary,
+                  ),
                   kHSpacer4,
                   Text('Rx: $inCount'),
                   const SizedBox(width: 16),
@@ -272,7 +378,7 @@ class _MessageStream extends StatelessWidget {
     return ListView.separated(
       padding: kP12,
       itemCount: messages.length,
-      separatorBuilder: (_, __) => kVSpacer8,
+      separatorBuilder: (_, _) => kVSpacer8,
       itemBuilder: (ctx, idx) {
         final m = messages[idx];
         return _MessageBubble(msg: m);
@@ -288,59 +394,73 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clr = Theme.of(context).colorScheme;
-    final bg = msg.isIncoming
-        ? clr.secondaryContainer.withAlpha(150)
-        : clr.primaryContainer.withAlpha(150);
-    final borderClr = msg.isIncoming ? clr.secondary : clr.primary;
-    final icon = msg.isIncoming ? Icons.arrow_downward : Icons.arrow_upward;
-    final label = msg.isIncoming ? 'IN' : 'OUT';
+    final isIncoming = msg.isIncoming;
+    final bg = isIncoming ? clr.secondaryContainer : clr.primaryContainer;
+    final borderClr = isIncoming ? clr.secondary : clr.primary;
+    final icon = isIncoming ? Icons.arrow_downward : Icons.arrow_upward;
+    final label = isIncoming ? 'IN' : 'OUT';
 
-    return Container(
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: kBorderRadius8,
-        border: Border.all(color: borderClr.withAlpha(50)),
-      ),
-      padding: kP8,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Align(
+      alignment: isIncoming ? Alignment.centerLeft : Alignment.centerRight,
+      child: FractionallySizedBox(
+        widthFactor: 0.8,
+        child: Container(
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(12),
+              topRight: const Radius.circular(12),
+              bottomLeft: Radius.circular(isIncoming ? 0 : 12),
+              bottomRight: Radius.circular(isIncoming ? 12 : 0),
+            ),
+            border: Border.all(color: borderClr.withAlpha(50)),
+          ),
+          padding: kP8,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: borderClr.withAlpha(200),
-                  borderRadius: kBorderRadius4,
-                ),
-                child: Row(
-                  children: [
-                    Icon(icon, size: 10, color: clr.onPrimary),
-                    kHSpacer4,
-                    Text(
-                      label,
-                      style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: clr.onPrimary),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 2,
                     ),
-                  ],
-                ),
+                    decoration: BoxDecoration(
+                      color: borderClr.withAlpha(200),
+                      borderRadius: kBorderRadius4,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(icon, size: 10, color: clr.onPrimary),
+                        kHSpacer4,
+                        Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: clr.onPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  kHSpacer8,
+                  const Spacer(),
+                  Text(
+                    _timeFmt.format(msg.timestamp),
+                    style: TextStyle(fontSize: 11, color: clr.onSurfaceVariant),
+                  ),
+                ],
               ),
-              kHSpacer8,
-              const Spacer(),
-              Text(
-                _timeFmt.format(msg.timestamp),
-                style: TextStyle(fontSize: 10, color: clr.outline),
+              kVSpacer8,
+              SelectableText(
+                msg.payload,
+                style: TextStyle(color: clr.onSurface, fontFamily: 'Courier'),
               ),
             ],
           ),
-          kVSpacer8,
-          SelectableText(
-            msg.payload.toString(),
-            style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -367,22 +487,41 @@ class _EventLog extends StatelessWidget {
       rows: events.reversed.map((e) {
         return DataRow(
           cells: [
-            DataCell(Text(_timeFmt.format(e.timestamp),
-                style: TextStyle(color: clr.outline, fontSize: 12))),
+            DataCell(
+              Text(
+                _timeFmt.format(e.timestamp),
+                style: TextStyle(color: clr.outline, fontSize: 12),
+              ),
+            ),
             DataCell(
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: clr.surfaceContainerHighest,
+                  color:
+                      (e.type == GrpcEventType.error ||
+                          e.type == GrpcEventType.disconnect)
+                      ? clr.errorContainer
+                      : (e.type == GrpcEventType.connect
+                            ? Colors.green.withAlpha(50)
+                            : clr.surfaceContainerHighest),
                   borderRadius: kBorderRadius4,
                 ),
-                child: Text(e.type.name.toUpperCase(),
-                    style: const TextStyle(fontSize: 10)),
+                child: Text(
+                  e.type.name.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color:
+                        (e.type == GrpcEventType.error ||
+                            e.type == GrpcEventType.disconnect)
+                        ? clr.onErrorContainer
+                        : (e.type == GrpcEventType.connect
+                              ? Colors.green
+                              : null),
+                  ),
+                ),
               ),
             ),
-            DataCell(
-              Text(e.description, style: const TextStyle(fontSize: 12)),
-            ),
+            DataCell(Text(e.description, style: const TextStyle(fontSize: 12))),
           ],
         );
       }).toList(),

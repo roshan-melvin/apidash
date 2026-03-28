@@ -39,6 +39,7 @@ class GrpcConnectionState {
   final String? connectedUrl;
   final List<GrpcMessage> messages;
   final List<GrpcEvent> eventLog;
+  final Map<String, $descriptor.FileDescriptorProto>? descriptors;
 
   const GrpcConnectionState({
     this.isConnected = false,
@@ -47,6 +48,7 @@ class GrpcConnectionState {
     this.connectedUrl,
     this.messages = const [],
     this.eventLog = const [],
+    this.descriptors,
   });
 
   GrpcConnectionState copyWith({
@@ -58,6 +60,7 @@ class GrpcConnectionState {
     bool clearUrl = false,
     List<GrpcMessage>? messages,
     List<GrpcEvent>? eventLog,
+    Map<String, $descriptor.FileDescriptorProto>? descriptors,
   }) {
     return GrpcConnectionState(
       isConnected: isConnected ?? this.isConnected,
@@ -66,6 +69,7 @@ class GrpcConnectionState {
       connectedUrl: clearUrl ? null : (connectedUrl ?? this.connectedUrl),
       messages: messages ?? this.messages,
       eventLog: eventLog ?? this.eventLog,
+      descriptors: descriptors ?? this.descriptors,
     );
   }
 }
@@ -110,46 +114,67 @@ class GrpcService {
       _channel = ClientChannel(
         host,
         port: port,
-        options: ChannelOptions(credentials: requestModel.useTls ? const ChannelCredentials.secure() : const ChannelCredentials.insecure()),
+        options: ChannelOptions(
+          credentials: requestModel.useTls ? const ChannelCredentials.secure() : const ChannelCredentials.insecure(),
+          connectionTimeout: const Duration(seconds: 10),
+        ),
       );
 
-      await _channel!.getConnection();
+      await _channel!.getConnection().timeout(
+        const Duration(seconds: 15),
+        onTimeout: () => throw Exception('Connection timed out after 15 seconds. Check port and TLS settings.'),
+      );
       
-      _updateState((state) => state.copyWith(
-        eventLog: [
-          ...state.eventLog,
-          GrpcEvent(timestamp: DateTime.now(), type: GrpcEventType.connect, description: 'Connected successfully to $host:$port. Loading reflection...')
-        ]
-      ));
+      if (requestModel.descriptorSource == GrpcDescriptorSource.reflection) {
+          _updateState((state) => state.copyWith(
+            eventLog: [
+              ...state.eventLog,
+              GrpcEvent(timestamp: DateTime.now(), type: GrpcEventType.connect, description: 'Connected successfully to $host:$port. Loading reflection...')
+            ]
+          ));
 
-      _descriptors = await _reflectionService.loadDescriptorsViaReflection(
-        channel: _channel!,
-        host: host,
-        targetSymbol: requestModel.serviceName.isNotEmpty ? '${requestModel.serviceName}.${requestModel.methodName}' : null,
-      );
+          _descriptors = await _reflectionService.loadDescriptorsViaReflection(
+            channel: _channel!,
+            host: host,
+          ).timeout(const Duration(seconds: 15), onTimeout: () {
+            throw Exception('Server Reflection timed out after 15 seconds. Check port and TLS connection settings.');
+          });
 
-      if (requestModel.serviceName.isNotEmpty && requestModel.methodName.isNotEmpty) {
-        _methodSignature = _reflectionService.extractMethodSignature(
-          serviceName: requestModel.serviceName,
-          methodName: requestModel.methodName,
-          descriptors: _descriptors!,
-        );
-      }
+          if (requestModel.serviceName.isNotEmpty && requestModel.methodName.isNotEmpty) {
+            _methodSignature = _reflectionService.extractMethodSignature(
+              serviceName: requestModel.serviceName,
+              methodName: requestModel.methodName,
+              descriptors: _descriptors!,
+            );
+          }
 
-      _updateState((state) => state.copyWith(
-        isConnecting: false,
-        isConnected: true,
-        connectedUrl: requestModel.url,
-        eventLog: [
-          ...state.eventLog,
-          GrpcEvent(timestamp: DateTime.now(), type: GrpcEventType.connect, description: 'Reflection descriptors loaded successfully.')
-        ]
-      ));
+          _updateState((state) => state.copyWith(
+            isConnecting: false,
+            isConnected: true,
+            connectedUrl: requestModel.url,
+            descriptors: _descriptors,
+            eventLog: [
+              ...state.eventLog,
+              GrpcEvent(timestamp: DateTime.now(), type: GrpcEventType.connect, description: 'Reflection descriptors loaded successfully.')
+            ]
+          ));
+        } else {
+          _updateState((state) => state.copyWith(
+            isConnecting: false,
+            isConnected: true,
+            connectedUrl: requestModel.url,
+            eventLog: [
+              ...state.eventLog,
+              GrpcEvent(timestamp: DateTime.now(), type: GrpcEventType.connect, description: 'Connected successfully to $host:$port. (Server Reflection off)')
+            ]
+          ));
+        }
     } catch (e) {
       debugPrint('gRPC Error: $e');
       if (_channel != null) {
         try {
-          await _channel!.shutdown();
+          // Do not await shutdown. It can hang indefinitely on broken TLS/HTTP2 connections!
+          _channel!.shutdown();
         } catch (_) {}
         _channel = null;
       }
@@ -163,7 +188,7 @@ class GrpcService {
   Future<void> disconnect() async {
     if (_channel != null) {
       try {
-        await _channel!.shutdown();
+        await _channel!.shutdown().timeout(const Duration(seconds: 2));
       } catch (e) {
         debugPrint("[gRPC] Error shutting down channel: $e");
       }

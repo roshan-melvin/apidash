@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:collection/collection.dart';
@@ -89,17 +90,25 @@ class GrpcReflectionService {
     final req = $reflection.ServerReflectionRequest()
       ..host = host
       ..listServices = '*';
-    final responseStream = client.serverReflectionInfo(Stream.value(req));
-    await for (final resp in responseStream) {
-      if (resp.hasListServicesResponse()) {
-        return resp.listServicesResponse.service
-            .map((s) => s.name)
-            .where((s) => s.isNotEmpty)
-            .toList(growable: false);
+    final controller = StreamController<$reflection.ServerReflectionRequest>();
+    controller.add(req);
+    final responseStream = client.serverReflectionInfo(controller.stream);
+    try {
+      await for (final resp in responseStream.timeout(const Duration(seconds: 15), onTimeout: (sink) {
+        sink.addError(GrpcReflectionException('Server Reflection timed out. Check TLS/SSL settings and port.'));
+      })) {
+        if (resp.hasListServicesResponse()) {
+          return resp.listServicesResponse.service
+              .map((s) => s.name)
+              .where((s) => s.isNotEmpty)
+              .toList(growable: false);
+        }
+        if (resp.hasErrorResponse()) {
+          throw GrpcReflectionException('Reflection listServices failed: ${resp.errorResponse.errorMessage}');
+        }
       }
-      if (resp.hasErrorResponse()) {
-        throw GrpcReflectionException('Reflection listServices failed: ${resp.errorResponse.errorMessage}');
-      }
+    } finally {
+      controller.close();
     }
     return const [];
   }
@@ -114,23 +123,33 @@ class GrpcReflectionService {
       ..host = host
       ..fileContainingSymbol = symbol;
 
-    final responseStream = client.serverReflectionInfo(Stream.value(req));
-    await for (final resp in responseStream) {
-      if (resp.hasFileDescriptorResponse()) {
-        for (final fdBytes in resp.fileDescriptorResponse.fileDescriptorProto) {
-          final fd = $descriptor.FileDescriptorProto.fromBuffer(fdBytes);
-          if (!descriptorMap.containsKey(fd.name)) {
-            descriptorMap[fd.name] = fd;
-          }
-          for (final dep in fd.dependency) {
-            if (!descriptorMap.containsKey(dep)) {
-              await _resolveDescriptorsForFile(client, dep, descriptorMap, host);
+    final controller = StreamController<$reflection.ServerReflectionRequest>();
+    controller.add(req);
+    final responseStream = client.serverReflectionInfo(controller.stream);
+    
+    try {
+      await for (final resp in responseStream.timeout(const Duration(seconds: 15), onTimeout: (sink) {
+        sink.addError(GrpcReflectionException('Server Reflection timed out. Check TLS/SSL settings and port.'));
+      })) {
+        if (resp.hasFileDescriptorResponse()) {
+          for (final fdBytes in resp.fileDescriptorResponse.fileDescriptorProto) {
+            final fd = $descriptor.FileDescriptorProto.fromBuffer(fdBytes);
+            if (!descriptorMap.containsKey(fd.name)) {
+              descriptorMap[fd.name] = fd;
+            }
+            for (final dep in fd.dependency) {
+              if (!descriptorMap.containsKey(dep)) {
+                await _resolveDescriptorsForFile(client, dep, descriptorMap, host);
+              }
             }
           }
+          break; // Stop after getting the response to prevent hanging
+        } else if (resp.hasErrorResponse()) {
+          throw GrpcReflectionException('Reflection symbol lookup failed: ${resp.errorResponse.errorMessage}');
         }
-      } else if (resp.hasErrorResponse()) {
-        throw GrpcReflectionException('Reflection symbol lookup failed: ${resp.errorResponse.errorMessage}');
       }
+    } finally {
+      controller.close();
     }
   }
 
@@ -146,15 +165,24 @@ class GrpcReflectionService {
       ..host = host
       ..fileByFilename = filename;
 
-    final responseStream = client.serverReflectionInfo(Stream.value(req));
+    final controller = StreamController<$reflection.ServerReflectionRequest>();
+    controller.add(req);
+    final responseStream = client.serverReflectionInfo(controller.stream);
 
-    await for (final resp in responseStream) {
-      if (resp.hasFileDescriptorResponse()) {
-        for (final fdBytes in resp.fileDescriptorResponse.fileDescriptorProto) {
-          final fd = $descriptor.FileDescriptorProto.fromBuffer(fdBytes);
-          descriptorMap[fd.name] = fd;
+    try {
+      await for (final resp in responseStream.timeout(const Duration(seconds: 15), onTimeout: (sink) {
+        sink.addError(GrpcReflectionException('Server Reflection timed out. Check TLS/SSL settings and port.'));
+      })) {
+        if (resp.hasFileDescriptorResponse()) {
+          for (final fdBytes in resp.fileDescriptorResponse.fileDescriptorProto) {
+            final fd = $descriptor.FileDescriptorProto.fromBuffer(fdBytes);
+            descriptorMap[fd.name] = fd;
+          }
+          break;
         }
       }
+    } finally {
+      controller.close();
     }
   }
 

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MQTTRequestModel {
 
- String get brokerUrl; int get port; String get clientId; String get username; String get password; int get keepAlive; bool get cleanSession; int get connectTimeout; MQTTProtocolVersion get protocolVersion; bool get useTls; List<MQTTTopicModel> get topics; String get publishTopic; String get publishPayload; int get publishQos; bool get publishRetain; List<MQTTSavedMessage> get savedMessages; List<MQTTSavedEvent> get savedEventLog;
+ String get brokerUrl; int get port; String get clientId; String get username; String get password; int get keepAlive; bool get cleanSession; int get connectTimeout; MQTTProtocolVersion get protocolVersion; bool get useTls; List<MQTTTopicModel> get topics; String get publishTopic; String get publishPayload; int get publishQos; bool get publishRetain; String get lastWillTopic; String get lastWillMessage; int get lastWillQos; bool get lastWillRetain; List<MQTTSavedMessage> get savedMessages; List<MQTTSavedEvent> get savedEventLog;
 /// Create a copy of MQTTRequestModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $MQTTRequestModelCopyWith<MQTTRequestModel> get copyWith => _$MQTTRequestModelCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MQTTRequestModel&&(identical(other.brokerUrl, brokerUrl) || other.brokerUrl == brokerUrl)&&(identical(other.port, port) || other.port == port)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.keepAlive, keepAlive) || other.keepAlive == keepAlive)&&(identical(other.cleanSession, cleanSession) || other.cleanSession == cleanSession)&&(identical(other.connectTimeout, connectTimeout) || other.connectTimeout == connectTimeout)&&(identical(other.protocolVersion, protocolVersion) || other.protocolVersion == protocolVersion)&&(identical(other.useTls, useTls) || other.useTls == useTls)&&const DeepCollectionEquality().equals(other.topics, topics)&&(identical(other.publishTopic, publishTopic) || other.publishTopic == publishTopic)&&(identical(other.publishPayload, publishPayload) || other.publishPayload == publishPayload)&&(identical(other.publishQos, publishQos) || other.publishQos == publishQos)&&(identical(other.publishRetain, publishRetain) || other.publishRetain == publishRetain)&&const DeepCollectionEquality().equals(other.savedMessages, savedMessages)&&const DeepCollectionEquality().equals(other.savedEventLog, savedEventLog));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MQTTRequestModel&&(identical(other.brokerUrl, brokerUrl) || other.brokerUrl == brokerUrl)&&(identical(other.port, port) || other.port == port)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.keepAlive, keepAlive) || other.keepAlive == keepAlive)&&(identical(other.cleanSession, cleanSession) || other.cleanSession == cleanSession)&&(identical(other.connectTimeout, connectTimeout) || other.connectTimeout == connectTimeout)&&(identical(other.protocolVersion, protocolVersion) || other.protocolVersion == protocolVersion)&&(identical(other.useTls, useTls) || other.useTls == useTls)&&const DeepCollectionEquality().equals(other.topics, topics)&&(identical(other.publishTopic, publishTopic) || other.publishTopic == publishTopic)&&(identical(other.publishPayload, publishPayload) || other.publishPayload == publishPayload)&&(identical(other.publishQos, publishQos) || other.publishQos == publishQos)&&(identical(other.publishRetain, publishRetain) || other.publishRetain == publishRetain)&&(identical(other.lastWillTopic, lastWillTopic) || other.lastWillTopic == lastWillTopic)&&(identical(other.lastWillMessage, lastWillMessage) || other.lastWillMessage == lastWillMessage)&&(identical(other.lastWillQos, lastWillQos) || other.lastWillQos == lastWillQos)&&(identical(other.lastWillRetain, lastWillRetain) || other.lastWillRetain == lastWillRetain)&&const DeepCollectionEquality().equals(other.savedMessages, savedMessages)&&const DeepCollectionEquality().equals(other.savedEventLog, savedEventLog));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,brokerUrl,port,clientId,username,password,keepAlive,cleanSession,connectTimeout,protocolVersion,useTls,const DeepCollectionEquality().hash(topics),publishTopic,publishPayload,publishQos,publishRetain,const DeepCollectionEquality().hash(savedMessages),const DeepCollectionEquality().hash(savedEventLog));
+int get hashCode => Object.hashAll([runtimeType,brokerUrl,port,clientId,username,password,keepAlive,cleanSession,connectTimeout,protocolVersion,useTls,const DeepCollectionEquality().hash(topics),publishTopic,publishPayload,publishQos,publishRetain,lastWillTopic,lastWillMessage,lastWillQos,lastWillRetain,const DeepCollectionEquality().hash(savedMessages),const DeepCollectionEquality().hash(savedEventLog)]);
 
 @override
 String toString() {
-  return 'MQTTRequestModel(brokerUrl: $brokerUrl, port: $port, clientId: $clientId, username: $username, password: $password, keepAlive: $keepAlive, cleanSession: $cleanSession, connectTimeout: $connectTimeout, protocolVersion: $protocolVersion, useTls: $useTls, topics: $topics, publishTopic: $publishTopic, publishPayload: $publishPayload, publishQos: $publishQos, publishRetain: $publishRetain, savedMessages: $savedMessages, savedEventLog: $savedEventLog)';
+  return 'MQTTRequestModel(brokerUrl: $brokerUrl, port: $port, clientId: $clientId, username: $username, password: $password, keepAlive: $keepAlive, cleanSession: $cleanSession, connectTimeout: $connectTimeout, protocolVersion: $protocolVersion, useTls: $useTls, topics: $topics, publishTopic: $publishTopic, publishPayload: $publishPayload, publishQos: $publishQos, publishRetain: $publishRetain, lastWillTopic: $lastWillTopic, lastWillMessage: $lastWillMessage, lastWillQos: $lastWillQos, lastWillRetain: $lastWillRetain, savedMessages: $savedMessages, savedEventLog: $savedEventLog)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $MQTTRequestModelCopyWith<$Res>  {
   factory $MQTTRequestModelCopyWith(MQTTRequestModel value, $Res Function(MQTTRequestModel) _then) = _$MQTTRequestModelCopyWithImpl;
 @useResult
 $Res call({
- String brokerUrl, int port, String clientId, String username, String password, int keepAlive, bool cleanSession, int connectTimeout, MQTTProtocolVersion protocolVersion, bool useTls, List<MQTTTopicModel> topics, String publishTopic, String publishPayload, int publishQos, bool publishRetain, List<MQTTSavedMessage> savedMessages, List<MQTTSavedEvent> savedEventLog
+ String brokerUrl, int port, String clientId, String username, String password, int keepAlive, bool cleanSession, int connectTimeout, MQTTProtocolVersion protocolVersion, bool useTls, List<MQTTTopicModel> topics, String publishTopic, String publishPayload, int publishQos, bool publishRetain, String lastWillTopic, String lastWillMessage, int lastWillQos, bool lastWillRetain, List<MQTTSavedMessage> savedMessages, List<MQTTSavedEvent> savedEventLog
 });
 
 
@@ -65,7 +65,7 @@ class _$MQTTRequestModelCopyWithImpl<$Res>
 
 /// Create a copy of MQTTRequestModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? brokerUrl = null,Object? port = null,Object? clientId = null,Object? username = null,Object? password = null,Object? keepAlive = null,Object? cleanSession = null,Object? connectTimeout = null,Object? protocolVersion = null,Object? useTls = null,Object? topics = null,Object? publishTopic = null,Object? publishPayload = null,Object? publishQos = null,Object? publishRetain = null,Object? savedMessages = null,Object? savedEventLog = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? brokerUrl = null,Object? port = null,Object? clientId = null,Object? username = null,Object? password = null,Object? keepAlive = null,Object? cleanSession = null,Object? connectTimeout = null,Object? protocolVersion = null,Object? useTls = null,Object? topics = null,Object? publishTopic = null,Object? publishPayload = null,Object? publishQos = null,Object? publishRetain = null,Object? lastWillTopic = null,Object? lastWillMessage = null,Object? lastWillQos = null,Object? lastWillRetain = null,Object? savedMessages = null,Object? savedEventLog = null,}) {
   return _then(_self.copyWith(
 brokerUrl: null == brokerUrl ? _self.brokerUrl : brokerUrl // ignore: cast_nullable_to_non_nullable
 as String,port: null == port ? _self.port : port // ignore: cast_nullable_to_non_nullable
@@ -82,6 +82,10 @@ as List<MQTTTopicModel>,publishTopic: null == publishTopic ? _self.publishTopic 
 as String,publishPayload: null == publishPayload ? _self.publishPayload : publishPayload // ignore: cast_nullable_to_non_nullable
 as String,publishQos: null == publishQos ? _self.publishQos : publishQos // ignore: cast_nullable_to_non_nullable
 as int,publishRetain: null == publishRetain ? _self.publishRetain : publishRetain // ignore: cast_nullable_to_non_nullable
+as bool,lastWillTopic: null == lastWillTopic ? _self.lastWillTopic : lastWillTopic // ignore: cast_nullable_to_non_nullable
+as String,lastWillMessage: null == lastWillMessage ? _self.lastWillMessage : lastWillMessage // ignore: cast_nullable_to_non_nullable
+as String,lastWillQos: null == lastWillQos ? _self.lastWillQos : lastWillQos // ignore: cast_nullable_to_non_nullable
+as int,lastWillRetain: null == lastWillRetain ? _self.lastWillRetain : lastWillRetain // ignore: cast_nullable_to_non_nullable
 as bool,savedMessages: null == savedMessages ? _self.savedMessages : savedMessages // ignore: cast_nullable_to_non_nullable
 as List<MQTTSavedMessage>,savedEventLog: null == savedEventLog ? _self.savedEventLog : savedEventLog // ignore: cast_nullable_to_non_nullable
 as List<MQTTSavedEvent>,
@@ -169,10 +173,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String brokerUrl,  int port,  String clientId,  String username,  String password,  int keepAlive,  bool cleanSession,  int connectTimeout,  MQTTProtocolVersion protocolVersion,  bool useTls,  List<MQTTTopicModel> topics,  String publishTopic,  String publishPayload,  int publishQos,  bool publishRetain,  List<MQTTSavedMessage> savedMessages,  List<MQTTSavedEvent> savedEventLog)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String brokerUrl,  int port,  String clientId,  String username,  String password,  int keepAlive,  bool cleanSession,  int connectTimeout,  MQTTProtocolVersion protocolVersion,  bool useTls,  List<MQTTTopicModel> topics,  String publishTopic,  String publishPayload,  int publishQos,  bool publishRetain,  String lastWillTopic,  String lastWillMessage,  int lastWillQos,  bool lastWillRetain,  List<MQTTSavedMessage> savedMessages,  List<MQTTSavedEvent> savedEventLog)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MQTTRequestModel() when $default != null:
-return $default(_that.brokerUrl,_that.port,_that.clientId,_that.username,_that.password,_that.keepAlive,_that.cleanSession,_that.connectTimeout,_that.protocolVersion,_that.useTls,_that.topics,_that.publishTopic,_that.publishPayload,_that.publishQos,_that.publishRetain,_that.savedMessages,_that.savedEventLog);case _:
+return $default(_that.brokerUrl,_that.port,_that.clientId,_that.username,_that.password,_that.keepAlive,_that.cleanSession,_that.connectTimeout,_that.protocolVersion,_that.useTls,_that.topics,_that.publishTopic,_that.publishPayload,_that.publishQos,_that.publishRetain,_that.lastWillTopic,_that.lastWillMessage,_that.lastWillQos,_that.lastWillRetain,_that.savedMessages,_that.savedEventLog);case _:
   return orElse();
 
 }
@@ -190,10 +194,10 @@ return $default(_that.brokerUrl,_that.port,_that.clientId,_that.username,_that.p
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String brokerUrl,  int port,  String clientId,  String username,  String password,  int keepAlive,  bool cleanSession,  int connectTimeout,  MQTTProtocolVersion protocolVersion,  bool useTls,  List<MQTTTopicModel> topics,  String publishTopic,  String publishPayload,  int publishQos,  bool publishRetain,  List<MQTTSavedMessage> savedMessages,  List<MQTTSavedEvent> savedEventLog)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String brokerUrl,  int port,  String clientId,  String username,  String password,  int keepAlive,  bool cleanSession,  int connectTimeout,  MQTTProtocolVersion protocolVersion,  bool useTls,  List<MQTTTopicModel> topics,  String publishTopic,  String publishPayload,  int publishQos,  bool publishRetain,  String lastWillTopic,  String lastWillMessage,  int lastWillQos,  bool lastWillRetain,  List<MQTTSavedMessage> savedMessages,  List<MQTTSavedEvent> savedEventLog)  $default,) {final _that = this;
 switch (_that) {
 case _MQTTRequestModel():
-return $default(_that.brokerUrl,_that.port,_that.clientId,_that.username,_that.password,_that.keepAlive,_that.cleanSession,_that.connectTimeout,_that.protocolVersion,_that.useTls,_that.topics,_that.publishTopic,_that.publishPayload,_that.publishQos,_that.publishRetain,_that.savedMessages,_that.savedEventLog);case _:
+return $default(_that.brokerUrl,_that.port,_that.clientId,_that.username,_that.password,_that.keepAlive,_that.cleanSession,_that.connectTimeout,_that.protocolVersion,_that.useTls,_that.topics,_that.publishTopic,_that.publishPayload,_that.publishQos,_that.publishRetain,_that.lastWillTopic,_that.lastWillMessage,_that.lastWillQos,_that.lastWillRetain,_that.savedMessages,_that.savedEventLog);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -210,10 +214,10 @@ return $default(_that.brokerUrl,_that.port,_that.clientId,_that.username,_that.p
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String brokerUrl,  int port,  String clientId,  String username,  String password,  int keepAlive,  bool cleanSession,  int connectTimeout,  MQTTProtocolVersion protocolVersion,  bool useTls,  List<MQTTTopicModel> topics,  String publishTopic,  String publishPayload,  int publishQos,  bool publishRetain,  List<MQTTSavedMessage> savedMessages,  List<MQTTSavedEvent> savedEventLog)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String brokerUrl,  int port,  String clientId,  String username,  String password,  int keepAlive,  bool cleanSession,  int connectTimeout,  MQTTProtocolVersion protocolVersion,  bool useTls,  List<MQTTTopicModel> topics,  String publishTopic,  String publishPayload,  int publishQos,  bool publishRetain,  String lastWillTopic,  String lastWillMessage,  int lastWillQos,  bool lastWillRetain,  List<MQTTSavedMessage> savedMessages,  List<MQTTSavedEvent> savedEventLog)?  $default,) {final _that = this;
 switch (_that) {
 case _MQTTRequestModel() when $default != null:
-return $default(_that.brokerUrl,_that.port,_that.clientId,_that.username,_that.password,_that.keepAlive,_that.cleanSession,_that.connectTimeout,_that.protocolVersion,_that.useTls,_that.topics,_that.publishTopic,_that.publishPayload,_that.publishQos,_that.publishRetain,_that.savedMessages,_that.savedEventLog);case _:
+return $default(_that.brokerUrl,_that.port,_that.clientId,_that.username,_that.password,_that.keepAlive,_that.cleanSession,_that.connectTimeout,_that.protocolVersion,_that.useTls,_that.topics,_that.publishTopic,_that.publishPayload,_that.publishQos,_that.publishRetain,_that.lastWillTopic,_that.lastWillMessage,_that.lastWillQos,_that.lastWillRetain,_that.savedMessages,_that.savedEventLog);case _:
   return null;
 
 }
@@ -225,7 +229,7 @@ return $default(_that.brokerUrl,_that.port,_that.clientId,_that.username,_that.p
 
 @JsonSerializable(explicitToJson: true, anyMap: true)
 class _MQTTRequestModel implements MQTTRequestModel {
-  const _MQTTRequestModel({this.brokerUrl = "", this.port = 1883, this.clientId = "", this.username = "", this.password = "", this.keepAlive = 60, this.cleanSession = false, this.connectTimeout = 3, this.protocolVersion = MQTTProtocolVersion.v311, this.useTls = false, final  List<MQTTTopicModel> topics = const [], this.publishTopic = "", this.publishPayload = "", this.publishQos = 0, this.publishRetain = false, final  List<MQTTSavedMessage> savedMessages = const [], final  List<MQTTSavedEvent> savedEventLog = const []}): _topics = topics,_savedMessages = savedMessages,_savedEventLog = savedEventLog;
+  const _MQTTRequestModel({this.brokerUrl = "", this.port = 1883, this.clientId = "", this.username = "", this.password = "", this.keepAlive = 60, this.cleanSession = false, this.connectTimeout = 3, this.protocolVersion = MQTTProtocolVersion.v311, this.useTls = false, final  List<MQTTTopicModel> topics = const [], this.publishTopic = "", this.publishPayload = "", this.publishQos = 0, this.publishRetain = false, this.lastWillTopic = "", this.lastWillMessage = "", this.lastWillQos = 0, this.lastWillRetain = false, final  List<MQTTSavedMessage> savedMessages = const [], final  List<MQTTSavedEvent> savedEventLog = const []}): _topics = topics,_savedMessages = savedMessages,_savedEventLog = savedEventLog;
   factory _MQTTRequestModel.fromJson(Map<String, dynamic> json) => _$MQTTRequestModelFromJson(json);
 
 @override@JsonKey() final  String brokerUrl;
@@ -249,6 +253,10 @@ class _MQTTRequestModel implements MQTTRequestModel {
 @override@JsonKey() final  String publishPayload;
 @override@JsonKey() final  int publishQos;
 @override@JsonKey() final  bool publishRetain;
+@override@JsonKey() final  String lastWillTopic;
+@override@JsonKey() final  String lastWillMessage;
+@override@JsonKey() final  int lastWillQos;
+@override@JsonKey() final  bool lastWillRetain;
  final  List<MQTTSavedMessage> _savedMessages;
 @override@JsonKey() List<MQTTSavedMessage> get savedMessages {
   if (_savedMessages is EqualUnmodifiableListView) return _savedMessages;
@@ -277,16 +285,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MQTTRequestModel&&(identical(other.brokerUrl, brokerUrl) || other.brokerUrl == brokerUrl)&&(identical(other.port, port) || other.port == port)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.keepAlive, keepAlive) || other.keepAlive == keepAlive)&&(identical(other.cleanSession, cleanSession) || other.cleanSession == cleanSession)&&(identical(other.connectTimeout, connectTimeout) || other.connectTimeout == connectTimeout)&&(identical(other.protocolVersion, protocolVersion) || other.protocolVersion == protocolVersion)&&(identical(other.useTls, useTls) || other.useTls == useTls)&&const DeepCollectionEquality().equals(other._topics, _topics)&&(identical(other.publishTopic, publishTopic) || other.publishTopic == publishTopic)&&(identical(other.publishPayload, publishPayload) || other.publishPayload == publishPayload)&&(identical(other.publishQos, publishQos) || other.publishQos == publishQos)&&(identical(other.publishRetain, publishRetain) || other.publishRetain == publishRetain)&&const DeepCollectionEquality().equals(other._savedMessages, _savedMessages)&&const DeepCollectionEquality().equals(other._savedEventLog, _savedEventLog));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MQTTRequestModel&&(identical(other.brokerUrl, brokerUrl) || other.brokerUrl == brokerUrl)&&(identical(other.port, port) || other.port == port)&&(identical(other.clientId, clientId) || other.clientId == clientId)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.keepAlive, keepAlive) || other.keepAlive == keepAlive)&&(identical(other.cleanSession, cleanSession) || other.cleanSession == cleanSession)&&(identical(other.connectTimeout, connectTimeout) || other.connectTimeout == connectTimeout)&&(identical(other.protocolVersion, protocolVersion) || other.protocolVersion == protocolVersion)&&(identical(other.useTls, useTls) || other.useTls == useTls)&&const DeepCollectionEquality().equals(other._topics, _topics)&&(identical(other.publishTopic, publishTopic) || other.publishTopic == publishTopic)&&(identical(other.publishPayload, publishPayload) || other.publishPayload == publishPayload)&&(identical(other.publishQos, publishQos) || other.publishQos == publishQos)&&(identical(other.publishRetain, publishRetain) || other.publishRetain == publishRetain)&&(identical(other.lastWillTopic, lastWillTopic) || other.lastWillTopic == lastWillTopic)&&(identical(other.lastWillMessage, lastWillMessage) || other.lastWillMessage == lastWillMessage)&&(identical(other.lastWillQos, lastWillQos) || other.lastWillQos == lastWillQos)&&(identical(other.lastWillRetain, lastWillRetain) || other.lastWillRetain == lastWillRetain)&&const DeepCollectionEquality().equals(other._savedMessages, _savedMessages)&&const DeepCollectionEquality().equals(other._savedEventLog, _savedEventLog));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,brokerUrl,port,clientId,username,password,keepAlive,cleanSession,connectTimeout,protocolVersion,useTls,const DeepCollectionEquality().hash(_topics),publishTopic,publishPayload,publishQos,publishRetain,const DeepCollectionEquality().hash(_savedMessages),const DeepCollectionEquality().hash(_savedEventLog));
+int get hashCode => Object.hashAll([runtimeType,brokerUrl,port,clientId,username,password,keepAlive,cleanSession,connectTimeout,protocolVersion,useTls,const DeepCollectionEquality().hash(_topics),publishTopic,publishPayload,publishQos,publishRetain,lastWillTopic,lastWillMessage,lastWillQos,lastWillRetain,const DeepCollectionEquality().hash(_savedMessages),const DeepCollectionEquality().hash(_savedEventLog)]);
 
 @override
 String toString() {
-  return 'MQTTRequestModel(brokerUrl: $brokerUrl, port: $port, clientId: $clientId, username: $username, password: $password, keepAlive: $keepAlive, cleanSession: $cleanSession, connectTimeout: $connectTimeout, protocolVersion: $protocolVersion, useTls: $useTls, topics: $topics, publishTopic: $publishTopic, publishPayload: $publishPayload, publishQos: $publishQos, publishRetain: $publishRetain, savedMessages: $savedMessages, savedEventLog: $savedEventLog)';
+  return 'MQTTRequestModel(brokerUrl: $brokerUrl, port: $port, clientId: $clientId, username: $username, password: $password, keepAlive: $keepAlive, cleanSession: $cleanSession, connectTimeout: $connectTimeout, protocolVersion: $protocolVersion, useTls: $useTls, topics: $topics, publishTopic: $publishTopic, publishPayload: $publishPayload, publishQos: $publishQos, publishRetain: $publishRetain, lastWillTopic: $lastWillTopic, lastWillMessage: $lastWillMessage, lastWillQos: $lastWillQos, lastWillRetain: $lastWillRetain, savedMessages: $savedMessages, savedEventLog: $savedEventLog)';
 }
 
 
@@ -297,7 +305,7 @@ abstract mixin class _$MQTTRequestModelCopyWith<$Res> implements $MQTTRequestMod
   factory _$MQTTRequestModelCopyWith(_MQTTRequestModel value, $Res Function(_MQTTRequestModel) _then) = __$MQTTRequestModelCopyWithImpl;
 @override @useResult
 $Res call({
- String brokerUrl, int port, String clientId, String username, String password, int keepAlive, bool cleanSession, int connectTimeout, MQTTProtocolVersion protocolVersion, bool useTls, List<MQTTTopicModel> topics, String publishTopic, String publishPayload, int publishQos, bool publishRetain, List<MQTTSavedMessage> savedMessages, List<MQTTSavedEvent> savedEventLog
+ String brokerUrl, int port, String clientId, String username, String password, int keepAlive, bool cleanSession, int connectTimeout, MQTTProtocolVersion protocolVersion, bool useTls, List<MQTTTopicModel> topics, String publishTopic, String publishPayload, int publishQos, bool publishRetain, String lastWillTopic, String lastWillMessage, int lastWillQos, bool lastWillRetain, List<MQTTSavedMessage> savedMessages, List<MQTTSavedEvent> savedEventLog
 });
 
 
@@ -314,7 +322,7 @@ class __$MQTTRequestModelCopyWithImpl<$Res>
 
 /// Create a copy of MQTTRequestModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? brokerUrl = null,Object? port = null,Object? clientId = null,Object? username = null,Object? password = null,Object? keepAlive = null,Object? cleanSession = null,Object? connectTimeout = null,Object? protocolVersion = null,Object? useTls = null,Object? topics = null,Object? publishTopic = null,Object? publishPayload = null,Object? publishQos = null,Object? publishRetain = null,Object? savedMessages = null,Object? savedEventLog = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? brokerUrl = null,Object? port = null,Object? clientId = null,Object? username = null,Object? password = null,Object? keepAlive = null,Object? cleanSession = null,Object? connectTimeout = null,Object? protocolVersion = null,Object? useTls = null,Object? topics = null,Object? publishTopic = null,Object? publishPayload = null,Object? publishQos = null,Object? publishRetain = null,Object? lastWillTopic = null,Object? lastWillMessage = null,Object? lastWillQos = null,Object? lastWillRetain = null,Object? savedMessages = null,Object? savedEventLog = null,}) {
   return _then(_MQTTRequestModel(
 brokerUrl: null == brokerUrl ? _self.brokerUrl : brokerUrl // ignore: cast_nullable_to_non_nullable
 as String,port: null == port ? _self.port : port // ignore: cast_nullable_to_non_nullable
@@ -331,6 +339,10 @@ as List<MQTTTopicModel>,publishTopic: null == publishTopic ? _self.publishTopic 
 as String,publishPayload: null == publishPayload ? _self.publishPayload : publishPayload // ignore: cast_nullable_to_non_nullable
 as String,publishQos: null == publishQos ? _self.publishQos : publishQos // ignore: cast_nullable_to_non_nullable
 as int,publishRetain: null == publishRetain ? _self.publishRetain : publishRetain // ignore: cast_nullable_to_non_nullable
+as bool,lastWillTopic: null == lastWillTopic ? _self.lastWillTopic : lastWillTopic // ignore: cast_nullable_to_non_nullable
+as String,lastWillMessage: null == lastWillMessage ? _self.lastWillMessage : lastWillMessage // ignore: cast_nullable_to_non_nullable
+as String,lastWillQos: null == lastWillQos ? _self.lastWillQos : lastWillQos // ignore: cast_nullable_to_non_nullable
+as int,lastWillRetain: null == lastWillRetain ? _self.lastWillRetain : lastWillRetain // ignore: cast_nullable_to_non_nullable
 as bool,savedMessages: null == savedMessages ? _self._savedMessages : savedMessages // ignore: cast_nullable_to_non_nullable
 as List<MQTTSavedMessage>,savedEventLog: null == savedEventLog ? _self._savedEventLog : savedEventLog // ignore: cast_nullable_to_non_nullable
 as List<MQTTSavedEvent>,

@@ -7,6 +7,7 @@ import 'package:apidash/providers/providers.dart';
 import 'package:apidash/widgets/widgets.dart';
 import '../../common_widgets/common_widgets.dart';
 import 'package:apidash/models/models.dart';
+import 'package:apidash/utils/utils.dart';
 
 class EditorPaneRequestURLCard extends ConsumerWidget {
   const EditorPaneRequestURLCard({super.key});
@@ -39,7 +40,7 @@ class EditorPaneRequestURLCard extends ConsumerWidget {
                     APIType.rest => const DropdownButtonHTTPMethod(),
                     APIType.graphql => kSizedBoxEmpty,
                     APIType.ai => const AIModelSelector(),
-                    APIType.mqtt => kSizedBoxEmpty,
+                    APIType.mqtt => const DropdownButtonMQTTProtocol(),
                     APIType.websocket => kSizedBoxEmpty,
                     APIType.grpc => kSizedBoxEmpty,
                     null => kSizedBoxEmpty,
@@ -64,7 +65,7 @@ class EditorPaneRequestURLCard extends ConsumerWidget {
                     APIType.rest => const DropdownButtonHTTPMethod(),
                     APIType.graphql => kSizedBoxEmpty,
                     APIType.ai => const AIModelSelector(),
-                    APIType.mqtt => kSizedBoxEmpty,
+                    APIType.mqtt => const DropdownButtonMQTTProtocol(),
                     APIType.websocket => kSizedBoxEmpty,
                     APIType.grpc => kSizedBoxEmpty,
                     null => kSizedBoxEmpty,
@@ -458,12 +459,29 @@ class MQTTPortField extends ConsumerWidget {
             horizontal: 12,
             vertical: 8,
           ),
-          border: OutlineInputBorder(
+          hintStyle: TextStyle(
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
+          focusedBorder: OutlineInputBorder(
             borderRadius: kBorderRadius8,
             borderSide: BorderSide(
               color: Theme.of(context).colorScheme.outlineVariant,
             ),
           ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: kBorderRadius8,
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            ),
+          ),
+          border: OutlineInputBorder(
+            borderRadius: kBorderRadius8,
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            ),
+          ),
+          filled: true,
+          fillColor: Theme.of(context).colorScheme.surfaceContainerLowest,
           isDense: true,
         ),
         onChanged: (v) {
@@ -560,6 +578,67 @@ class _MQTTConnectButtonState extends ConsumerState<MQTTConnectButton> {
             ? 'Disconnect'
             : (showLoading ? 'Connecting...' : 'Connect'),
         style: kTextStyleButton,
+      ),
+    );
+  }
+}
+
+class DropdownButtonMQTTProtocol extends ConsumerWidget {
+  const DropdownButtonMQTTProtocol({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedId = ref.watch(selectedIdStateProvider);
+    final protocolVersion = ref.watch(
+      selectedRequestModelProvider.select(
+        (value) =>
+            value?.mqttRequestModel?.protocolVersion ??
+            MQTTProtocolVersion.v311,
+      ),
+    );
+    final connState = ref.watch(mqttConnectionStateProvider).value;
+    final isConnected = connState?.isConnected ?? false;
+
+    return DropdownButtonHideUnderline(
+      child: ADDropdownButton<MQTTProtocolVersion>(
+        value: protocolVersion,
+        values: MQTTProtocolVersion.values.map((v) {
+          return (
+            v,
+            v == MQTTProtocolVersion.v31
+                ? 'V3.1'
+                : v == MQTTProtocolVersion.v311
+                ? 'V3.1.1'
+                : 'V5.0',
+          );
+        }).toList(),
+        onChanged: isConnected
+            ? null
+            : (MQTTProtocolVersion? value) {
+                if (value != null && selectedId != null) {
+                  final latestModel = ref
+                      .read(collectionStateNotifierProvider.notifier)
+                      .getRequestModel(selectedId)!;
+                  ref
+                      .read(collectionStateNotifierProvider.notifier)
+                      .updateMQTTState(
+                        id: selectedId,
+                        mqttRequestModel: latestModel.mqttRequestModel
+                            ?.copyWith(protocolVersion: value),
+                      );
+                }
+              },
+        dropdownMenuItemPadding: EdgeInsets.only(
+          left: context.isMediumWindow ? 8 : 16,
+        ),
+        dropdownMenuItemtextStyle: (MQTTProtocolVersion v) =>
+            kCodeStyle.copyWith(
+              fontWeight: FontWeight.bold,
+              color: getAPIColor(
+                APIType.mqtt,
+                brightness: Theme.of(context).brightness,
+              ),
+            ),
       ),
     );
   }

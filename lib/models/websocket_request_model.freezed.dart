@@ -556,7 +556,7 @@ as String,
 /// @nodoc
 mixin _$WebSocketRequestModel {
 
- String get url; List<NameValueModel>? get requestHeaders; List<bool>? get isHeaderEnabledList; List<WebSocketSavedMessage> get savedMessages; List<WebSocketSavedEvent> get savedEventLog; int get requestTabIndex; int get filterIndex; int get pingInterval;
+ String get url; List<NameValueModel>? get requestParams; List<bool>? get isParamEnabledList; List<NameValueModel>? get requestHeaders; List<bool>? get isHeaderEnabledList; List<WebSocketSavedMessage> get savedMessages; List<WebSocketSavedEvent> get savedEventLog; int get requestTabIndex; int get filterIndex; int get pingInterval;
 /// Create a copy of WebSocketRequestModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -569,16 +569,16 @@ $WebSocketRequestModelCopyWith<WebSocketRequestModel> get copyWith => _$WebSocke
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSocketRequestModel&&(identical(other.url, url) || other.url == url)&&const DeepCollectionEquality().equals(other.requestHeaders, requestHeaders)&&const DeepCollectionEquality().equals(other.isHeaderEnabledList, isHeaderEnabledList)&&const DeepCollectionEquality().equals(other.savedMessages, savedMessages)&&const DeepCollectionEquality().equals(other.savedEventLog, savedEventLog)&&(identical(other.requestTabIndex, requestTabIndex) || other.requestTabIndex == requestTabIndex)&&(identical(other.filterIndex, filterIndex) || other.filterIndex == filterIndex)&&(identical(other.pingInterval, pingInterval) || other.pingInterval == pingInterval));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WebSocketRequestModel&&(identical(other.url, url) || other.url == url)&&const DeepCollectionEquality().equals(other.requestParams, requestParams)&&const DeepCollectionEquality().equals(other.isParamEnabledList, isParamEnabledList)&&const DeepCollectionEquality().equals(other.requestHeaders, requestHeaders)&&const DeepCollectionEquality().equals(other.isHeaderEnabledList, isHeaderEnabledList)&&const DeepCollectionEquality().equals(other.savedMessages, savedMessages)&&const DeepCollectionEquality().equals(other.savedEventLog, savedEventLog)&&(identical(other.requestTabIndex, requestTabIndex) || other.requestTabIndex == requestTabIndex)&&(identical(other.filterIndex, filterIndex) || other.filterIndex == filterIndex)&&(identical(other.pingInterval, pingInterval) || other.pingInterval == pingInterval));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,url,const DeepCollectionEquality().hash(requestHeaders),const DeepCollectionEquality().hash(isHeaderEnabledList),const DeepCollectionEquality().hash(savedMessages),const DeepCollectionEquality().hash(savedEventLog),requestTabIndex,filterIndex,pingInterval);
+int get hashCode => Object.hash(runtimeType,url,const DeepCollectionEquality().hash(requestParams),const DeepCollectionEquality().hash(isParamEnabledList),const DeepCollectionEquality().hash(requestHeaders),const DeepCollectionEquality().hash(isHeaderEnabledList),const DeepCollectionEquality().hash(savedMessages),const DeepCollectionEquality().hash(savedEventLog),requestTabIndex,filterIndex,pingInterval);
 
 @override
 String toString() {
-  return 'WebSocketRequestModel(url: $url, requestHeaders: $requestHeaders, isHeaderEnabledList: $isHeaderEnabledList, savedMessages: $savedMessages, savedEventLog: $savedEventLog, requestTabIndex: $requestTabIndex, filterIndex: $filterIndex, pingInterval: $pingInterval)';
+  return 'WebSocketRequestModel(url: $url, requestParams: $requestParams, isParamEnabledList: $isParamEnabledList, requestHeaders: $requestHeaders, isHeaderEnabledList: $isHeaderEnabledList, savedMessages: $savedMessages, savedEventLog: $savedEventLog, requestTabIndex: $requestTabIndex, filterIndex: $filterIndex, pingInterval: $pingInterval)';
 }
 
 
@@ -589,7 +589,7 @@ abstract mixin class $WebSocketRequestModelCopyWith<$Res>  {
   factory $WebSocketRequestModelCopyWith(WebSocketRequestModel value, $Res Function(WebSocketRequestModel) _then) = _$WebSocketRequestModelCopyWithImpl;
 @useResult
 $Res call({
- String url, List<NameValueModel>? requestHeaders, List<bool>? isHeaderEnabledList, List<WebSocketSavedMessage> savedMessages, List<WebSocketSavedEvent> savedEventLog, int requestTabIndex, int filterIndex, int pingInterval
+ String url, List<NameValueModel>? requestParams, List<bool>? isParamEnabledList, List<NameValueModel>? requestHeaders, List<bool>? isHeaderEnabledList, List<WebSocketSavedMessage> savedMessages, List<WebSocketSavedEvent> savedEventLog, int requestTabIndex, int filterIndex, int pingInterval
 });
 
 
@@ -606,10 +606,12 @@ class _$WebSocketRequestModelCopyWithImpl<$Res>
 
 /// Create a copy of WebSocketRequestModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? url = null,Object? requestHeaders = freezed,Object? isHeaderEnabledList = freezed,Object? savedMessages = null,Object? savedEventLog = null,Object? requestTabIndex = null,Object? filterIndex = null,Object? pingInterval = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? url = null,Object? requestParams = freezed,Object? isParamEnabledList = freezed,Object? requestHeaders = freezed,Object? isHeaderEnabledList = freezed,Object? savedMessages = null,Object? savedEventLog = null,Object? requestTabIndex = null,Object? filterIndex = null,Object? pingInterval = null,}) {
   return _then(_self.copyWith(
 url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
-as String,requestHeaders: freezed == requestHeaders ? _self.requestHeaders : requestHeaders // ignore: cast_nullable_to_non_nullable
+as String,requestParams: freezed == requestParams ? _self.requestParams : requestParams // ignore: cast_nullable_to_non_nullable
+as List<NameValueModel>?,isParamEnabledList: freezed == isParamEnabledList ? _self.isParamEnabledList : isParamEnabledList // ignore: cast_nullable_to_non_nullable
+as List<bool>?,requestHeaders: freezed == requestHeaders ? _self.requestHeaders : requestHeaders // ignore: cast_nullable_to_non_nullable
 as List<NameValueModel>?,isHeaderEnabledList: freezed == isHeaderEnabledList ? _self.isHeaderEnabledList : isHeaderEnabledList // ignore: cast_nullable_to_non_nullable
 as List<bool>?,savedMessages: null == savedMessages ? _self.savedMessages : savedMessages // ignore: cast_nullable_to_non_nullable
 as List<WebSocketSavedMessage>,savedEventLog: null == savedEventLog ? _self.savedEventLog : savedEventLog // ignore: cast_nullable_to_non_nullable
@@ -701,10 +703,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String url,  List<NameValueModel>? requestHeaders,  List<bool>? isHeaderEnabledList,  List<WebSocketSavedMessage> savedMessages,  List<WebSocketSavedEvent> savedEventLog,  int requestTabIndex,  int filterIndex,  int pingInterval)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String url,  List<NameValueModel>? requestParams,  List<bool>? isParamEnabledList,  List<NameValueModel>? requestHeaders,  List<bool>? isHeaderEnabledList,  List<WebSocketSavedMessage> savedMessages,  List<WebSocketSavedEvent> savedEventLog,  int requestTabIndex,  int filterIndex,  int pingInterval)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WebSocketRequestModel() when $default != null:
-return $default(_that.url,_that.requestHeaders,_that.isHeaderEnabledList,_that.savedMessages,_that.savedEventLog,_that.requestTabIndex,_that.filterIndex,_that.pingInterval);case _:
+return $default(_that.url,_that.requestParams,_that.isParamEnabledList,_that.requestHeaders,_that.isHeaderEnabledList,_that.savedMessages,_that.savedEventLog,_that.requestTabIndex,_that.filterIndex,_that.pingInterval);case _:
   return orElse();
 
 }
@@ -722,10 +724,10 @@ return $default(_that.url,_that.requestHeaders,_that.isHeaderEnabledList,_that.s
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String url,  List<NameValueModel>? requestHeaders,  List<bool>? isHeaderEnabledList,  List<WebSocketSavedMessage> savedMessages,  List<WebSocketSavedEvent> savedEventLog,  int requestTabIndex,  int filterIndex,  int pingInterval)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String url,  List<NameValueModel>? requestParams,  List<bool>? isParamEnabledList,  List<NameValueModel>? requestHeaders,  List<bool>? isHeaderEnabledList,  List<WebSocketSavedMessage> savedMessages,  List<WebSocketSavedEvent> savedEventLog,  int requestTabIndex,  int filterIndex,  int pingInterval)  $default,) {final _that = this;
 switch (_that) {
 case _WebSocketRequestModel():
-return $default(_that.url,_that.requestHeaders,_that.isHeaderEnabledList,_that.savedMessages,_that.savedEventLog,_that.requestTabIndex,_that.filterIndex,_that.pingInterval);case _:
+return $default(_that.url,_that.requestParams,_that.isParamEnabledList,_that.requestHeaders,_that.isHeaderEnabledList,_that.savedMessages,_that.savedEventLog,_that.requestTabIndex,_that.filterIndex,_that.pingInterval);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -742,10 +744,10 @@ return $default(_that.url,_that.requestHeaders,_that.isHeaderEnabledList,_that.s
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String url,  List<NameValueModel>? requestHeaders,  List<bool>? isHeaderEnabledList,  List<WebSocketSavedMessage> savedMessages,  List<WebSocketSavedEvent> savedEventLog,  int requestTabIndex,  int filterIndex,  int pingInterval)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String url,  List<NameValueModel>? requestParams,  List<bool>? isParamEnabledList,  List<NameValueModel>? requestHeaders,  List<bool>? isHeaderEnabledList,  List<WebSocketSavedMessage> savedMessages,  List<WebSocketSavedEvent> savedEventLog,  int requestTabIndex,  int filterIndex,  int pingInterval)?  $default,) {final _that = this;
 switch (_that) {
 case _WebSocketRequestModel() when $default != null:
-return $default(_that.url,_that.requestHeaders,_that.isHeaderEnabledList,_that.savedMessages,_that.savedEventLog,_that.requestTabIndex,_that.filterIndex,_that.pingInterval);case _:
+return $default(_that.url,_that.requestParams,_that.isParamEnabledList,_that.requestHeaders,_that.isHeaderEnabledList,_that.savedMessages,_that.savedEventLog,_that.requestTabIndex,_that.filterIndex,_that.pingInterval);case _:
   return null;
 
 }
@@ -757,10 +759,28 @@ return $default(_that.url,_that.requestHeaders,_that.isHeaderEnabledList,_that.s
 
 @JsonSerializable(explicitToJson: true, anyMap: true)
 class _WebSocketRequestModel implements WebSocketRequestModel {
-  const _WebSocketRequestModel({this.url = "", final  List<NameValueModel>? requestHeaders, final  List<bool>? isHeaderEnabledList, final  List<WebSocketSavedMessage> savedMessages = const [], final  List<WebSocketSavedEvent> savedEventLog = const [], this.requestTabIndex = 0, this.filterIndex = 0, this.pingInterval = 0}): _requestHeaders = requestHeaders,_isHeaderEnabledList = isHeaderEnabledList,_savedMessages = savedMessages,_savedEventLog = savedEventLog;
+  const _WebSocketRequestModel({this.url = "", final  List<NameValueModel>? requestParams, final  List<bool>? isParamEnabledList, final  List<NameValueModel>? requestHeaders, final  List<bool>? isHeaderEnabledList, final  List<WebSocketSavedMessage> savedMessages = const [], final  List<WebSocketSavedEvent> savedEventLog = const [], this.requestTabIndex = 0, this.filterIndex = 0, this.pingInterval = 0}): _requestParams = requestParams,_isParamEnabledList = isParamEnabledList,_requestHeaders = requestHeaders,_isHeaderEnabledList = isHeaderEnabledList,_savedMessages = savedMessages,_savedEventLog = savedEventLog;
   factory _WebSocketRequestModel.fromJson(Map<String, dynamic> json) => _$WebSocketRequestModelFromJson(json);
 
 @override@JsonKey() final  String url;
+ final  List<NameValueModel>? _requestParams;
+@override List<NameValueModel>? get requestParams {
+  final value = _requestParams;
+  if (value == null) return null;
+  if (_requestParams is EqualUnmodifiableListView) return _requestParams;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
+ final  List<bool>? _isParamEnabledList;
+@override List<bool>? get isParamEnabledList {
+  final value = _isParamEnabledList;
+  if (value == null) return null;
+  if (_isParamEnabledList is EqualUnmodifiableListView) return _isParamEnabledList;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
  final  List<NameValueModel>? _requestHeaders;
 @override List<NameValueModel>? get requestHeaders {
   final value = _requestHeaders;
@@ -810,16 +830,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebSocketRequestModel&&(identical(other.url, url) || other.url == url)&&const DeepCollectionEquality().equals(other._requestHeaders, _requestHeaders)&&const DeepCollectionEquality().equals(other._isHeaderEnabledList, _isHeaderEnabledList)&&const DeepCollectionEquality().equals(other._savedMessages, _savedMessages)&&const DeepCollectionEquality().equals(other._savedEventLog, _savedEventLog)&&(identical(other.requestTabIndex, requestTabIndex) || other.requestTabIndex == requestTabIndex)&&(identical(other.filterIndex, filterIndex) || other.filterIndex == filterIndex)&&(identical(other.pingInterval, pingInterval) || other.pingInterval == pingInterval));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WebSocketRequestModel&&(identical(other.url, url) || other.url == url)&&const DeepCollectionEquality().equals(other._requestParams, _requestParams)&&const DeepCollectionEquality().equals(other._isParamEnabledList, _isParamEnabledList)&&const DeepCollectionEquality().equals(other._requestHeaders, _requestHeaders)&&const DeepCollectionEquality().equals(other._isHeaderEnabledList, _isHeaderEnabledList)&&const DeepCollectionEquality().equals(other._savedMessages, _savedMessages)&&const DeepCollectionEquality().equals(other._savedEventLog, _savedEventLog)&&(identical(other.requestTabIndex, requestTabIndex) || other.requestTabIndex == requestTabIndex)&&(identical(other.filterIndex, filterIndex) || other.filterIndex == filterIndex)&&(identical(other.pingInterval, pingInterval) || other.pingInterval == pingInterval));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,url,const DeepCollectionEquality().hash(_requestHeaders),const DeepCollectionEquality().hash(_isHeaderEnabledList),const DeepCollectionEquality().hash(_savedMessages),const DeepCollectionEquality().hash(_savedEventLog),requestTabIndex,filterIndex,pingInterval);
+int get hashCode => Object.hash(runtimeType,url,const DeepCollectionEquality().hash(_requestParams),const DeepCollectionEquality().hash(_isParamEnabledList),const DeepCollectionEquality().hash(_requestHeaders),const DeepCollectionEquality().hash(_isHeaderEnabledList),const DeepCollectionEquality().hash(_savedMessages),const DeepCollectionEquality().hash(_savedEventLog),requestTabIndex,filterIndex,pingInterval);
 
 @override
 String toString() {
-  return 'WebSocketRequestModel(url: $url, requestHeaders: $requestHeaders, isHeaderEnabledList: $isHeaderEnabledList, savedMessages: $savedMessages, savedEventLog: $savedEventLog, requestTabIndex: $requestTabIndex, filterIndex: $filterIndex, pingInterval: $pingInterval)';
+  return 'WebSocketRequestModel(url: $url, requestParams: $requestParams, isParamEnabledList: $isParamEnabledList, requestHeaders: $requestHeaders, isHeaderEnabledList: $isHeaderEnabledList, savedMessages: $savedMessages, savedEventLog: $savedEventLog, requestTabIndex: $requestTabIndex, filterIndex: $filterIndex, pingInterval: $pingInterval)';
 }
 
 
@@ -830,7 +850,7 @@ abstract mixin class _$WebSocketRequestModelCopyWith<$Res> implements $WebSocket
   factory _$WebSocketRequestModelCopyWith(_WebSocketRequestModel value, $Res Function(_WebSocketRequestModel) _then) = __$WebSocketRequestModelCopyWithImpl;
 @override @useResult
 $Res call({
- String url, List<NameValueModel>? requestHeaders, List<bool>? isHeaderEnabledList, List<WebSocketSavedMessage> savedMessages, List<WebSocketSavedEvent> savedEventLog, int requestTabIndex, int filterIndex, int pingInterval
+ String url, List<NameValueModel>? requestParams, List<bool>? isParamEnabledList, List<NameValueModel>? requestHeaders, List<bool>? isHeaderEnabledList, List<WebSocketSavedMessage> savedMessages, List<WebSocketSavedEvent> savedEventLog, int requestTabIndex, int filterIndex, int pingInterval
 });
 
 
@@ -847,10 +867,12 @@ class __$WebSocketRequestModelCopyWithImpl<$Res>
 
 /// Create a copy of WebSocketRequestModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? url = null,Object? requestHeaders = freezed,Object? isHeaderEnabledList = freezed,Object? savedMessages = null,Object? savedEventLog = null,Object? requestTabIndex = null,Object? filterIndex = null,Object? pingInterval = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? url = null,Object? requestParams = freezed,Object? isParamEnabledList = freezed,Object? requestHeaders = freezed,Object? isHeaderEnabledList = freezed,Object? savedMessages = null,Object? savedEventLog = null,Object? requestTabIndex = null,Object? filterIndex = null,Object? pingInterval = null,}) {
   return _then(_WebSocketRequestModel(
 url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
-as String,requestHeaders: freezed == requestHeaders ? _self._requestHeaders : requestHeaders // ignore: cast_nullable_to_non_nullable
+as String,requestParams: freezed == requestParams ? _self._requestParams : requestParams // ignore: cast_nullable_to_non_nullable
+as List<NameValueModel>?,isParamEnabledList: freezed == isParamEnabledList ? _self._isParamEnabledList : isParamEnabledList // ignore: cast_nullable_to_non_nullable
+as List<bool>?,requestHeaders: freezed == requestHeaders ? _self._requestHeaders : requestHeaders // ignore: cast_nullable_to_non_nullable
 as List<NameValueModel>?,isHeaderEnabledList: freezed == isHeaderEnabledList ? _self._isHeaderEnabledList : isHeaderEnabledList // ignore: cast_nullable_to_non_nullable
 as List<bool>?,savedMessages: null == savedMessages ? _self._savedMessages : savedMessages // ignore: cast_nullable_to_non_nullable
 as List<WebSocketSavedMessage>,savedEventLog: null == savedEventLog ? _self._savedEventLog : savedEventLog // ignore: cast_nullable_to_non_nullable

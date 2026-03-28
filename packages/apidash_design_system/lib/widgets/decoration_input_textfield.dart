@@ -22,15 +22,23 @@ InputDecoration getTextFieldInputDecoration(
           fontSize: hintTextFontSize,
           color: hintTextColor ?? clrScheme.outlineVariant,
         ),
-        suffixIcon: suffixIcon,
+    suffixIcon: suffixIcon,
     hintText: hintText,
     contentPadding: contentPadding ?? kP10,
     focusedBorder: OutlineInputBorder(
+      borderRadius: kBorderRadius8,
       borderSide: BorderSide(
         color: focussedBorderColor ?? clrScheme.outline,
       ),
     ),
     enabledBorder: OutlineInputBorder(
+      borderRadius: kBorderRadius8,
+      borderSide: BorderSide(
+        color: enabledBorderColor ?? clrScheme.surfaceContainerHighest,
+      ),
+    ),
+    border: OutlineInputBorder(
+      borderRadius: kBorderRadius8,
       borderSide: BorderSide(
         color: enabledBorderColor ?? clrScheme.surfaceContainerHighest,
       ),
