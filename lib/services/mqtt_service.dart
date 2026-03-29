@@ -43,12 +43,16 @@ class MQTTMessage {
   final String payload;
   final DateTime timestamp;
   final bool isIncoming;
+  final int qos;        // 0, 1, or 2
+  final bool isRetained; // broker-flagged retained
 
   const MQTTMessage({
     required this.topic,
     required this.payload,
     required this.timestamp,
     required this.isIncoming,
+    this.qos = 0,
+    this.isRetained = false,
   });
 }
 
@@ -166,6 +170,8 @@ class MQTTService {
           payload: s.payload,
           timestamp: s.timestamp,
           isIncoming: s.isIncoming,
+          qos: s.qos,
+          isRetained: s.isRetained,
         )));
 
     _eventLog.clear();
@@ -255,6 +261,7 @@ class MQTTService {
         : (mqtt3_server.MqttServerClient(uri.host, clientId)
           ..port = uri.hasPort ? uri.port : (request.port == 0 ? 1883 : request.port));
 
+    client.connectTimeoutPeriod = 10000; // 10s timeout
     client.keepAlivePeriod = request.keepAlive;
     client.disconnectOnNoResponsePeriod = request.keepAlive > 0 ? request.keepAlive * 2 : 60;
     client.secure = request.useTls;
@@ -309,12 +316,16 @@ class MQTTService {
       for (final msg in messages) {
         final r = msg.payload as mqtt3.MqttPublishMessage;
         final payload = mqtt3.MqttPublishPayload.bytesToStringAsString(r.payload.message);
+        final qosVal = r.header?.qos.index ?? 0;
+        final retained = r.header?.retain ?? false;
         _log.d('[MQTT] Received on ${msg.topic}: $payload');
         _addMessage(MQTTMessage(
           topic: msg.topic,
           payload: payload,
           timestamp: DateTime.now(),
           isIncoming: true,
+          qos: qosVal.clamp(0, 2),
+          isRetained: retained,
         ));
         _addEvent(MQTTEvent(
           timestamp: DateTime.now(),
@@ -385,13 +396,16 @@ class MQTTService {
         final r = msg.payload as mqtt5.MqttPublishMessage;
         final pb = r.payload.message;
         final payload = pb == null ? '' : mqtt5.MqttPublishPayload.bytesToStringAsString(pb);
-        
+        final qosVal = r.header?.qos.index ?? 0;
+        final retained = r.header?.retain ?? false;
         _log.d('[MQTT] Received on ${msg.topic}: $payload');
         _addMessage(MQTTMessage(
           topic: msg.topic ?? '',
           payload: payload,
           timestamp: DateTime.now(),
           isIncoming: true,
+          qos: qosVal.clamp(0, 2),
+          isRetained: retained,
         ));
         _addEvent(MQTTEvent(
           timestamp: DateTime.now(),
@@ -409,10 +423,11 @@ class MQTTService {
     await _updatesSub?.cancel();
     _updatesSub = null;
     
-    if (isConnected) {
-      _clientV5?.disconnect();
-      _clientV3?.disconnect();
-    }
+    // Always call disconnect on both clients if they exist, 
+    // regardless of the isConnected state to clean up zombies.
+    _clientV5?.disconnect();
+    _clientV3?.disconnect();
+    
     _clientV5 = null;
     _clientV3 = null;
     _pushState(const MQTTConnectionState());
@@ -499,6 +514,8 @@ class MQTTService {
         payload: payload,
         timestamp: DateTime.now(),
         isIncoming: false,
+        qos: qos.clamp(0, 2),
+        isRetained: retain,
       ));
       _addEvent(MQTTEvent(
         timestamp: DateTime.now(),

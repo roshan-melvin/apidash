@@ -106,6 +106,8 @@ _MQTTSavedMessage _$MQTTSavedMessageFromJson(Map json) => _MQTTSavedMessage(
   payload: json['payload'] as String,
   timestamp: DateTime.parse(json['timestamp'] as String),
   isIncoming: json['isIncoming'] as bool,
+  qos: (json['qos'] as num?)?.toInt() ?? 0,
+  isRetained: json['isRetained'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$MQTTSavedMessageToJson(_MQTTSavedMessage instance) =>
@@ -114,6 +116,8 @@ Map<String, dynamic> _$MQTTSavedMessageToJson(_MQTTSavedMessage instance) =>
       'payload': instance.payload,
       'timestamp': instance.timestamp.toIso8601String(),
       'isIncoming': instance.isIncoming,
+      'qos': instance.qos,
+      'isRetained': instance.isRetained,
     };
 
 _MQTTSavedEvent _$MQTTSavedEventFromJson(Map json) => _MQTTSavedEvent(

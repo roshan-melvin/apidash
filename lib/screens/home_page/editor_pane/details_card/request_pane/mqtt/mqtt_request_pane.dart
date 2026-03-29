@@ -6,6 +6,7 @@ import 'package:apidash/consts.dart';
 import 'package:apidash/providers/providers.dart';
 import 'package:apidash/models/mqtt_request_model.dart';
 import 'package:apidash/widgets/widgets.dart';
+import 'package:apidash/widgets/mqtt_topic_autocomplete.dart';
 
 class EditMQTTRequestPane extends ConsumerStatefulWidget {
   const EditMQTTRequestPane({super.key});
@@ -523,11 +524,19 @@ class _TopicsTab extends StatelessWidget {
                   return DataRow(
                     cells: [
                       DataCell(
-                        CellField(
+                        MqttTopicAutocomplete(
                           keyId: "mqtt-topic-$i",
                           initialValue: t.topic,
                           hintText: 'home/sensor',
                           onChanged: (v) => onUpdate(i, t.copyWith(topic: v)),
+                          suffixIcon: Tooltip(
+                            message: 'Wildcards:\n+ : Single level (e.g. home/+/temp)\n# : Multi level (e.g. home/#)',
+                            child: Icon(
+                              Icons.info_outline,
+                              size: 14,
+                              color: Theme.of(context).colorScheme.outlineVariant,
+                            ),
+                          ),
                         ),
                       ),
                       DataCell(

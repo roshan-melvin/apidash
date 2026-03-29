@@ -628,7 +628,7 @@ as String,
 /// @nodoc
 mixin _$MQTTSavedMessage {
 
- String get topic; String get payload; DateTime get timestamp; bool get isIncoming;
+ String get topic; String get payload; DateTime get timestamp; bool get isIncoming; int get qos; bool get isRetained;
 /// Create a copy of MQTTSavedMessage
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -641,16 +641,16 @@ $MQTTSavedMessageCopyWith<MQTTSavedMessage> get copyWith => _$MQTTSavedMessageCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MQTTSavedMessage&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.payload, payload) || other.payload == payload)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.isIncoming, isIncoming) || other.isIncoming == isIncoming));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MQTTSavedMessage&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.payload, payload) || other.payload == payload)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.isIncoming, isIncoming) || other.isIncoming == isIncoming)&&(identical(other.qos, qos) || other.qos == qos)&&(identical(other.isRetained, isRetained) || other.isRetained == isRetained));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,topic,payload,timestamp,isIncoming);
+int get hashCode => Object.hash(runtimeType,topic,payload,timestamp,isIncoming,qos,isRetained);
 
 @override
 String toString() {
-  return 'MQTTSavedMessage(topic: $topic, payload: $payload, timestamp: $timestamp, isIncoming: $isIncoming)';
+  return 'MQTTSavedMessage(topic: $topic, payload: $payload, timestamp: $timestamp, isIncoming: $isIncoming, qos: $qos, isRetained: $isRetained)';
 }
 
 
@@ -661,7 +661,7 @@ abstract mixin class $MQTTSavedMessageCopyWith<$Res>  {
   factory $MQTTSavedMessageCopyWith(MQTTSavedMessage value, $Res Function(MQTTSavedMessage) _then) = _$MQTTSavedMessageCopyWithImpl;
 @useResult
 $Res call({
- String topic, String payload, DateTime timestamp, bool isIncoming
+ String topic, String payload, DateTime timestamp, bool isIncoming, int qos, bool isRetained
 });
 
 
@@ -678,12 +678,14 @@ class _$MQTTSavedMessageCopyWithImpl<$Res>
 
 /// Create a copy of MQTTSavedMessage
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? topic = null,Object? payload = null,Object? timestamp = null,Object? isIncoming = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? topic = null,Object? payload = null,Object? timestamp = null,Object? isIncoming = null,Object? qos = null,Object? isRetained = null,}) {
   return _then(_self.copyWith(
 topic: null == topic ? _self.topic : topic // ignore: cast_nullable_to_non_nullable
 as String,payload: null == payload ? _self.payload : payload // ignore: cast_nullable_to_non_nullable
 as String,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
 as DateTime,isIncoming: null == isIncoming ? _self.isIncoming : isIncoming // ignore: cast_nullable_to_non_nullable
+as bool,qos: null == qos ? _self.qos : qos // ignore: cast_nullable_to_non_nullable
+as int,isRetained: null == isRetained ? _self.isRetained : isRetained // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -769,10 +771,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String topic,  String payload,  DateTime timestamp,  bool isIncoming)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String topic,  String payload,  DateTime timestamp,  bool isIncoming,  int qos,  bool isRetained)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MQTTSavedMessage() when $default != null:
-return $default(_that.topic,_that.payload,_that.timestamp,_that.isIncoming);case _:
+return $default(_that.topic,_that.payload,_that.timestamp,_that.isIncoming,_that.qos,_that.isRetained);case _:
   return orElse();
 
 }
@@ -790,10 +792,10 @@ return $default(_that.topic,_that.payload,_that.timestamp,_that.isIncoming);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String topic,  String payload,  DateTime timestamp,  bool isIncoming)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String topic,  String payload,  DateTime timestamp,  bool isIncoming,  int qos,  bool isRetained)  $default,) {final _that = this;
 switch (_that) {
 case _MQTTSavedMessage():
-return $default(_that.topic,_that.payload,_that.timestamp,_that.isIncoming);case _:
+return $default(_that.topic,_that.payload,_that.timestamp,_that.isIncoming,_that.qos,_that.isRetained);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -810,10 +812,10 @@ return $default(_that.topic,_that.payload,_that.timestamp,_that.isIncoming);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String topic,  String payload,  DateTime timestamp,  bool isIncoming)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String topic,  String payload,  DateTime timestamp,  bool isIncoming,  int qos,  bool isRetained)?  $default,) {final _that = this;
 switch (_that) {
 case _MQTTSavedMessage() when $default != null:
-return $default(_that.topic,_that.payload,_that.timestamp,_that.isIncoming);case _:
+return $default(_that.topic,_that.payload,_that.timestamp,_that.isIncoming,_that.qos,_that.isRetained);case _:
   return null;
 
 }
@@ -825,13 +827,15 @@ return $default(_that.topic,_that.payload,_that.timestamp,_that.isIncoming);case
 
 @JsonSerializable(anyMap: true)
 class _MQTTSavedMessage implements MQTTSavedMessage {
-  const _MQTTSavedMessage({required this.topic, required this.payload, required this.timestamp, required this.isIncoming});
+  const _MQTTSavedMessage({required this.topic, required this.payload, required this.timestamp, required this.isIncoming, this.qos = 0, this.isRetained = false});
   factory _MQTTSavedMessage.fromJson(Map<String, dynamic> json) => _$MQTTSavedMessageFromJson(json);
 
 @override final  String topic;
 @override final  String payload;
 @override final  DateTime timestamp;
 @override final  bool isIncoming;
+@override@JsonKey() final  int qos;
+@override@JsonKey() final  bool isRetained;
 
 /// Create a copy of MQTTSavedMessage
 /// with the given fields replaced by the non-null parameter values.
@@ -846,16 +850,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MQTTSavedMessage&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.payload, payload) || other.payload == payload)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.isIncoming, isIncoming) || other.isIncoming == isIncoming));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MQTTSavedMessage&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.payload, payload) || other.payload == payload)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.isIncoming, isIncoming) || other.isIncoming == isIncoming)&&(identical(other.qos, qos) || other.qos == qos)&&(identical(other.isRetained, isRetained) || other.isRetained == isRetained));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,topic,payload,timestamp,isIncoming);
+int get hashCode => Object.hash(runtimeType,topic,payload,timestamp,isIncoming,qos,isRetained);
 
 @override
 String toString() {
-  return 'MQTTSavedMessage(topic: $topic, payload: $payload, timestamp: $timestamp, isIncoming: $isIncoming)';
+  return 'MQTTSavedMessage(topic: $topic, payload: $payload, timestamp: $timestamp, isIncoming: $isIncoming, qos: $qos, isRetained: $isRetained)';
 }
 
 
@@ -866,7 +870,7 @@ abstract mixin class _$MQTTSavedMessageCopyWith<$Res> implements $MQTTSavedMessa
   factory _$MQTTSavedMessageCopyWith(_MQTTSavedMessage value, $Res Function(_MQTTSavedMessage) _then) = __$MQTTSavedMessageCopyWithImpl;
 @override @useResult
 $Res call({
- String topic, String payload, DateTime timestamp, bool isIncoming
+ String topic, String payload, DateTime timestamp, bool isIncoming, int qos, bool isRetained
 });
 
 
@@ -883,12 +887,14 @@ class __$MQTTSavedMessageCopyWithImpl<$Res>
 
 /// Create a copy of MQTTSavedMessage
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? topic = null,Object? payload = null,Object? timestamp = null,Object? isIncoming = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? topic = null,Object? payload = null,Object? timestamp = null,Object? isIncoming = null,Object? qos = null,Object? isRetained = null,}) {
   return _then(_MQTTSavedMessage(
 topic: null == topic ? _self.topic : topic // ignore: cast_nullable_to_non_nullable
 as String,payload: null == payload ? _self.payload : payload // ignore: cast_nullable_to_non_nullable
 as String,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
 as DateTime,isIncoming: null == isIncoming ? _self.isIncoming : isIncoming // ignore: cast_nullable_to_non_nullable
+as bool,qos: null == qos ? _self.qos : qos // ignore: cast_nullable_to_non_nullable
+as int,isRetained: null == isRetained ? _self.isRetained : isRetained // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

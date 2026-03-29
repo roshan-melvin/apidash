@@ -53,6 +53,8 @@ final mqttMessagesProvider = Provider<List<MQTTMessage>>((ref) {
             payload: s.payload,
             timestamp: s.timestamp,
             isIncoming: s.isIncoming,
+            qos: s.qos,
+            isRetained: s.isRetained,
           ))
       .toList();
 });
@@ -103,6 +105,8 @@ final mqttStateSyncProvider = Provider<void>((ref) {
                   payload: m.payload,
                   timestamp: m.timestamp,
                   isIncoming: m.isIncoming,
+                  qos: m.qos,
+                  isRetained: m.isRetained,
                 ))
             .toList();
 

@@ -63,6 +63,8 @@ abstract class MQTTSavedMessage with _$MQTTSavedMessage {
     required String payload,
     required DateTime timestamp,
     required bool isIncoming,
+    @Default(0) int qos,
+    @Default(false) bool isRetained,
   }) = _MQTTSavedMessage;
 
   factory MQTTSavedMessage.fromJson(Map<String, Object?> json) =>
