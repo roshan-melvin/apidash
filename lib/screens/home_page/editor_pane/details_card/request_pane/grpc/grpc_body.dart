@@ -1,8 +1,11 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:apidash_design_system/apidash_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apidash/providers/providers.dart';
 import 'package:apidash/widgets/widgets.dart';
+import 'package:apidash/screens/home_page/editor_pane/details_card/request_pane/websocket/websocket_template_panel.dart';
 
 class GrpcBody extends ConsumerStatefulWidget {
   const GrpcBody({super.key});
@@ -12,9 +15,112 @@ class GrpcBody extends ConsumerStatefulWidget {
 }
 
 class _GrpcBodyState extends ConsumerState<GrpcBody> {
+  List<Map<String, dynamic>> _templates = [];
+  String? _currentRequestId;
+
+  void _checkRequestId(String newId) {
+    if (_currentRequestId != newId) {
+      _currentRequestId = newId;
+      _loadTemplates(newId);
+    }
+  }
+
+  Future<void> _loadTemplates(String requestId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final str = prefs.getString('grpc_templates_$requestId');
+    if (str != null) {
+      try {
+        final List<dynamic> list = jsonDecode(str);
+        if (mounted) {
+          setState(() {
+            _templates = list.cast<Map<String, dynamic>>();
+          });
+        }
+      } catch (_) {
+        if (mounted) {
+          setState(() {
+            _templates = [];
+          });
+        }
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _templates = [];
+        });
+      }
+    }
+  }
+
+  Future<void> _saveTemplates() async {
+    if (_currentRequestId == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      'grpc_templates_$_currentRequestId',
+      jsonEncode(_templates),
+    );
+  }
+
+  void _saveNewTemplate(String name, String currentPayload) {
+    setState(() {
+      _templates.insert(0, {'name': name.trim(), 'payload': currentPayload});
+    });
+    _saveTemplates();
+  }
+
+  void _deleteTemplate(int index) {
+    setState(() {
+      _templates.removeAt(index);
+    });
+    _saveTemplates();
+  }
+
+  void _applyTemplate(
+    Map<String, dynamic> template,
+    String selectedId,
+    WidgetRef ref,
+  ) {
+    final newPayload = template['payload'] ?? '';
+    ref
+        .read(collectionStateNotifierProvider.notifier)
+        .updateGrpcModel(id: selectedId, requestJson: newPayload);
+  }
+
+  void _openTemplatesPanel(
+    BuildContext ctx,
+    String currentPayload,
+    String selectedId,
+    WidgetRef ref,
+  ) {
+    showDialog(
+      context: ctx,
+      barrierColor: Theme.of(ctx).colorScheme.scrim.withValues(alpha: 0.5),
+      builder: (context) {
+        return WebSocketTemplatePanel(
+          templates: _templates,
+          initialIsSavingView: false,
+          currentPayload: currentPayload,
+          onClose: () => Navigator.of(context).pop(),
+          onSave: (name) {
+            _saveNewTemplate(name, currentPayload);
+            Navigator.of(context).pop();
+          },
+          onDelete: _deleteTemplate,
+          onSelect: (t) {
+            _applyTemplate(t, selectedId, ref);
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final selectedId = ref.watch(selectedIdStateProvider);
+    if (selectedId != null) {
+      _checkRequestId(selectedId);
+    }
     final requestModel = ref.watch(
       collectionStateNotifierProvider.select(
         (value) => value?[selectedId]?.grpcRequestModel,
@@ -206,6 +312,40 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
             ],
           ),
           kVSpacer10,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Payload",
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              SizedBox(
+                height: 32,
+                child: TextButton.icon(
+                  onPressed: () => _openTemplatesPanel(
+                    context,
+                    requestModel.requestJson,
+                    selectedId!,
+                    ref,
+                  ),
+                  icon: Icon(
+                    Icons.library_books_rounded,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  label: Text(
+                    'Templates',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          kVSpacer5,
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(bottom: 10),

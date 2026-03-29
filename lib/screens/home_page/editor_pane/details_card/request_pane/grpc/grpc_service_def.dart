@@ -158,7 +158,15 @@ class GrpcServiceDef extends ConsumerWidget {
                             id: selectedId,
                             serviceName: service['name'],
                             methodName: mName,
+                            requestTabIndex: 0,
                           );
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Switched to $mName — ready to send'),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
