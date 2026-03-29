@@ -10,10 +10,7 @@ part 'history_request_model.g.dart';
 
 @freezed
 abstract class HistoryRequestModel with _$HistoryRequestModel {
-  @JsonSerializable(
-    explicitToJson: true,
-    anyMap: true,
-  )
+  @JsonSerializable(explicitToJson: true, anyMap: true)
   const factory HistoryRequestModel({
     required String historyId,
     required HistoryMetaModel metaData,

@@ -657,7 +657,6 @@ const kMsgCodegenMQTTNotAvailable =
 const kMsgCodegenError =
     "An error was encountered while generating code. $kRaiseIssue";
 
-
 // Scripts Tabs
 const kLabelPreRequest = "Pre Request";
 const kLabelPostResponse = "Post Response";

@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:async';
+import 'dart:ui' as ui;
 import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
@@ -15,10 +17,13 @@ final _timeFmt = DateFormat('HH:mm:ss.SSS');
 /// Format a numeric value: whole numbers show no decimal, fractions keep digits.
 String _fmtNum(double v) {
   if (v.isNaN || v.isInfinite) return '$v';
-  if (v == v.truncateToDouble()) {
-    return NumberFormat('#,##0').format(v.truncate());
+  final s = v.toStringAsFixed(3);
+  if (s.endsWith('.000')) return s.substring(0, s.length - 4);
+  var trimmed = s;
+  while (trimmed.contains('.') && (trimmed.endsWith('0') || trimmed.endsWith('.'))) {
+    trimmed = trimmed.substring(0, trimmed.length - 1);
   }
-  return NumberFormat('#,##0.###').format(v);
+  return trimmed;
 }
 
 // ─── Topic Tree Node ──────────────────────────────────────────────────────────
@@ -150,23 +155,27 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
       final asNum = _parseNumeric(msg.payload);
       if (asNum != null) {
         newData.putIfAbsent(msg.topic, () => []);
-        newData[msg.topic]!.add(_DataPoint(
-          timestamp: msg.timestamp,
-          value: asNum,
-          field: null,
-          jsonFields: null,
-        ));
+        newData[msg.topic]!.add(
+          _DataPoint(
+            timestamp: msg.timestamp,
+            value: asNum,
+            field: null,
+            jsonFields: null,
+          ),
+        );
       } else {
         // Try JSON object
         final fields = _extractJsonNumericFields(msg.payload);
         if (fields.isNotEmpty) {
           newData.putIfAbsent(msg.topic, () => []);
-          newData[msg.topic]!.add(_DataPoint(
-            timestamp: msg.timestamp,
-            value: fields.values.first,
-            field: fields.keys.first,
-            jsonFields: fields,
-          ));
+          newData[msg.topic]!.add(
+            _DataPoint(
+              timestamp: msg.timestamp,
+              value: fields.values.first,
+              field: fields.keys.first,
+              jsonFields: fields,
+            ),
+          );
         }
       }
     }
@@ -175,8 +184,9 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
     const kGraphPointsCap = 2000;
     for (final topic in newData.keys) {
       if (newData[topic]!.length > kGraphPointsCap) {
-        newData[topic] =
-            newData[topic]!.sublist(newData[topic]!.length - kGraphPointsCap);
+        newData[topic] = newData[topic]!.sublist(
+          newData[topic]!.length - kGraphPointsCap,
+        );
       }
     }
 
@@ -192,8 +202,7 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
     // If selected topic disappeared, reset
     if (_selectedGraphTopic != null &&
         !newTopics.contains(_selectedGraphTopic)) {
-      _selectedGraphTopic =
-          newTopics.isNotEmpty ? newTopics.first : null;
+      _selectedGraphTopic = newTopics.isNotEmpty ? newTopics.first : null;
       _selectedGraphField = null;
     }
 
@@ -214,15 +223,20 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
 
   List<String> _availableFields(List<_DataPoint> points) {
     final fields = <String>{};
+    bool hasNoField = false;
     for (final p in points) {
+      if (p.field == null && p.jsonFields == null) hasNoField = true;
       if (p.jsonFields != null) fields.addAll(p.jsonFields!.keys);
     }
+    if (hasNoField) fields.add('No Field');
     return fields.toList();
   }
 
-  List<double> _getValues(
-      List<_DataPoint> points, String? field) {
+  List<double> _getValues(List<_DataPoint> points, String? field) {
     return points.map((p) {
+      if (field == 'No Field') {
+        return (p.field == null && p.jsonFields == null) ? p.value : double.nan;
+      }
       if (field != null && p.jsonFields != null) {
         return p.jsonFields![field] ?? double.nan;
       }
@@ -233,12 +247,16 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
   // ── Export ────────────────────────────────────────────────────────────────
 
   void _exportJson(List<MQTTMessage> messages) {
-    final data = messages.map((m) => {
-          'timestamp': m.timestamp.toIso8601String(),
-          'direction': m.isIncoming ? 'in' : 'out',
-          'topic': m.topic,
-          'payload': m.payload,
-        }).toList();
+    final data = messages
+        .map(
+          (m) => {
+            'timestamp': m.timestamp.toIso8601String(),
+            'direction': m.isIncoming ? 'in' : 'out',
+            'topic': m.topic,
+            'payload': m.payload,
+          },
+        )
+        .toList();
     final json = const JsonEncoder.withIndent('  ').convert(data);
     final ts = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
     _showExportDialog('mqtt_session_$ts.json', json, context);
@@ -250,7 +268,8 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
       final payload = m.payload.replaceAll('"', '""');
       final topic = m.topic.replaceAll('"', '""');
       buf.writeln(
-          '"${m.timestamp.toIso8601String()}","${m.isIncoming ? 'in' : 'out'}","$topic","$payload"');
+        '"${m.timestamp.toIso8601String()}","${m.isIncoming ? 'in' : 'out'}","$topic","$payload"',
+      );
     }
     final ts = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
     _showExportDialog('mqtt_session_$ts.csv', buf.toString(), context);
@@ -264,8 +283,10 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
         content: SizedBox(
           width: 500,
           height: 300,
-          child: SelectableText(content,
-              style: const TextStyle(fontFamily: 'monospace', fontSize: 11)),
+          child: SelectableText(
+            content,
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
+          ),
         ),
         actions: [
           TextButton(
@@ -338,27 +359,34 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
       displayMessages = filtered;
     } else {
       displayMessages = filtered
-          .where((m) =>
-              m.topic == _treeFilterTopic ||
-              m.topic.startsWith('$_treeFilterTopic/'))
+          .where(
+            (m) =>
+                m.topic == _treeFilterTopic ||
+                m.topic.startsWith('$_treeFilterTopic/'),
+          )
           .toList();
     }
 
     // ── Filtered events ────────────────────────────────────────────────────
     var typeFilteredEvents = events;
     if (_filterEventIndex == 1) {
-      typeFilteredEvents =
-          events.where((e) => e.type == MQTTEventType.error).toList();
+      typeFilteredEvents = events
+          .where((e) => e.type == MQTTEventType.error)
+          .toList();
     } else if (_filterEventIndex == 2) {
-      typeFilteredEvents =
-          events.where((e) => e.type != MQTTEventType.error).toList();
+      typeFilteredEvents = events
+          .where((e) => e.type != MQTTEventType.error)
+          .toList();
     }
     final filteredEvents = _filterEvent.isEmpty
         ? typeFilteredEvents
         : typeFilteredEvents
-            .where((e) =>
-                e.description.toLowerCase().contains(_filterEvent.toLowerCase()))
-            .toList();
+              .where(
+                (e) => e.description.toLowerCase().contains(
+                  _filterEvent.toLowerCase(),
+                ),
+              )
+              .toList();
 
     // ── Topic tree data ────────────────────────────────────────────────────
     final topicCounts = <String, int>{};
@@ -375,6 +403,7 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
           error: connState?.error,
           inCount: inCount,
           outCount: outCount,
+          connectedAt: connState?.connectedAt,
         ),
         TabBar(
           controller: _tabCtrl,
@@ -408,8 +437,7 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
                 children: [
                   const Text('Topic Tree'),
                   kHSpacer8,
-                  if (topicCounts.isNotEmpty)
-                    _Badge(count: topicCounts.length),
+                  if (topicCounts.isNotEmpty) _Badge(count: topicCounts.length),
                 ],
               ),
             ),
@@ -486,8 +514,7 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
                     if (fields.isNotEmpty) _selectedGraphField = fields.first;
                   });
                 },
-                onFieldChanged: (f) =>
-                    setState(() => _selectedGraphField = f),
+                onFieldChanged: (f) => setState(() => _selectedGraphField = f),
                 getValues: _getValues,
                 availableFields: _availableFields,
                 notifyParent: () {
@@ -540,13 +567,14 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
                 isDense: true,
                 hintText: 'Filter by topic...',
                 prefixIcon: const Icon(Icons.search, size: 16),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 filled: true,
-                fillColor:
-                    Theme.of(context).brightness == Brightness.light
-                        ? Colors.white
-                        : null,
+                fillColor: Theme.of(context).brightness == Brightness.light
+                    ? Colors.white
+                    : null,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: kBorderRadius8,
                   borderSide: const BorderSide(color: Colors.grey),
@@ -603,13 +631,14 @@ class _MQTTResponsePaneState extends ConsumerState<MQTTResponsePane>
                 isDense: true,
                 hintText: 'Filter events...',
                 prefixIcon: const Icon(Icons.search, size: 16),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 filled: true,
-                fillColor:
-                    Theme.of(context).brightness == Brightness.light
-                        ? Colors.white
-                        : null,
+                fillColor: Theme.of(context).brightness == Brightness.light
+                    ? Colors.white
+                    : null,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: kBorderRadius8,
                   borderSide: const BorderSide(color: Colors.grey),
@@ -666,6 +695,7 @@ class _LiveGraphTab extends StatefulWidget {
   final void Function(String) onFieldChanged;
   final List<double> Function(List<_DataPoint>, String?) getValues;
   final List<String> Function(List<_DataPoint>) availableFields;
+
   /// Extra rebuild on the MQTT pane (child [setState] should suffice; this
   /// helps graph repaint if the platform misses a frame).
   final VoidCallback? notifyParent;
@@ -698,15 +728,22 @@ class _LiveGraphTabState extends State<_LiveGraphTab>
   int _visiblePoints = 50;
   int _scrollOffset = 0; // Points back from latest
   bool _autoFollow = true;
+
   /// Leftover pointer delta when converting pixels → index steps.
   double _panPixelRemainder = 0;
 
   @override
   void didUpdateWidget(_LiveGraphTab oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final oldTopic = oldWidget.selectedTopic ?? (oldWidget.graphData.keys.isNotEmpty ? oldWidget.graphData.keys.first : null);
-    final newTopic = widget.selectedTopic ?? (widget.graphData.keys.isNotEmpty ? widget.graphData.keys.first : null);
-    
+    final oldTopic =
+        oldWidget.selectedTopic ??
+        (oldWidget.graphData.keys.isNotEmpty
+            ? oldWidget.graphData.keys.first
+            : null);
+    final newTopic =
+        widget.selectedTopic ??
+        (widget.graphData.keys.isNotEmpty ? widget.graphData.keys.first : null);
+
     if (oldTopic != newTopic) {
       setState(() {
         _visiblePoints = 50;
@@ -871,8 +908,9 @@ class _LiveGraphTabState extends State<_LiveGraphTab>
     final endSlice = endIdx.clamp(startIdx, n);
 
     final visibleValues = allValues.sublist(startIdx, endSlice);
-    final validValues =
-        visibleValues.where((v) => !v.isNaN && v.isFinite).toList();
+    final validValues = visibleValues
+        .where((v) => !v.isNaN && v.isFinite)
+        .toList();
 
     double dataMin;
     double dataMax;
@@ -901,8 +939,10 @@ class _LiveGraphTabState extends State<_LiveGraphTab>
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: Row(
             children: [
-              const Text('Topic: ',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              const Text(
+                'Topic: ',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              ),
               kHSpacer4,
               Expanded(
                 child: ADDropdownButton<String>(
@@ -916,9 +956,10 @@ class _LiveGraphTabState extends State<_LiveGraphTab>
               ),
               if (isJsonTopic && fields.isNotEmpty) ...[
                 kHSpacer8,
-                const Text('Field: ',
-                    style:
-                        TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                const Text(
+                  'Field: ',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                ),
                 kHSpacer4,
                 Expanded(
                   child: ADDropdownButton<String>(
@@ -928,12 +969,14 @@ class _LiveGraphTabState extends State<_LiveGraphTab>
                       if (v != null) widget.onFieldChanged(v);
                     },
                     values: fields
-                        .map((f) => (
-                              f,
-                              double.tryParse(f) != null
-                                  ? _fmtNum(double.parse(f))
-                                  : f
-                            ))
+                        .map(
+                          (f) => (
+                            f,
+                            double.tryParse(f) != null
+                                ? _fmtNum(double.parse(f))
+                                : f,
+                          ),
+                        )
                         .toList(),
                   ),
                 ),
@@ -1158,8 +1201,7 @@ class _SparklineChartState extends State<_SparklineChart> {
   }
 
   void _handlePanZoomUpdate(PointerPanZoomUpdateEvent e) {
-    if (e.panDelta.dx != 0 &&
-        e.panDelta.dx.abs() >= e.panDelta.dy.abs()) {
+    if (e.panDelta.dx != 0 && e.panDelta.dx.abs() >= e.panDelta.dy.abs()) {
       widget.onChartPanPixels(e.panDelta.dx);
     } else if (widget.maxPan > 0 &&
         e.panDelta.dy != 0 &&
@@ -1198,7 +1240,11 @@ class _SparklineChartState extends State<_SparklineChart> {
                 children: [
                   // Chart + wheel/pinch. Pan uses Listener (not GestureDetector) so +/−
                   // InkWells are not defeated by the pan gesture arena.
-                  Positioned.fill(
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 60, // Pad bottom to prevent overlap with floating button
                     child: Listener(
                       behavior: HitTestBehavior.opaque,
                       onPointerMove: (PointerMoveEvent e) {
@@ -1238,8 +1284,9 @@ class _SparklineChartState extends State<_SparklineChart> {
                               paddedMin: widget.paddedMin,
                               paddedMax: widget.paddedMax,
                               color: widget.color,
-                              gridColor: clr.outlineVariant.withAlpha(100),
+                              gridColor: Theme.of(context).dividerColor.withValues(alpha: 0.4),
                               dotColor: widget.color,
+                              textColor: clr.onSurfaceVariant,
                               visibleCount: widget.visibleCount,
                               endIdx: widget.endIdx,
                             ),
@@ -1249,7 +1296,7 @@ class _SparklineChartState extends State<_SparklineChart> {
                     ),
                   ),
                   Positioned(
-                    bottom: 8,
+                    bottom: 60 - 16,
                     left: 8,
                     child: Text(
                       'Min: ${_fmtNum(widget.paddedMin)}',
@@ -1266,7 +1313,9 @@ class _SparklineChartState extends State<_SparklineChart> {
                       top: 8,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: clr.surfaceContainerHighest.withAlpha(200),
                           borderRadius: BorderRadius.circular(4),
@@ -1285,7 +1334,9 @@ class _SparklineChartState extends State<_SparklineChart> {
                         onPressed: widget.onJumpToLatest,
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           minimumSize: Size.zero,
                           visualDensity: VisualDensity.compact,
                           backgroundColor: clr.secondaryContainer,
@@ -1315,6 +1366,7 @@ class _SparklinePainter extends CustomPainter {
   final Color color;
   final Color gridColor;
   final Color dotColor;
+  final Color textColor;
   final int visibleCount;
   final int endIdx;
   static const double _dotR = 4.0;
@@ -1326,6 +1378,7 @@ class _SparklinePainter extends CustomPainter {
     required this.color,
     required this.gridColor,
     required this.dotColor,
+    required this.textColor,
     required this.visibleCount,
     required this.endIdx,
   });
@@ -1334,7 +1387,7 @@ class _SparklinePainter extends CustomPainter {
     if (!v.isFinite) return (h / 2).clamp(_dotR, h - _dotR);
     final span = paddedMax - paddedMin;
     if (span <= 0) return (h / 2).clamp(_dotR, h - _dotR);
-    
+
     final y = h - ((v - paddedMin) / span) * h;
     return y.clamp(_dotR, h - _dotR); // Apply the Y clamp to every single point
   }
@@ -1351,9 +1404,27 @@ class _SparklinePainter extends CustomPainter {
       ..color = gridColor
       ..strokeWidth = 0.5;
 
-    for (int i = 0; i <= 4; i++) {
-      final y = h * i / 4;
+    final textStyle = TextStyle(
+      color: textColor,
+      fontSize: 11,
+    );
+
+    // 4 evenly spaced grid lines: 1/5, 2/5, 3/5, 4/5 of height
+    for (int i = 1; i <= 4; i++) {
+      final y = h * i / 5;
       canvas.drawLine(Offset(0, y), Offset(w, y), gridPaint);
+
+      final val = paddedMax - (span * i / 5);
+      final textSpan = TextSpan(
+        text: _fmtNum(val),
+        style: textStyle,
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: ui.TextDirection.ltr,
+      );
+      textPainter.layout();
+      textPainter.paint(canvas, Offset(0, y - textPainter.height - 2));
     }
 
     if (span > 0 && paddedMin < 0 && paddedMax > 0) {
@@ -1379,7 +1450,7 @@ class _SparklinePainter extends CustomPainter {
 
     double xPos(int i) {
       if (visibleCount <= 1) return w - _dotR;
-      
+
       final wStart = endIdx - visibleCount;
       final originalIdx = endIdx - nv + i;
       return ((originalIdx - wStart) / (visibleCount - 1)) * w;
@@ -1420,7 +1491,7 @@ class _SparklinePainter extends CustomPainter {
     if (validPoints.isNotEmpty) {
       // The dot representing the latest value is placed exactly at the end of the line
       Offset lastP = validPoints.last;
-      
+
       final dotPaint = Paint()
         ..color = dotColor
         ..style = PaintingStyle.fill;
@@ -1479,8 +1550,10 @@ class _TopicTreeTabState extends State<_TopicTreeTab> {
             children: [
               const Icon(Icons.account_tree_outlined, size: 16),
               kHSpacer8,
-              const Text('Topic Tree',
-                  style: TextStyle(fontWeight: FontWeight.w600)),
+              const Text(
+                'Topic Tree',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
               const Spacer(),
               if (widget.selectedFilter != null)
                 TextButton.icon(
@@ -1489,7 +1562,9 @@ class _TopicTreeTabState extends State<_TopicTreeTab> {
                   label: const Text('Show All', style: TextStyle(fontSize: 12)),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     minimumSize: Size.zero,
                   ),
                 ),
@@ -1501,24 +1576,26 @@ class _TopicTreeTabState extends State<_TopicTreeTab> {
           child: ListView(
             padding: const EdgeInsets.symmetric(vertical: 4),
             children: widget.roots.entries
-                .map((e) => _TreeNodeWidget(
-                      node: e.value,
-                      path: e.key,
-                      depth: 0,
-                      expandedPaths: _expanded,
-                      selectedFilter: widget.selectedFilter,
-                      allTopicCounts: widget.topicCounts,
-                      onExpansionChanged: (path, expanded) {
-                        setState(() {
-                          if (expanded) {
-                            _expanded.add(path);
-                          } else {
-                            _expanded.remove(path);
-                          }
-                        });
-                      },
-                      onSelected: widget.onTopicSelected,
-                    ))
+                .map(
+                  (e) => _TreeNodeWidget(
+                    node: e.value,
+                    path: e.key,
+                    depth: 0,
+                    expandedPaths: _expanded,
+                    selectedFilter: widget.selectedFilter,
+                    allTopicCounts: widget.topicCounts,
+                    onExpansionChanged: (path, expanded) {
+                      setState(() {
+                        if (expanded) {
+                          _expanded.add(path);
+                        } else {
+                          _expanded.remove(path);
+                        }
+                      });
+                    },
+                    onSelected: widget.onTopicSelected,
+                  ),
+                )
                 .toList(),
           ),
         ),
@@ -1553,7 +1630,8 @@ class _TreeNodeWidget extends StatelessWidget {
     final clr = Theme.of(context).colorScheme;
     final isLeaf = node.children.isEmpty;
     final isExpanded = expandedPaths.contains(path);
-    final isSelected = selectedFilter != null &&
+    final isSelected =
+        selectedFilter != null &&
         (selectedFilter == path || selectedFilter!.startsWith('$path/'));
     final count = isLeaf ? (allTopicCounts[path] ?? 0) : node.totalCount;
 
@@ -1576,9 +1654,7 @@ class _TreeNodeWidget extends StatelessWidget {
                   width: 16.0 + depth * 16.0 + 20,
                   height: 36,
                   child: Padding(
-                    padding: EdgeInsets.only(
-                      left: 8.0 + depth * 16.0,
-                    ),
+                    padding: EdgeInsets.only(left: 8.0 + depth * 16.0),
                     child: Center(
                       child: !isLeaf
                           ? Icon(
@@ -1606,13 +1682,13 @@ class _TreeNodeWidget extends StatelessWidget {
                   onTap: () => onSelected(path, isLeaf),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 6, horizontal: 4),
+                      vertical: 6,
+                      horizontal: 4,
+                    ),
                     child: Row(
                       children: [
                         Icon(
-                          isLeaf
-                              ? Icons.topic_outlined
-                              : Icons.folder_outlined,
+                          isLeaf ? Icons.topic_outlined : Icons.folder_outlined,
                           size: 14,
                           color: isLeaf ? clr.primary : clr.secondary,
                         ),
@@ -1632,7 +1708,9 @@ class _TreeNodeWidget extends StatelessWidget {
                         const SizedBox(width: 4),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 1),
+                            horizontal: 6,
+                            vertical: 1,
+                          ),
                           decoration: BoxDecoration(
                             color: clr.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(10),
@@ -1698,12 +1776,17 @@ class _HistoryView extends StatelessWidget {
               TextButton.icon(
                 onPressed: onBack,
                 icon: const Icon(Icons.arrow_back, size: 14),
-                label: const Text('Back to All',
-                    style: TextStyle(fontSize: 12)),
+                label: const Text(
+                  'Back to All',
+                  style: TextStyle(fontSize: 12),
+                ),
                 style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6, vertical: 4),
-                    minimumSize: Size.zero),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 4,
+                  ),
+                  minimumSize: Size.zero,
+                ),
               ),
               kHSpacer8,
               Expanded(
@@ -1739,14 +1822,17 @@ class _HistoryView extends StatelessWidget {
                         color: clr.surfaceContainerHighest.withAlpha(80),
                         borderRadius: kBorderRadius8,
                         border: Border.all(
-                            color: clr.outlineVariant.withAlpha(80)),
+                          color: clr.outlineVariant.withAlpha(80),
+                        ),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 2),
+                              horizontal: 4,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: m.isIncoming
                                   ? clr.secondary.withAlpha(180)
@@ -1756,9 +1842,10 @@ class _HistoryView extends StatelessWidget {
                             child: Text(
                               m.isIncoming ? 'IN' : 'OUT',
                               style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.bold,
-                                  color: clr.onPrimary),
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: clr.onPrimary,
+                              ),
                             ),
                           ),
                           kHSpacer8,
@@ -1769,20 +1856,24 @@ class _HistoryView extends StatelessWidget {
                                 Text(
                                   _timeFmt.format(m.timestamp),
                                   style: TextStyle(
-                                      fontSize: 10, color: clr.outline),
+                                    fontSize: 10,
+                                    color: clr.outline,
+                                  ),
                                 ),
                                 kVSpacer4,
                                 SelectableText(
                                   m.payload.isEmpty
                                       ? '(empty)'
                                       : (double.tryParse(m.payload.trim()) !=
-                                              null
-                                          ? _fmtNum(
-                                              double.parse(m.payload.trim()))
-                                          : m.payload),
+                                                null
+                                            ? _fmtNum(
+                                                double.parse(m.payload.trim()),
+                                              )
+                                            : m.payload),
                                   style: const TextStyle(
-                                      fontFamily: 'monospace',
-                                      fontSize: 12),
+                                    fontFamily: 'monospace',
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ],
                             ),
@@ -1826,7 +1917,10 @@ class _FilterChip extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                  fontSize: 11, color: clr.primary, fontWeight: FontWeight.w500),
+                fontSize: 11,
+                color: clr.primary,
+                fontWeight: FontWeight.w500,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -1858,18 +1952,27 @@ class _ExportButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final childChip = Chip(
-      avatar: Icon(Icons.download_outlined, size: 14, color: disabled ? theme.disabledColor : null),
-      label: Text('Export', style: TextStyle(fontSize: 12, color: disabled ? theme.disabledColor : null)),
+      avatar: Icon(
+        Icons.download_outlined,
+        size: 14,
+        color: disabled ? theme.disabledColor : null,
+      ),
+      label: Text(
+        'Export',
+        style: TextStyle(
+          fontSize: 12,
+          color: disabled ? theme.disabledColor : null,
+        ),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      backgroundColor: disabled ? theme.disabledColor.withValues(alpha: 0.1) : null,
+      backgroundColor: disabled
+          ? theme.disabledColor.withValues(alpha: 0.1)
+          : null,
       surfaceTintColor: disabled ? Colors.transparent : null,
     );
 
     if (disabled) {
-      return Tooltip(
-        message: 'No messages to export',
-        child: childChip,
-      );
+      return Tooltip(message: 'No messages to export', child: childChip);
     }
 
     return PopupMenuButton<String>(
@@ -1910,24 +2013,75 @@ class _ExportButton extends StatelessWidget {
 
 // ─── Status Bar ───────────────────────────────────────────────────────────────
 
-class _StatusBar extends StatelessWidget {
+class _StatusBar extends StatefulWidget {
   final bool isConnected;
   final String? error;
   final int inCount;
   final int outCount;
+  final DateTime? connectedAt;
 
   const _StatusBar({
     required this.isConnected,
     this.error,
     required this.inCount,
     required this.outCount,
+    this.connectedAt,
   });
+
+  @override
+  State<_StatusBar> createState() => _StatusBarState();
+}
+
+class _StatusBarState extends State<_StatusBar> {
+  Timer? _timer;
+  String _durationStr = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void didUpdateWidget(covariant _StatusBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isConnected != oldWidget.isConnected ||
+        widget.connectedAt != oldWidget.connectedAt) {
+      _startTimer();
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    if (widget.isConnected && widget.connectedAt != null) {
+      _updateDuration();
+      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted) _updateDuration();
+      });
+    } else {
+      setState(() => _durationStr = '');
+    }
+  }
+
+  void _updateDuration() {
+    if (widget.connectedAt == null) return;
+    final diff = DateTime.now().difference(widget.connectedAt!);
+    final mm = diff.inMinutes.toString().padLeft(2, '0');
+    final ss = (diff.inSeconds % 60).toString().padLeft(2, '0');
+    setState(() => _durationStr = '$mm:$ss');
+  }
 
   @override
   Widget build(BuildContext context) {
     final clrScheme = Theme.of(context).colorScheme;
 
-    if (error != null) {
+    if (widget.error != null) {
       return Container(
         color: clrScheme.errorContainer,
         width: double.infinity,
@@ -1938,10 +2092,10 @@ class _StatusBar extends StatelessWidget {
             kHSpacer8,
             Expanded(
               child: Text(
-                error!,
+                widget.error!,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: clrScheme.onErrorContainer,
-                    ),
+                  color: clrScheme.onErrorContainer,
+                ),
               ),
             ),
           ],
@@ -1950,49 +2104,47 @@ class _StatusBar extends StatelessWidget {
     }
 
     return Container(
-      padding: kP8,
-      decoration: BoxDecoration(
-        color: clrScheme.surfaceContainerHighest.withAlpha(50),
-        border:
-            Border(bottom: BorderSide(color: clrScheme.outlineVariant)),
-      ),
+      color: clrScheme.surfaceContainerHighest,
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Icon(
+            widget.isConnected ? Icons.circle : Icons.circle_outlined,
+            color: widget.isConnected ? Colors.green : Colors.grey,
+            size: 10,
+          ),
+          kHSpacer8,
+          Text(
+            widget.isConnected ? 'Connected' : 'Disconnected',
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+          ),
+          if (_durationStr.isNotEmpty) ...[
+            kHSpacer8,
+            Text(
+              _durationStr,
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+          ],
+          const Spacer(),
+          // Stats
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isConnected ? Colors.green : Colors.grey,
-                ),
-              ),
-              kHSpacer8,
+              Icon(Icons.arrow_downward, size: 14, color: clrScheme.primary),
+              kHSpacer4,
               Text(
-                isConnected ? 'Connected' : 'Disconnected',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                'Rx: ${widget.inCount}',
+                style: const TextStyle(fontSize: 12),
+              ),
+              kHSpacer10,
+              Icon(Icons.arrow_upward, size: 14, color: clrScheme.secondary),
+              kHSpacer4,
+              Text(
+                'Tx: ${widget.outCount}',
+                style: const TextStyle(fontSize: 12),
               ),
             ],
-          ),
-          Flexible(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  Icon(Icons.arrow_downward,
-                      size: 14, color: clrScheme.primary),
-                  kHSpacer4,
-                  Text('Rx: $inCount'),
-                  const SizedBox(width: 16),
-                  Icon(Icons.arrow_upward,
-                      size: 14, color: clrScheme.primary),
-                  kHSpacer4,
-                  Text('Tx: $outCount'),
-                ],
-              ),
-            ),
           ),
         ],
       ),
@@ -2062,8 +2214,7 @@ class _MessageTile extends StatelessWidget {
     try {
       final decoded = jsonDecode(payload);
       if (decoded is Map || decoded is List) {
-        final pretty =
-            const JsonEncoder.withIndent('  ').convert(decoded);
+        final pretty = const JsonEncoder.withIndent('  ').convert(decoded);
         return ConstrainedBox(
           constraints: const BoxConstraints(maxHeight: 200),
           child: Scrollbar(
@@ -2124,9 +2275,7 @@ class _MessageTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: clr.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: clr.outlineVariant.withAlpha(60),
-            ),
+            border: Border.all(color: clr.outlineVariant.withAlpha(60)),
           ),
           child: IntrinsicHeight(
             child: Row(
@@ -2138,7 +2287,9 @@ class _MessageTile extends StatelessWidget {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 10),
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -2149,7 +2300,9 @@ class _MessageTile extends StatelessWidget {
                             // Direction pill
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: accentColor.withAlpha(28),
                                 border: Border.all(
@@ -2208,8 +2361,8 @@ class _MessageTile extends StatelessWidget {
                                   color: clr.onSurfaceVariant,
                                 ),
                                 onPressed: () => Clipboard.setData(
-                                    ClipboardData(
-                                        text: message.payload)),
+                                  ClipboardData(text: message.payload),
+                                ),
                                 padding: EdgeInsets.zero,
                                 tooltip: 'Copy payload',
                               ),
@@ -2239,14 +2392,15 @@ class _MessageTile extends StatelessWidget {
                             Text(
                               _timeFmt.format(message.timestamp),
                               style: TextStyle(
-                                  fontSize: 10, color: clr.outline),
+                                fontSize: 10,
+                                color: clr.outline,
+                              ),
                             ),
                           ],
                         ),
                         // ── Divider ───────────────────────────────────────
                         Padding(
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
                           child: Divider(
                             height: 1,
                             thickness: 0.5,
@@ -2263,7 +2417,9 @@ class _MessageTile extends StatelessWidget {
                             Text(
                               '$payloadBytes B',
                               style: TextStyle(
-                                  fontSize: 10, color: clr.outline),
+                                fontSize: 10,
+                                color: clr.outline,
+                              ),
                             ),
                           ],
                         ),
@@ -2300,19 +2456,19 @@ class _JsonHighlightText extends StatelessWidget {
   List<TextSpan> _tokenize() {
     final spans = <TextSpan>[];
     // Token categories → theme color tokens
-    final keyColor = clr.primary;        // JSON keys
-    final stringColor = clr.tertiary;    // string values
-    final numberColor = clr.secondary;   // number values
-    final litColor = clr.outline;        // true / false / null
+    final keyColor = clr.primary; // JSON keys
+    final stringColor = clr.tertiary; // string values
+    final numberColor = clr.secondary; // number values
+    final litColor = clr.outline; // true / false / null
     final punctColor = clr.onSurfaceVariant; // {} [] , :
 
     // Regex: key-or-string | number | literal | punctuation
     final pattern = RegExp(
-      r'"[^"\\]*(?:\\.[^"\\]*)*"(?=\s*:)'  // JSON key (string followed by :)
-      r'|"[^"\\]*(?:\\.[^"\\]*)*"'          // string value
-      r'|[-]?\d+\.?\d*(?:[eE][+\-]?\d+)?'  // number
-      r'|true|false|null'                    // literals
-      r'|[{\[\]},:]',                        // punctuation
+      r'"[^"\\]*(?:\\.[^"\\]*)*"(?=\s*:)' // JSON key (string followed by :)
+      r'|"[^"\\]*(?:\\.[^"\\]*)*"' // string value
+      r'|[-]?\d+\.?\d*(?:[eE][+\-]?\d+)?' // number
+      r'|true|false|null' // literals
+      r'|[{\[\]},:]', // punctuation
       dotAll: true,
     );
 
@@ -2320,10 +2476,12 @@ class _JsonHighlightText extends StatelessWidget {
     for (final match in pattern.allMatches(json)) {
       if (match.start > lastEnd) {
         // Whitespace / newlines between tokens
-        spans.add(TextSpan(
-          text: json.substring(lastEnd, match.start),
-          style: TextStyle(color: clr.onSurface),
-        ));
+        spans.add(
+          TextSpan(
+            text: json.substring(lastEnd, match.start),
+            style: TextStyle(color: clr.onSurface),
+          ),
+        );
       }
       final tok = match.group(0)!;
       Color color;
@@ -2342,22 +2500,27 @@ class _JsonHighlightText extends StatelessWidget {
       } else {
         color = punctColor;
       }
-      final displayTok = (color == numberColor &&
+      final displayTok =
+          (color == numberColor &&
               RegExp(r'^-?\d').hasMatch(tok) &&
               double.tryParse(tok) != null)
           ? _fmtNum(double.parse(tok))
           : tok;
-      spans.add(TextSpan(
-        text: displayTok,
-        style: TextStyle(color: color),
-      ));
+      spans.add(
+        TextSpan(
+          text: displayTok,
+          style: TextStyle(color: color),
+        ),
+      );
       lastEnd = match.end;
     }
     if (lastEnd < json.length) {
-      spans.add(TextSpan(
-        text: json.substring(lastEnd),
-        style: TextStyle(color: clr.onSurface),
-      ));
+      spans.add(
+        TextSpan(
+          text: json.substring(lastEnd),
+          style: TextStyle(color: clr.onSurface),
+        ),
+      );
     }
     return spans;
   }
@@ -2395,10 +2558,10 @@ class _EventList extends StatelessWidget {
             ),
             DataCell(
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: (e.type == MQTTEventType.error ||
+                  color:
+                      (e.type == MQTTEventType.error ||
                           e.type == MQTTEventType.disconnect ||
                           e.type == MQTTEventType.unsubscribe)
                       ? clr.errorContainer
@@ -2409,7 +2572,8 @@ class _EventList extends StatelessWidget {
                   e.type.name.toUpperCase(),
                   style: TextStyle(
                     fontSize: 10,
-                    color: (e.type == MQTTEventType.error ||
+                    color:
+                        (e.type == MQTTEventType.error ||
                             e.type == MQTTEventType.disconnect ||
                             e.type == MQTTEventType.unsubscribe)
                         ? clr.onErrorContainer
@@ -2423,8 +2587,7 @@ class _EventList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(e.description,
-                      style: const TextStyle(fontSize: 12)),
+                  Text(e.description, style: const TextStyle(fontSize: 12)),
                   if (e.topic != null)
                     Text(
                       e.topic!,
@@ -2499,7 +2662,9 @@ class _QosBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // QoS 0: default border, QoS 1: primary color border, QoS 2: secondary color border
-    final borderColor = qos == 1 ? clr.primary : (qos == 2 ? clr.secondary : clr.outlineVariant);
+    final borderColor = qos == 1
+        ? clr.primary
+        : (qos == 2 ? clr.secondary : clr.outlineVariant);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       decoration: BoxDecoration(
@@ -2546,4 +2711,3 @@ class _RetainedBadge extends StatelessWidget {
     );
   }
 }
-

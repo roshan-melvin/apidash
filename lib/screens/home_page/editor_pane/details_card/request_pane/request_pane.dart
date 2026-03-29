@@ -16,20 +16,19 @@ import 'websocket/websocket_request_pane.dart';
 import 'grpc/grpc_request_pane.dart';
 
 class EditRequestPane extends ConsumerWidget {
-  const EditRequestPane({
-    super.key,
-    this.showViewCodeButton = true,
-  });
+  const EditRequestPane({super.key, this.showViewCodeButton = true});
 
   final bool showViewCodeButton;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(selectedIdStateProvider);
-    final apiType = ref
-        .watch(selectedRequestModelProvider.select((value) => value?.apiType));
-    final isPopped =
-        ref.watch(dashbotWindowNotifierProvider.select((s) => s.isPopped));
+    final apiType = ref.watch(
+      selectedRequestModelProvider.select((value) => value?.apiType),
+    );
+    final isPopped = ref.watch(
+      dashbotWindowNotifierProvider.select((s) => s.isPopped),
+    );
 
     // When Dashbot window is not popped, show compact segmented layout like History page
     if (!isPopped && !context.isMediumWindow) {
@@ -55,18 +54,18 @@ class EditRequestPane extends ConsumerWidget {
                     controller: controller,
                     children: [
                       switch (apiType) {
-                        APIType.rest =>
-                          EditRestRequestPane(showViewCodeButton: false),
-                        APIType.graphql =>
-                          EditGraphQLRequestPane(showViewCodeButton: false),
-                        APIType.ai =>
-                          EditAIRequestPane(showViewCodeButton: false),
-                        APIType.mqtt =>
-                          const EditMQTTRequestPane(),
-                        APIType.websocket =>
-                          const EditWebSocketRequestPane(),
-                        APIType.grpc =>
-                          const EditGrpcRequestPane(),
+                        APIType.rest => EditRestRequestPane(
+                          showViewCodeButton: false,
+                        ),
+                        APIType.graphql => EditGraphQLRequestPane(
+                          showViewCodeButton: false,
+                        ),
+                        APIType.ai => EditAIRequestPane(
+                          showViewCodeButton: false,
+                        ),
+                        APIType.mqtt => const EditMQTTRequestPane(),
+                        APIType.websocket => const EditWebSocketRequestPane(),
+                        APIType.grpc => const EditGrpcRequestPane(),
                         _ => kSizedBoxEmpty,
                       },
                       ResponsePane(),
@@ -84,14 +83,12 @@ class EditRequestPane extends ConsumerWidget {
 
     return switch (apiType) {
       APIType.rest => EditRestRequestPane(
-          showViewCodeButton: showViewCodeButton,
-        ),
+        showViewCodeButton: showViewCodeButton,
+      ),
       APIType.graphql => EditGraphQLRequestPane(
-          showViewCodeButton: showViewCodeButton,
-        ),
-      APIType.ai => EditAIRequestPane(
-          showViewCodeButton: showViewCodeButton,
-        ),
+        showViewCodeButton: showViewCodeButton,
+      ),
+      APIType.ai => EditAIRequestPane(showViewCodeButton: showViewCodeButton),
       APIType.mqtt => const EditMQTTRequestPane(),
       APIType.websocket => const EditWebSocketRequestPane(),
       APIType.grpc => const EditGrpcRequestPane(),

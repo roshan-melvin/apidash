@@ -13,21 +13,19 @@ enum GrpcCallType {
   final String label;
 }
 
-enum GrpcDescriptorSource {
-  reflection,
-  protoUpload,
-}
+enum GrpcDescriptorSource { reflection, protoUpload }
 
 @freezed
 abstract class GrpcRequestModel with _$GrpcRequestModel {
   const factory GrpcRequestModel({
     @Default('') String url,
-    
+
     @Default(false) bool useTls,
     @Default('') String serviceName,
     @Default('') String methodName,
     @Default(GrpcCallType.unary) GrpcCallType callType,
-    @Default(GrpcDescriptorSource.reflection) GrpcDescriptorSource descriptorSource,
+    @Default(GrpcDescriptorSource.reflection)
+    GrpcDescriptorSource descriptorSource,
     @Default([]) List<NameValueModel> metadata,
     @Default([]) List<bool> isMetadataEnabledList,
     @Default('') String requestJson,

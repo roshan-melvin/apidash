@@ -17,7 +17,9 @@ Future<void> main() async {
     final r = GrpcReflectionService();
     try {
       final t = DateTime.now();
-      final d = await r.loadDescriptorsViaReflection(channel: channel, host: 'grpcb.in').timeout(Duration(seconds: 15));
+      final d = await r
+          .loadDescriptorsViaReflection(channel: channel, host: 'grpcb.in')
+          .timeout(Duration(seconds: 15));
       print('len: ${d.length}');
       print('time took: ${DateTime.now().difference(t).inMilliseconds}ms');
     } catch (e) {

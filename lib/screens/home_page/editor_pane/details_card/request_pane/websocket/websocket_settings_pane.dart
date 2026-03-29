@@ -13,22 +13,14 @@ class EditWebSocketSettingsPane extends ConsumerStatefulWidget {
 
 class _EditWebSocketSettingsPaneState
     extends ConsumerState<EditWebSocketSettingsPane> {
-  late TextEditingController _pingIntervalCtrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _pingIntervalCtrl = TextEditingController(text: '0');
-  }
-
-  @override
-  void dispose() {
-    _pingIntervalCtrl.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final activeRequestModel = ref.watch(selectedRequestModelProvider);
+    final wsModel = activeRequestModel?.websocketRequestModel;
+    if (wsModel == null) return const SizedBox.shrink();
+
+    final clrScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: kP12,
       child: SingleChildScrollView(
@@ -40,51 +32,164 @@ class _EditWebSocketSettingsPaneState
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
-            Text(
-              'Ping Interval (milliseconds)',
-              style: Theme.of(context).textTheme.labelMedium,
-            ),
-            kVSpacer4,
-            TextField(
-              controller: _pingIntervalCtrl,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                hintText: 'Enter interval in milliseconds (0 = disabled)',
-                border: OutlineInputBorder(
-                  borderRadius: kBorderRadius8,
+
+            // Ping Interval
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Ping Interval (seconds)',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                 ),
-                isDense: true,
+                SizedBox(
+                  width: 120,
+                  child: TextField(
+                    controller:
+                        TextEditingController(
+                            text: wsModel.pingInterval.toString(),
+                          )
+                          ..selection = TextSelection.collapsed(
+                            offset: wsModel.pingInterval.toString().length,
+                          ),
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      hintText: '0 = disabled',
+                      border: OutlineInputBorder(borderRadius: kBorderRadius8),
+                      isDense: true,
+                    ),
+                    onChanged: (value) {
+                      final interval = int.tryParse(value) ?? 0;
+                      ref
+                          .read(collectionStateNotifierProvider.notifier)
+                          .updateWebSocketModel(pingInterval: interval);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Auto Reconnect Toggle
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Auto Reconnect',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
+                ),
+                Switch(
+                  value: wsModel.autoReconnect,
+                  onChanged: (val) {
+                    ref
+                        .read(collectionStateNotifierProvider.notifier)
+                        .updateWebSocketModel(autoReconnect: val);
+                  },
+                ),
+              ],
+            ),
+
+            if (wsModel.autoReconnect) ...[
+              const SizedBox(height: 16),
+              // Reconnect Interval
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Reconnect Interval (s)',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 120,
+                    child: TextField(
+                      controller:
+                          TextEditingController(
+                              text: wsModel.reconnectInterval.toString(),
+                            )
+                            ..selection = TextSelection.collapsed(
+                              offset: wsModel.reconnectInterval
+                                  .toString()
+                                  .length,
+                            ),
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                        ),
+                        isDense: true,
+                      ),
+                      onChanged: (value) {
+                        var interval = int.tryParse(value) ?? 5;
+                        if (interval < 1) interval = 1;
+                        if (interval > 60) interval = 60;
+                        ref
+                            .read(collectionStateNotifierProvider.notifier)
+                            .updateWebSocketModel(reconnectInterval: interval);
+                      },
+                    ),
+                  ),
+                ],
               ),
-              onChanged: (value) {
-                final interval = int.tryParse(value) ?? 0;
-                ref
-                    .read(collectionStateNotifierProvider.notifier)
-                    .updateWebSocketModel(
-                      pingInterval: interval,
-                    );
-              },
-            ),
+              const SizedBox(height: 16),
+              // Max Retries
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Max Retries (0 = unlimited)',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 120,
+                    child: TextField(
+                      controller:
+                          TextEditingController(
+                              text: wsModel.maxRetries.toString(),
+                            )
+                            ..selection = TextSelection.collapsed(
+                              offset: wsModel.maxRetries.toString().length,
+                            ),
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: kBorderRadius8,
+                        ),
+                        isDense: true,
+                      ),
+                      onChanged: (value) {
+                        final retries = int.tryParse(value) ?? 5;
+                        ref
+                            .read(collectionStateNotifierProvider.notifier)
+                            .updateWebSocketModel(
+                              maxRetries: retries > 0 ? retries : 0,
+                            );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+
+            const SizedBox(height: 16),
+            Divider(color: clrScheme.outlineVariant.withAlpha(100)),
             const SizedBox(height: 12),
-            Divider(color: Colors.grey.shade300),
-            const SizedBox(height: 12),
-            Text(
-              'Information',
-              style: Theme.of(context).textTheme.labelMedium,
-            ),
-            kVSpacer8,
             Container(
               padding: kP12,
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
+                color: clrScheme.surfaceContainerHighest.withAlpha(50),
                 borderRadius: kBorderRadius8,
-                border: Border.all(color: Colors.blue.shade300),
+                border: Border.all(
+                  color: clrScheme.outlineVariant.withAlpha(100),
+                ),
               ),
               child: Text(
-                'Ping intervals help maintain active WebSocket connections by sending periodic ping frames to the server.',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: Colors.blue.shade900),
+                'Autoreconnect activates automatically if a connected socket drops. Manually disconnecting prevents auto reconnect attempts.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: clrScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ],

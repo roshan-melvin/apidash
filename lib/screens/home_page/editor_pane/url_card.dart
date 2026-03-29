@@ -293,7 +293,7 @@ class _WebSocketConnectButtonState
     // If it's connected globally but to a DIFFERENT url, we treat this tab as not connected
     final isConnected = isActiveUrlConnected;
 
-    return FilledButton.icon(
+    final btn = FilledButton.icon(
       onPressed: showLoading ? null : (isConnected ? _disconnect : _connect),
       style: FilledButton.styleFrom(
         backgroundColor: isConnected
@@ -307,7 +307,7 @@ class _WebSocketConnectButtonState
         minimumSize: const Size(100, 36),
       ),
       icon: showLoading
-          ? SizedBox(
+          ? const SizedBox(
               width: 14,
               height: 14,
               child: CircularProgressIndicator(
@@ -323,6 +323,32 @@ class _WebSocketConnectButtonState
         style: kTextStyleButton,
       ),
     );
+
+    if (showLoading && !isConnected) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          btn,
+          const SizedBox(width: 8),
+          FilledButton.icon(
+            onPressed: () {
+              ref.read(webSocketServiceProvider).disconnect();
+              setState(() => _isConnecting = false);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
+              shape: const RoundedRectangleBorder(borderRadius: kBorderRadius8),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              minimumSize: const Size(100, 36),
+            ),
+            icon: const Icon(Icons.close, size: 16),
+            label: const Text('Cancel', style: kTextStyleButton),
+          ),
+        ],
+      );
+    }
+    return btn;
   }
 }
 
@@ -550,7 +576,7 @@ class _MQTTConnectButtonState extends ConsumerState<MQTTConnectButton> {
     final isConnected = connState?.isConnected ?? false;
     final showLoading = isConnecting;
 
-    return FilledButton.icon(
+    final btn = FilledButton.icon(
       onPressed: showLoading ? null : (isConnected ? _disconnect : _connect),
       style: FilledButton.styleFrom(
         backgroundColor: isConnected
@@ -559,7 +585,7 @@ class _MQTTConnectButtonState extends ConsumerState<MQTTConnectButton> {
         foregroundColor: isConnected
             ? Theme.of(context).colorScheme.onError
             : Theme.of(context).colorScheme.onPrimary,
-        shape: const RoundedRectangleBorder(borderRadius: kBorderRadius8),
+        shape: RoundedRectangleBorder(borderRadius: kBorderRadius8),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         minimumSize: const Size(100, 36),
       ),
@@ -580,6 +606,32 @@ class _MQTTConnectButtonState extends ConsumerState<MQTTConnectButton> {
         style: kTextStyleButton,
       ),
     );
+
+    if (showLoading && !isConnected) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          btn,
+          const SizedBox(width: 8),
+          FilledButton.icon(
+            onPressed: () {
+              ref.read(webSocketServiceProvider).disconnect();
+              setState(() => _isConnecting = false);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
+              shape: const RoundedRectangleBorder(borderRadius: kBorderRadius8),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              minimumSize: const Size(100, 36),
+            ),
+            icon: const Icon(Icons.close, size: 16),
+            label: const Text('Cancel', style: kTextStyleButton),
+          ),
+        ],
+      );
+    }
+    return btn;
   }
 }
 

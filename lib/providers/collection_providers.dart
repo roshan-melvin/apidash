@@ -121,11 +121,12 @@ class CollectionStateNotifier
     bool isManualEdit = true,
   }) {
     if (state == null || !state!.containsKey(id)) return;
-    
+
     final currentModel = state![id]!;
     final newModel = currentModel.copyWith(
       mqttRequestModel: mqttRequestModel ?? currentModel.mqttRequestModel,
-      mqttConnectionState: mqttConnectionState ?? currentModel.mqttConnectionState,
+      mqttConnectionState:
+          mqttConnectionState ?? currentModel.mqttConnectionState,
     );
 
     var map = {...state!};
@@ -137,18 +138,19 @@ class CollectionStateNotifier
     }
   }
 
-    void updateGrpcState({
+  void updateGrpcState({
     required String id,
     GrpcRequestModel? grpcRequestModel,
     GrpcConnectionState? grpcConnectionState,
     bool isManualEdit = true,
   }) {
     if (state == null || !state!.containsKey(id)) return;
-    
+
     final currentModel = state![id]!;
     final newModel = currentModel.copyWith(
       grpcRequestModel: grpcRequestModel ?? currentModel.grpcRequestModel,
-      grpcConnectionState: grpcConnectionState ?? currentModel.grpcConnectionState,
+      grpcConnectionState:
+          grpcConnectionState ?? currentModel.grpcConnectionState,
     );
 
     var map = {...state!};
@@ -178,7 +180,7 @@ class CollectionStateNotifier
 
     final currentModel = state![rId]!;
     final currentGrpcModel = currentModel.grpcRequestModel;
-    
+
     if (currentGrpcModel == null) return;
 
     final updatedGrpcModel = currentGrpcModel.copyWith(
@@ -189,7 +191,8 @@ class CollectionStateNotifier
       callType: callType ?? currentGrpcModel.callType,
       descriptorSource: descriptorSource ?? currentGrpcModel.descriptorSource,
       metadata: metadata ?? currentGrpcModel.metadata,
-      isMetadataEnabledList: isMetadataEnabledList ?? currentGrpcModel.isMetadataEnabledList,
+      isMetadataEnabledList:
+          isMetadataEnabledList ?? currentGrpcModel.isMetadataEnabledList,
       requestJson: requestJson ?? currentGrpcModel.requestJson,
       requestTabIndex: requestTabIndex ?? currentGrpcModel.requestTabIndex,
     );
@@ -208,11 +211,13 @@ class CollectionStateNotifier
     bool isManualEdit = true,
   }) {
     if (state == null || !state!.containsKey(id)) return;
-    
+
     final currentModel = state![id]!;
     final newModel = currentModel.copyWith(
-      websocketRequestModel: websocketRequestModel ?? currentModel.websocketRequestModel,
-      websocketConnectionState: websocketConnectionState ?? currentModel.websocketConnectionState,
+      websocketRequestModel:
+          websocketRequestModel ?? currentModel.websocketRequestModel,
+      websocketConnectionState:
+          websocketConnectionState ?? currentModel.websocketConnectionState,
     );
 
     var map = {...state!};
@@ -233,30 +238,34 @@ class CollectionStateNotifier
     int? requestTabIndex,
     int? filterIndex,
     int? pingInterval,
+    bool? autoReconnect,
+    int? reconnectInterval,
+    int? maxRetries,
   }) {
     final rId = id ?? ref.read(selectedIdStateProvider);
     if (rId == null || state?[rId] == null) return;
 
     final currentModel = state![rId]!;
     final currentWsModel = currentModel.websocketRequestModel;
-    
+
     if (currentWsModel == null) return;
 
     final updatedWsModel = currentWsModel.copyWith(
       requestParams: requestParams ?? currentWsModel.requestParams,
-      isParamEnabledList: isParamEnabledList ?? currentWsModel.isParamEnabledList,
+      isParamEnabledList:
+          isParamEnabledList ?? currentWsModel.isParamEnabledList,
       requestHeaders: requestHeaders ?? currentWsModel.requestHeaders,
-      isHeaderEnabledList: isHeaderEnabledList ?? currentWsModel.isHeaderEnabledList,
+      isHeaderEnabledList:
+          isHeaderEnabledList ?? currentWsModel.isHeaderEnabledList,
       requestTabIndex: requestTabIndex ?? currentWsModel.requestTabIndex,
       filterIndex: filterIndex ?? currentWsModel.filterIndex,
       pingInterval: pingInterval ?? currentWsModel.pingInterval,
+      autoReconnect: autoReconnect ?? currentWsModel.autoReconnect,
+      reconnectInterval: reconnectInterval ?? currentWsModel.reconnectInterval,
+      maxRetries: maxRetries ?? currentWsModel.maxRetries,
     );
 
-    updateWebSocketState(
-      id: rId,
-      websocketRequestModel: updatedWsModel,
-      isManualEdit: false,
-    );
+    updateWebSocketState(id: rId, websocketRequestModel: updatedWsModel);
   }
 
   void reorder(int oldIdx, int newIdx) {
@@ -533,12 +542,15 @@ class CollectionStateNotifier
     if (requestModel?.httpRequestModel == null &&
         requestModel?.aiRequestModel == null &&
         requestModel?.apiType != APIType.mqtt &&
-        requestModel?.apiType != APIType.websocket && requestModel?.apiType != APIType.grpc) {
+        requestModel?.apiType != APIType.websocket &&
+        requestModel?.apiType != APIType.grpc) {
       return;
     }
 
-    if (requestModel?.apiType == APIType.mqtt || requestModel?.apiType == APIType.websocket || requestModel?.apiType == APIType.grpc) {
-      // For MQTT, sendRequest() is replaced by the custom publish logic 
+    if (requestModel?.apiType == APIType.mqtt ||
+        requestModel?.apiType == APIType.websocket ||
+        requestModel?.apiType == APIType.grpc) {
+      // For MQTT, sendRequest() is replaced by the custom publish logic
       // in EditMQTTRequestPane. We just return here for simplicity.
       return;
     }
@@ -859,7 +871,7 @@ class CollectionStateNotifier
     ref.read(hasUnsavedChangesProvider.notifier).state = false;
   }
 
-  /// Quietly saves a single request model to Hive disk without resetting 
+  /// Quietly saves a single request model to Hive disk without resetting
   /// the 'hasUnsavedChanges' UI flag or showing a saving indicator.
   Future<void> saveRequestModel(String id) async {
     if (state == null || !state!.containsKey(id)) return;

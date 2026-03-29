@@ -15,15 +15,23 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
   @override
   Widget build(BuildContext context) {
     final selectedId = ref.watch(selectedIdStateProvider);
-    final requestModel = ref.watch(collectionStateNotifierProvider.select((value) => value?[selectedId]?.grpcRequestModel));
-    final darkMode = ref.watch(settingsProvider.select((value) => value.isDark));
+    final requestModel = ref.watch(
+      collectionStateNotifierProvider.select(
+        (value) => value?[selectedId]?.grpcRequestModel,
+      ),
+    );
+    final darkMode = ref.watch(
+      settingsProvider.select((value) => value.isDark),
+    );
 
     if (requestModel == null) {
       return const SizedBox.shrink();
     }
 
     final grpcState = ref.watch(grpcStateProvider);
-    final isActiveUrlConnected = (grpcState.value?.isConnected ?? false) && (grpcState.value?.connectedUrl == requestModel.url);
+    final isActiveUrlConnected =
+        (grpcState.value?.isConnected ?? false) &&
+        (grpcState.value?.connectedUrl == requestModel.url);
 
     // Extract services and methods
     List<String> services = [];
@@ -34,7 +42,9 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
       for (final fd in descriptors.values) {
         if (fd.service.isNotEmpty) {
           for (final s in fd.service) {
-            String fullServiceName = fd.package.isNotEmpty ? '${fd.package}.${s.name}' : s.name;
+            String fullServiceName = fd.package.isNotEmpty
+                ? '${fd.package}.${s.name}'
+                : s.name;
             if (!services.contains(fullServiceName)) {
               services.add(fullServiceName);
             }
@@ -57,7 +67,8 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
     }
 
     String? currentMethod = requestModel.methodName;
-    if (currentMethod.isNotEmpty && !methodsForSelectedService.contains(currentMethod)) {
+    if (currentMethod.isNotEmpty &&
+        !methodsForSelectedService.contains(currentMethod)) {
       methodsForSelectedService.add(currentMethod);
     }
 
@@ -72,16 +83,26 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Service", style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.primary)),
+                    Text(
+                      "Service",
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
                     kVSpacer5,
                     Container(
                       height: 36,
                       alignment: Alignment.centerLeft,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest
+                            .withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
@@ -93,17 +114,25 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
                               value: value,
                               child: Tooltip(
                                 message: value,
-                                child: Text(value, overflow: TextOverflow.ellipsis),
+                                child: Text(
+                                  value,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             );
                           }).toList(),
                           onChanged: (String? newValue) {
                             if (newValue != null) {
-                              ref.read(collectionStateNotifierProvider.notifier).updateGrpcModel(
-                                id: selectedId!,
-                                serviceName: newValue,
-                                methodName: "", // Reset method when service changes
-                              );
+                              ref
+                                  .read(
+                                    collectionStateNotifierProvider.notifier,
+                                  )
+                                  .updateGrpcModel(
+                                    id: selectedId!,
+                                    serviceName: newValue,
+                                    methodName:
+                                        "", // Reset method when service changes
+                                  );
                             }
                           },
                         ),
@@ -118,16 +147,26 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Method", style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.primary)),
+                    Text(
+                      "Method",
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
                     kVSpacer5,
                     Container(
                       height: 36,
                       alignment: Alignment.centerLeft,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest
+                            .withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
@@ -139,16 +178,23 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
                               value: value,
                               child: Tooltip(
                                 message: value,
-                                child: Text(value, overflow: TextOverflow.ellipsis),
+                                child: Text(
+                                  value,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             );
                           }).toList(),
                           onChanged: (String? newValue) {
                             if (newValue != null) {
-                              ref.read(collectionStateNotifierProvider.notifier).updateGrpcModel(
-                                id: selectedId!,
-                                methodName: newValue,
-                              );
+                              ref
+                                  .read(
+                                    collectionStateNotifierProvider.notifier,
+                                  )
+                                  .updateGrpcModel(
+                                    id: selectedId!,
+                                    methodName: newValue,
+                                  );
                             }
                           },
                         ),
@@ -164,7 +210,9 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
             child: Container(
               margin: const EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
-                border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
                 borderRadius: kBorderRadius8,
               ),
               child: JsonTextFieldEditor(
@@ -173,10 +221,9 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
                 isDark: darkMode,
                 initialValue: requestModel.requestJson,
                 onChanged: (String value) {
-                  ref.read(collectionStateNotifierProvider.notifier).updateGrpcModel(
-                    id: selectedId,
-                    requestJson: value,
-                  );
+                  ref
+                      .read(collectionStateNotifierProvider.notifier)
+                      .updateGrpcModel(id: selectedId, requestJson: value);
                 },
                 hintText: "Enter JSON body for gRPC payload...",
               ),
@@ -189,14 +236,20 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
                   ? () async {
                       final message = requestModel.requestJson;
                       if (message.isNotEmpty) {
-                        await ref.read(grpcServiceProvider).send(message: message, requestModel: requestModel);
+                        await ref
+                            .read(grpcServiceProvider)
+                            .send(message: message, requestModel: requestModel);
                       } else {
-                        await ref.read(grpcServiceProvider).send(message: "{}", requestModel: requestModel);
+                        await ref
+                            .read(grpcServiceProvider)
+                            .send(message: "{}", requestModel: requestModel);
                       }
                     }
                   : null,
               style: FilledButton.styleFrom(
-                shape: const RoundedRectangleBorder(borderRadius: kBorderRadius8),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: kBorderRadius8,
+                ),
               ),
               icon: const Icon(Icons.send),
               label: const Text("Send"),

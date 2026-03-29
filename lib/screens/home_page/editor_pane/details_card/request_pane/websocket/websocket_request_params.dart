@@ -16,7 +16,8 @@ class EditWebSocketURLParams extends ConsumerStatefulWidget {
       EditWebSocketURLParamsState();
 }
 
-class EditWebSocketURLParamsState extends ConsumerState<EditWebSocketURLParams> {
+class EditWebSocketURLParamsState
+    extends ConsumerState<EditWebSocketURLParams> {
   late int seed;
   final random = Random.secure();
   late List<NameValueModel> paramRows;
@@ -30,7 +31,9 @@ class EditWebSocketURLParamsState extends ConsumerState<EditWebSocketURLParams> 
   }
 
   void _onFieldChange() {
-    ref.read(collectionStateNotifierProvider.notifier).updateWebSocketModel(
+    ref
+        .read(collectionStateNotifierProvider.notifier)
+        .updateWebSocketModel(
           requestParams: paramRows.sublist(0, paramRows.length - 1),
           isParamEnabledList: isRowEnabledList.sublist(0, paramRows.length - 1),
         );
@@ -40,140 +43,119 @@ class EditWebSocketURLParamsState extends ConsumerState<EditWebSocketURLParams> 
   Widget build(BuildContext context) {
     dataTableShowLogs = false;
     final selectedId = ref.watch(selectedIdStateProvider);
-    ref.watch(selectedRequestModelProvider
-        .select((value) => value?.websocketRequestModel?.requestParams?.length));
-    var rP = ref.read(selectedRequestModelProvider)?.websocketRequestModel?.requestParams;
+    ref.watch(
+      selectedRequestModelProvider.select(
+        (value) => value?.websocketRequestModel?.requestParams?.length,
+      ),
+    );
+    var rP = ref
+        .read(selectedRequestModelProvider)
+        ?.websocketRequestModel
+        ?.requestParams;
     bool isParamsEmpty = rP == null || rP.isEmpty;
     paramRows = isParamsEmpty
-        ? [
-            kNameValueEmptyModel,
-          ]
+        ? [kNameValueEmptyModel]
         : rP + [kNameValueEmptyModel];
     isRowEnabledList = [
       ...(ref
               .read(selectedRequestModelProvider)
               ?.websocketRequestModel
               ?.isParamEnabledList ??
-          List.filled(rP?.length ?? 0, true, growable: true))
+          List.filled(rP?.length ?? 0, true, growable: true)),
     ];
     isRowEnabledList.add(false);
     isAddingRow = false;
 
     List<DataColumn> columns = const [
-      DataColumn2(
-        label: Text(kNameCheckbox),
-        fixedWidth: 30,
-      ),
-      DataColumn2(
-        label: Text(kNameURLParam),
-      ),
-      DataColumn2(
-        label: Text('='),
-        fixedWidth: 30,
-      ),
-      DataColumn2(
-        label: Text(kNameValue),
-      ),
-      DataColumn2(
-        label: Text(''),
-        fixedWidth: 32,
-      ),
+      DataColumn2(label: Text(kNameCheckbox), fixedWidth: 30),
+      DataColumn2(label: Text(kNameURLParam)),
+      DataColumn2(label: Text('='), fixedWidth: 30),
+      DataColumn2(label: Text(kNameValue)),
+      DataColumn2(label: Text(''), fixedWidth: 32),
     ];
 
-    List<DataRow> dataRows = List<DataRow>.generate(
-      paramRows.length,
-      (index) {
-        bool isLast = index + 1 == paramRows.length;
-        return DataRow(
-          key: ValueKey("ws-$selectedId-$index-params-row-$seed"),
-          cells: <DataCell>[
-            DataCell(
-              ADCheckBox(
-                keyId: "ws-$selectedId-$index-params-c-$seed",
-                value: isRowEnabledList[index],
-                onChanged: isLast
-                    ? null
-                    : (value) {
+    List<DataRow> dataRows = List<DataRow>.generate(paramRows.length, (index) {
+      bool isLast = index + 1 == paramRows.length;
+      return DataRow(
+        key: ValueKey("ws-$selectedId-$index-params-row-$seed"),
+        cells: <DataCell>[
+          DataCell(
+            ADCheckBox(
+              keyId: "ws-$selectedId-$index-params-c-$seed",
+              value: isRowEnabledList[index],
+              onChanged: isLast
+                  ? null
+                  : (value) {
+                      setState(() {
+                        isRowEnabledList[index] = value!;
+                      });
+                      _onFieldChange();
+                    },
+              colorScheme: Theme.of(context).colorScheme,
+            ),
+          ),
+          DataCell(
+            EnvCellField(
+              keyId: "ws-$selectedId-$index-params-k-$seed",
+              initialValue: paramRows[index].name,
+              hintText: kHintAddURLParam,
+              onChanged: (value) {
+                paramRows[index] = paramRows[index].copyWith(name: value);
+                if (isLast && !isAddingRow) {
+                  isAddingRow = true;
+                  isRowEnabledList[index] = true;
+                  paramRows.add(kNameValueEmptyModel);
+                  isRowEnabledList.add(false);
+                }
+                _onFieldChange();
+              },
+              colorScheme: Theme.of(context).colorScheme,
+            ),
+          ),
+          DataCell(Center(child: Text("=", style: kCodeStyle))),
+          DataCell(
+            EnvCellField(
+              keyId: "ws-$selectedId-$index-params-v-$seed",
+              initialValue: paramRows[index].value,
+              hintText: kHintAddValue,
+              onChanged: (value) {
+                paramRows[index] = paramRows[index].copyWith(value: value);
+                if (isLast && !isAddingRow) {
+                  isAddingRow = true;
+                  isRowEnabledList[index] = true;
+                  paramRows.add(kNameValueEmptyModel);
+                  isRowEnabledList.add(false);
+                }
+                _onFieldChange();
+              },
+              colorScheme: Theme.of(context).colorScheme,
+            ),
+          ),
+          DataCell(
+            InkWell(
+              onTap: isLast
+                  ? null
+                  : () {
+                      seed = random.nextInt(kRandMax);
+                      if (paramRows.length == 2) {
                         setState(() {
-                          isRowEnabledList[index] = value!;
+                          paramRows = [kNameValueEmptyModel];
+                          isRowEnabledList = [false];
                         });
-                        _onFieldChange();
-                      },
-                colorScheme: Theme.of(context).colorScheme,
-              ),
+                      } else {
+                        paramRows.removeAt(index);
+                        isRowEnabledList.removeAt(index);
+                      }
+                      _onFieldChange();
+                    },
+              child: Theme.of(context).brightness == Brightness.dark
+                  ? kIconRemoveDark
+                  : kIconRemoveLight,
             ),
-            DataCell(
-              EnvCellField(
-                keyId: "ws-$selectedId-$index-params-k-$seed",
-                initialValue: paramRows[index].name,
-                hintText: kHintAddURLParam,
-                onChanged: (value) {
-                  paramRows[index] = paramRows[index].copyWith(name: value);
-                  if (isLast && !isAddingRow) {
-                    isAddingRow = true;
-                    isRowEnabledList[index] = true;
-                    paramRows.add(kNameValueEmptyModel);
-                    isRowEnabledList.add(false);
-                  }
-                  _onFieldChange();
-                },
-                colorScheme: Theme.of(context).colorScheme,
-              ),
-            ),
-            DataCell(
-              Center(
-                child: Text(
-                  "=",
-                  style: kCodeStyle,
-                ),
-              ),
-            ),
-            DataCell(
-              EnvCellField(
-                keyId: "ws-$selectedId-$index-params-v-$seed",
-                initialValue: paramRows[index].value,
-                hintText: kHintAddValue,
-                onChanged: (value) {
-                  paramRows[index] = paramRows[index].copyWith(value: value);
-                  if (isLast && !isAddingRow) {
-                    isAddingRow = true;
-                    isRowEnabledList[index] = true;
-                    paramRows.add(kNameValueEmptyModel);
-                    isRowEnabledList.add(false);
-                  }
-                  _onFieldChange();
-                },
-                colorScheme: Theme.of(context).colorScheme,
-              ),
-            ),
-            DataCell(
-              InkWell(
-                onTap: isLast
-                    ? null
-                    : () {
-                        seed = random.nextInt(kRandMax);
-                        if (paramRows.length == 2) {
-                          setState(() {
-                            paramRows = [
-                              kNameValueEmptyModel,
-                            ];
-                            isRowEnabledList = [false];
-                          });
-                        } else {
-                          paramRows.removeAt(index);
-                          isRowEnabledList.removeAt(index);
-                        }
-                        _onFieldChange();
-                      },
-                child: Theme.of(context).brightness == Brightness.dark
-                    ? kIconRemoveDark
-                    : kIconRemoveLight,
-              ),
-            ),
-          ],
-        );
-      },
-    );
+          ),
+        ],
+      );
+    });
 
     return Stack(
       children: [
@@ -184,8 +166,9 @@ class EditWebSocketURLParamsState extends ConsumerState<EditWebSocketURLParams> 
             children: [
               Expanded(
                 child: Theme(
-                  data: Theme.of(context)
-                      .copyWith(scrollbarTheme: kDataTableScrollbarTheme),
+                  data: Theme.of(
+                    context,
+                  ).copyWith(scrollbarTheme: kDataTableScrollbarTheme),
                   child: DataTable2(
                     columnSpacing: 12,
                     dividerThickness: 0,
@@ -215,10 +198,7 @@ class EditWebSocketURLParamsState extends ConsumerState<EditWebSocketURLParams> 
                   _onFieldChange();
                 },
                 icon: const Icon(Icons.add),
-                label: const Text(
-                  kLabelAddParam,
-                  style: kTextStyleButton,
-                ),
+                label: const Text(kLabelAddParam, style: kTextStyleButton),
               ),
             ),
           ),

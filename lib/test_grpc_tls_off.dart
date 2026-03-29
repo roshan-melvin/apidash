@@ -14,14 +14,20 @@ Future<void> main() async {
     print('Connecting...');
     final t1 = DateTime.now();
     final conn = await channel.getConnection().timeout(Duration(seconds: 15));
-    print('Connected via TCP in \${DateTime.now().difference(t1).inMilliseconds}ms. Triggering reflection...');
+    print(
+      'Connected via TCP in \${DateTime.now().difference(t1).inMilliseconds}ms. Triggering reflection...',
+    );
     final r = GrpcReflectionService();
     try {
       final t2 = DateTime.now();
-      final d = await r.loadDescriptorsViaReflection(channel: channel, host: 'grpcb.in').timeout(Duration(seconds: 15));
+      final d = await r
+          .loadDescriptorsViaReflection(channel: channel, host: 'grpcb.in')
+          .timeout(Duration(seconds: 15));
       print('len: \${d.length}');
     } catch (e) {
-      print('Reflection failed after \${DateTime.now().difference(t2).inMilliseconds}ms: \$e');
+      print(
+        'Reflection failed after \${DateTime.now().difference(t2).inMilliseconds}ms: \$e',
+      );
     }
   } catch (e) {
     print('Error: \$e');

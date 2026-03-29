@@ -10,7 +10,8 @@ WebSocketChannel getChannel(Uri uri, WebSocketRequestModel request) {
       final h = request.requestHeaders![i];
       // Check if it's enabled (or if the enabled list is shorter/missing, default to true)
       bool isEnabled = true;
-      if (request.isHeaderEnabledList != null && i < request.isHeaderEnabledList!.length) {
+      if (request.isHeaderEnabledList != null &&
+          i < request.isHeaderEnabledList!.length) {
         isEnabled = request.isHeaderEnabledList![i];
       }
       if (isEnabled && h.name.isNotEmpty) {
@@ -18,7 +19,7 @@ WebSocketChannel getChannel(Uri uri, WebSocketRequestModel request) {
       }
     }
   }
-  
+
   Duration? pingInterval;
   if (request.pingInterval > 0) {
     pingInterval = Duration(seconds: request.pingInterval);

@@ -20,7 +20,7 @@ class CellField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ADOutlinedTextField(
-      key: ValueKey(keyId),
+      key: ValueKey('cell-$keyId-$initialValue'),
       keyId: keyId,
       initialValue: initialValue,
       hintText: hintText,

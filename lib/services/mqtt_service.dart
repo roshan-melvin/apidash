@@ -43,7 +43,7 @@ class MQTTMessage {
   final String payload;
   final DateTime timestamp;
   final bool isIncoming;
-  final int qos;        // 0, 1, or 2
+  final int qos; // 0, 1, or 2
   final bool isRetained; // broker-flagged retained
 
   const MQTTMessage({
@@ -60,6 +60,7 @@ class MQTTConnectionState {
   final bool isConnected;
   final bool isReconnecting;
   final String? error;
+  final DateTime? connectedAt;
   final List<MQTTMessage> messages;
   final List<MQTTEvent> eventLog;
 
@@ -67,6 +68,7 @@ class MQTTConnectionState {
     this.isConnected = false,
     this.isReconnecting = false,
     this.error,
+    this.connectedAt,
     this.messages = const [],
     this.eventLog = const [],
   });
@@ -75,6 +77,7 @@ class MQTTConnectionState {
     bool? isConnected,
     bool? isReconnecting,
     String? error,
+    DateTime? connectedAt,
     List<MQTTMessage>? messages,
     List<MQTTEvent>? eventLog,
   }) {
@@ -82,6 +85,7 @@ class MQTTConnectionState {
       isConnected: isConnected ?? this.isConnected,
       isReconnecting: isReconnecting ?? this.isReconnecting,
       error: error ?? this.error,
+      connectedAt: connectedAt ?? this.connectedAt,
       messages: messages ?? this.messages,
       eventLog: eventLog ?? this.eventLog,
     );
@@ -95,8 +99,7 @@ class MQTTService {
   mqtt5_server.MqttServerClient? _clientV5;
 
   MQTTConnectionState _state = const MQTTConnectionState();
-  final _stateController =
-      StreamController<MQTTConnectionState>.broadcast();
+  final _stateController = StreamController<MQTTConnectionState>.broadcast();
   final _messages = <MQTTMessage>[];
   final _eventLog = <MQTTEvent>[];
   StreamSubscription? _updatesSub;
@@ -105,7 +108,8 @@ class MQTTService {
   MQTTConnectionState get currentState => _state;
 
   bool get isConnected =>
-      _clientV5?.connectionStatus?.state == mqtt5.MqttConnectionState.connected ||
+      _clientV5?.connectionStatus?.state ==
+          mqtt5.MqttConnectionState.connected ||
       _clientV3?.connectionStatus?.state == mqtt3.MqttConnectionState.connected;
 
   // ── Private helpers ──────────────────────────────────────────────────────────
@@ -130,52 +134,70 @@ class MQTTService {
 
   void _onConnected() {
     _log.i('[MQTT] Connected to broker');
-    _addEvent(MQTTEvent(
-      timestamp: DateTime.now(),
-      type: MQTTEventType.connect,
-      description: 'Connected to broker',
-    ));
-    _pushState(_state.copyWith(isConnected: true, error: null));
+    _addEvent(
+      MQTTEvent(
+        timestamp: DateTime.now(),
+        type: MQTTEventType.connect,
+        description: 'Connected to broker',
+      ),
+    );
+    _pushState(
+      _state.copyWith(
+        isConnected: true,
+        connectedAt: DateTime.now(),
+        error: null,
+      ),
+    );
   }
 
   void _onDisconnected() {
     _log.i('[MQTT] Disconnected from broker');
-    _addEvent(MQTTEvent(
-      timestamp: DateTime.now(),
-      type: MQTTEventType.disconnect,
-      description: 'Disconnected from broker',
-    ));
+    _addEvent(
+      MQTTEvent(
+        timestamp: DateTime.now(),
+        type: MQTTEventType.disconnect,
+        description: 'Disconnected from broker',
+      ),
+    );
     _pushState(_state.copyWith(isConnected: false));
   }
 
   void _onSubscribed(String topic) {
     _log.i('[MQTT] Subscribed to $topic');
-    _addEvent(MQTTEvent(
-      timestamp: DateTime.now(),
-      type: MQTTEventType.subscribe,
-      topic: topic,
-      description: 'Subscribed to topic $topic',
-    ));
+    _addEvent(
+      MQTTEvent(
+        timestamp: DateTime.now(),
+        type: MQTTEventType.subscribe,
+        topic: topic,
+        description: 'Subscribed to topic $topic',
+      ),
+    );
   }
 
   // ── Public API ───────────────────────────────────────────────────────────────
 
   Future<bool> connect(MQTTRequestModel request) async {
     _log.i('[MQTT] Connecting to ${request.brokerUrl}:${request.port}');
-    
+
     // Initialize live session lists with saved history from Hive
     _messages.clear();
-    _messages.addAll(request.savedMessages.map((s) => MQTTMessage(
+    _messages.addAll(
+      request.savedMessages.map(
+        (s) => MQTTMessage(
           topic: s.topic,
           payload: s.payload,
           timestamp: s.timestamp,
           isIncoming: s.isIncoming,
           qos: s.qos,
           isRetained: s.isRetained,
-        )));
+        ),
+      ),
+    );
 
     _eventLog.clear();
-    _eventLog.addAll(request.savedEventLog.map((e) => MQTTEvent(
+    _eventLog.addAll(
+      request.savedEventLog.map(
+        (e) => MQTTEvent(
           timestamp: e.timestamp,
           type: MQTTEventType.values.firstWhere(
             (t) => t.name == e.eventType,
@@ -184,17 +206,21 @@ class MQTTService {
           topic: e.topic,
           payload: e.payload,
           description: e.description,
-        )));
+        ),
+      ),
+    );
 
     String brokerUrl = request.brokerUrl.trim();
     if (brokerUrl.isEmpty) {
       const errMsg = 'Connection error: Broker URL is required';
       _log.e('[MQTT] $errMsg');
-      _addEvent(MQTTEvent(
-        timestamp: DateTime.now(),
-        type: MQTTEventType.error,
-        description: errMsg,
-      ));
+      _addEvent(
+        MQTTEvent(
+          timestamp: DateTime.now(),
+          type: MQTTEventType.error,
+          description: errMsg,
+        ),
+      );
       _pushState(_state.copyWith(isConnected: false, error: errMsg));
       return false;
     }
@@ -217,23 +243,31 @@ class MQTTService {
       }
     } catch (e) {
       var errMsg = e.toString();
-      
-      if (_clientV5?.connectionStatus?.state == mqtt5.MqttConnectionState.faulted &&
+
+      if (_clientV5?.connectionStatus?.state ==
+              mqtt5.MqttConnectionState.faulted &&
           _clientV5?.connectionStatus?.reasonCode != null &&
-          _clientV5!.connectionStatus!.reasonCode != mqtt5.MqttConnectReasonCode.success) {
+          _clientV5!.connectionStatus!.reasonCode !=
+              mqtt5.MqttConnectReasonCode.success) {
         errMsg = _connackErrorV5(_clientV5!.connectionStatus);
-      } else if (_clientV3?.connectionStatus?.state == mqtt3.MqttConnectionState.faulted &&
+      } else if (_clientV3?.connectionStatus?.state ==
+              mqtt3.MqttConnectionState.faulted &&
           _clientV3?.connectionStatus?.returnCode != null &&
-          _clientV3!.connectionStatus!.returnCode != mqtt3.MqttConnectReturnCode.connectionAccepted) {
+          _clientV3!.connectionStatus!.returnCode !=
+              mqtt3.MqttConnectReturnCode.connectionAccepted) {
         errMsg = _connackErrorV3(_clientV3!.connectionStatus!.returnCode);
       } else if (errMsg.contains('SocketException')) {
-        errMsg = 'Connection failed: Unable to reach the broker. Check your URL and network.';
+        errMsg =
+            'Connection failed: Unable to reach the broker. Check your URL and network.';
       } else if (errMsg.contains('NoConnectionException')) {
-        errMsg = 'Connection timeout: The broker did not respond. Verify the port and TLS settings.';
+        errMsg =
+            'Connection timeout: The broker did not respond. Verify the port and TLS settings.';
       } else if (errMsg.contains('HandshakeException') ||
           errMsg.contains('CERTIFICATE_VERIFY_FAILED')) {
-        errMsg = 'TLS Handshake failed: The TLS connection was rejected by the broker or network.';
-      } else if (errMsg.contains('NotAuthorized') || errMsg.contains('Not authorized')) {
+        errMsg =
+            'TLS Handshake failed: The TLS connection was rejected by the broker or network.';
+      } else if (errMsg.contains('NotAuthorized') ||
+          errMsg.contains('Not authorized')) {
         errMsg = 'Authentication failed: Invalid username or password.';
       } else if (errMsg.contains('CONNACK error')) {
         // Fallback if exception string already contains CONNACK error
@@ -243,27 +277,38 @@ class MQTTService {
       }
 
       _log.e('[MQTT] $errMsg');
-      _addEvent(MQTTEvent(
-        timestamp: DateTime.now(),
-        type: MQTTEventType.error,
-        description: errMsg,
-      ));
+      _addEvent(
+        MQTTEvent(
+          timestamp: DateTime.now(),
+          type: MQTTEventType.error,
+          description: errMsg,
+        ),
+      );
       _pushState(_state.copyWith(isConnected: false, error: errMsg));
       return false;
     }
   }
 
-  Future<bool> _connectV3(MQTTRequestModel request, Uri uri, bool isWebSocket, String clientId) async {
+  Future<bool> _connectV3(
+    MQTTRequestModel request,
+    Uri uri,
+    bool isWebSocket,
+    String clientId,
+  ) async {
     final client = isWebSocket
         ? (mqtt3_server.MqttServerClient(uri.toString(), clientId)
-          ..useWebSocket = true
-          ..port = uri.hasPort ? uri.port : 9001)
+            ..useWebSocket = true
+            ..port = uri.hasPort ? uri.port : 9001)
         : (mqtt3_server.MqttServerClient(uri.host, clientId)
-          ..port = uri.hasPort ? uri.port : (request.port == 0 ? 1883 : request.port));
+            ..port = uri.hasPort
+                ? uri.port
+                : (request.port == 0 ? 1883 : request.port));
 
     client.connectTimeoutPeriod = 10000; // 10s timeout
     client.keepAlivePeriod = request.keepAlive;
-    client.disconnectOnNoResponsePeriod = request.keepAlive > 0 ? request.keepAlive * 2 : 60;
+    client.disconnectOnNoResponsePeriod = request.keepAlive > 0
+        ? request.keepAlive * 2
+        : 60;
     client.secure = request.useTls;
     if (request.useTls) {
       client.onBadCertificate = (dynamic cert) => true;
@@ -273,16 +318,25 @@ class MQTTService {
     client.autoReconnect = true;
     client.onAutoReconnect = () {
       _log.i('[MQTT] Auto-reconnecting...');
-      _addEvent(MQTTEvent(
-        timestamp: DateTime.now(),
-        type: MQTTEventType.disconnect,
-        description: 'Connection lost. Auto-reconnecting...',
-      ));
+      _addEvent(
+        MQTTEvent(
+          timestamp: DateTime.now(),
+          type: MQTTEventType.disconnect,
+          description: 'Connection lost. Auto-reconnecting...',
+        ),
+      );
       _pushState(_state.copyWith(isConnected: false, isReconnecting: true));
     };
     client.onAutoReconnected = () {
       _log.i('[MQTT] Auto-reconnected');
-      _pushState(_state.copyWith(isConnected: true, isReconnecting: false, error: null));
+      _pushState(
+        _state.copyWith(
+          isConnected: true,
+          isReconnecting: false,
+          connectedAt: DateTime.now(),
+          error: null,
+        ),
+      );
     };
 
     if (request.protocolVersion == MQTTProtocolVersion.v31) {
@@ -294,7 +348,7 @@ class MQTTService {
     final connMsg = mqtt3.MqttConnectMessage()
         .withClientIdentifier(clientId)
         .withWillQos(mqtt3.MqttQos.atMostOnce);
-        
+
     if (request.cleanSession) connMsg.startClean();
 
     if (request.username.isNotEmpty) {
@@ -311,44 +365,59 @@ class MQTTService {
     for (final topic in request.topics.where((t) => t.subscribe)) {
       await subscribe(topic.topic, topic.qos);
     }
-    
+
     _updatesSub = client.updates?.listen((messages) {
       for (final msg in messages) {
         final r = msg.payload as mqtt3.MqttPublishMessage;
-        final payload = mqtt3.MqttPublishPayload.bytesToStringAsString(r.payload.message);
+        final payload = mqtt3.MqttPublishPayload.bytesToStringAsString(
+          r.payload.message,
+        );
         final qosVal = r.header?.qos.index ?? 0;
         final retained = r.header?.retain ?? false;
         _log.d('[MQTT] Received on ${msg.topic}: $payload');
-        _addMessage(MQTTMessage(
-          topic: msg.topic,
-          payload: payload,
-          timestamp: DateTime.now(),
-          isIncoming: true,
-          qos: qosVal.clamp(0, 2),
-          isRetained: retained,
-        ));
-        _addEvent(MQTTEvent(
-          timestamp: DateTime.now(),
-          type: MQTTEventType.receive,
-          topic: msg.topic,
-          payload: payload,
-          description: 'Message received from ${msg.topic}',
-        ));
+        _addMessage(
+          MQTTMessage(
+            topic: msg.topic,
+            payload: payload,
+            timestamp: DateTime.now(),
+            isIncoming: true,
+            qos: qosVal.clamp(0, 2),
+            isRetained: retained,
+          ),
+        );
+        _addEvent(
+          MQTTEvent(
+            timestamp: DateTime.now(),
+            type: MQTTEventType.receive,
+            topic: msg.topic,
+            payload: payload,
+            description: 'Message received from ${msg.topic}',
+          ),
+        );
       }
     });
     return true;
   }
 
-  Future<bool> _connectV5(MQTTRequestModel request, Uri uri, bool isWebSocket, String clientId) async {
+  Future<bool> _connectV5(
+    MQTTRequestModel request,
+    Uri uri,
+    bool isWebSocket,
+    String clientId,
+  ) async {
     final client = isWebSocket
         ? (mqtt5_server.MqttServerClient(uri.toString(), clientId)
-          ..useWebSocket = true
-          ..port = uri.hasPort ? uri.port : 9001)
+            ..useWebSocket = true
+            ..port = uri.hasPort ? uri.port : 9001)
         : (mqtt5_server.MqttServerClient(uri.host, clientId)
-          ..port = uri.hasPort ? uri.port : (request.port == 0 ? 1883 : request.port));
+            ..port = uri.hasPort
+                ? uri.port
+                : (request.port == 0 ? 1883 : request.port));
 
     client.keepAlivePeriod = request.keepAlive;
-    client.disconnectOnNoResponsePeriod = request.keepAlive > 0 ? request.keepAlive * 2 : 60;
+    client.disconnectOnNoResponsePeriod = request.keepAlive > 0
+        ? request.keepAlive * 2
+        : 60;
     client.secure = request.useTls;
     if (request.useTls) {
       client.onBadCertificate = (dynamic cert) => true;
@@ -358,22 +427,31 @@ class MQTTService {
     client.autoReconnect = true;
     client.onAutoReconnect = () {
       _log.i('[MQTT] Auto-reconnecting...');
-      _addEvent(MQTTEvent(
-        timestamp: DateTime.now(),
-        type: MQTTEventType.disconnect,
-        description: 'Connection lost. Auto-reconnecting...',
-      ));
+      _addEvent(
+        MQTTEvent(
+          timestamp: DateTime.now(),
+          type: MQTTEventType.disconnect,
+          description: 'Connection lost. Auto-reconnecting...',
+        ),
+      );
       _pushState(_state.copyWith(isConnected: false, isReconnecting: true));
     };
     client.onAutoReconnected = () {
       _log.i('[MQTT] Auto-reconnected');
-      _pushState(_state.copyWith(isConnected: true, isReconnecting: false, error: null));
+      _pushState(
+        _state.copyWith(
+          isConnected: true,
+          isReconnecting: false,
+          connectedAt: DateTime.now(),
+          error: null,
+        ),
+      );
     };
 
     final connMsg = mqtt5.MqttConnectMessage()
         .withClientIdentifier(clientId)
         .withWillQos(mqtt5.MqttQos.atMostOnce);
-        
+
     if (request.cleanSession) connMsg.startClean();
 
     if (request.username.isNotEmpty) {
@@ -395,25 +473,31 @@ class MQTTService {
       for (final msg in messages) {
         final r = msg.payload as mqtt5.MqttPublishMessage;
         final pb = r.payload.message;
-        final payload = pb == null ? '' : mqtt5.MqttPublishPayload.bytesToStringAsString(pb);
+        final payload = pb == null
+            ? ''
+            : mqtt5.MqttPublishPayload.bytesToStringAsString(pb);
         final qosVal = r.header?.qos.index ?? 0;
         final retained = r.header?.retain ?? false;
         _log.d('[MQTT] Received on ${msg.topic}: $payload');
-        _addMessage(MQTTMessage(
-          topic: msg.topic ?? '',
-          payload: payload,
-          timestamp: DateTime.now(),
-          isIncoming: true,
-          qos: qosVal.clamp(0, 2),
-          isRetained: retained,
-        ));
-        _addEvent(MQTTEvent(
-          timestamp: DateTime.now(),
-          type: MQTTEventType.receive,
-          topic: msg.topic,
-          payload: payload,
-          description: 'Message received from ${msg.topic}',
-        ));
+        _addMessage(
+          MQTTMessage(
+            topic: msg.topic ?? '',
+            payload: payload,
+            timestamp: DateTime.now(),
+            isIncoming: true,
+            qos: qosVal.clamp(0, 2),
+            isRetained: retained,
+          ),
+        );
+        _addEvent(
+          MQTTEvent(
+            timestamp: DateTime.now(),
+            type: MQTTEventType.receive,
+            topic: msg.topic,
+            payload: payload,
+            description: 'Message received from ${msg.topic}',
+          ),
+        );
       }
     });
     return true;
@@ -422,12 +506,12 @@ class MQTTService {
   Future<void> disconnect() async {
     await _updatesSub?.cancel();
     _updatesSub = null;
-    
-    // Always call disconnect on both clients if they exist, 
+
+    // Always call disconnect on both clients if they exist,
     // regardless of the isConnected state to clean up zombies.
     _clientV5?.disconnect();
     _clientV3?.disconnect();
-    
+
     _clientV5 = null;
     _clientV3 = null;
     _pushState(const MQTTConnectionState());
@@ -446,12 +530,14 @@ class MQTTService {
     } catch (e) {
       final errMsg = 'Subscribe error: $e';
       _log.e('[MQTT] $errMsg');
-      _addEvent(MQTTEvent(
-        timestamp: DateTime.now(),
-        type: MQTTEventType.error,
-        topic: topic,
-        description: errMsg,
-      ));
+      _addEvent(
+        MQTTEvent(
+          timestamp: DateTime.now(),
+          type: MQTTEventType.error,
+          topic: topic,
+          description: errMsg,
+        ),
+      );
       _pushState(_state.copyWith(error: errMsg));
       return false;
     }
@@ -462,23 +548,27 @@ class MQTTService {
     try {
       _clientV5?.unsubscribeStringTopic(topic);
       _clientV3?.unsubscribe(topic);
-      
-      _addEvent(MQTTEvent(
-        timestamp: DateTime.now(),
-        type: MQTTEventType.unsubscribe,
-        topic: topic,
-        description: 'Unsubscribed from $topic',
-      ));
+
+      _addEvent(
+        MQTTEvent(
+          timestamp: DateTime.now(),
+          type: MQTTEventType.unsubscribe,
+          topic: topic,
+          description: 'Unsubscribed from $topic',
+        ),
+      );
       return true;
     } catch (e) {
       final errMsg = 'Unsubscribe error: $e';
       _log.e('[MQTT] $errMsg');
-      _addEvent(MQTTEvent(
-        timestamp: DateTime.now(),
-        type: MQTTEventType.error,
-        topic: topic,
-        description: errMsg,
-      ));
+      _addEvent(
+        MQTTEvent(
+          timestamp: DateTime.now(),
+          type: MQTTEventType.error,
+          topic: topic,
+          description: errMsg,
+        ),
+      );
       _pushState(_state.copyWith(error: errMsg));
       return false;
     }
@@ -509,31 +599,37 @@ class MQTTService {
           retain: retain,
         );
       }
-      _addMessage(MQTTMessage(
-        topic: topic,
-        payload: payload,
-        timestamp: DateTime.now(),
-        isIncoming: false,
-        qos: qos.clamp(0, 2),
-        isRetained: retain,
-      ));
-      _addEvent(MQTTEvent(
-        timestamp: DateTime.now(),
-        type: MQTTEventType.send,
-        topic: topic,
-        payload: payload,
-        description: 'Message sent to $topic',
-      ));
+      _addMessage(
+        MQTTMessage(
+          topic: topic,
+          payload: payload,
+          timestamp: DateTime.now(),
+          isIncoming: false,
+          qos: qos.clamp(0, 2),
+          isRetained: retain,
+        ),
+      );
+      _addEvent(
+        MQTTEvent(
+          timestamp: DateTime.now(),
+          type: MQTTEventType.send,
+          topic: topic,
+          payload: payload,
+          description: 'Message sent to $topic',
+        ),
+      );
       return true;
     } catch (e) {
       final errMsg = 'Publish error: $e';
       _log.e('[MQTT] $errMsg');
-      _addEvent(MQTTEvent(
-        timestamp: DateTime.now(),
-        type: MQTTEventType.error,
-        topic: topic,
-        description: errMsg,
-      ));
+      _addEvent(
+        MQTTEvent(
+          timestamp: DateTime.now(),
+          type: MQTTEventType.error,
+          topic: topic,
+          description: errMsg,
+        ),
+      );
       _pushState(_state.copyWith(error: errMsg));
       return false;
     }
@@ -561,7 +657,8 @@ class MQTTService {
   }
 
   static String _connackErrorV5(mqtt5.MqttConnectionStatus? status) {
-    final reason = mqtt5.MqttConnectReasonCodeSupport.mqttConnectReasonCode.asString(status?.reasonCode);
+    final reason = mqtt5.MqttConnectReasonCodeSupport.mqttConnectReasonCode
+        .asString(status?.reasonCode);
     final reasonString = status?.reasonString;
     if (reasonString == null || reasonString.isEmpty) {
       return 'CONNACK error: $reason';
@@ -569,4 +666,3 @@ class MQTTService {
     return 'CONNACK error: $reason ($reasonString)';
   }
 }
-

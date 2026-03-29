@@ -14,8 +14,11 @@ class EditWebSocketRequestPane extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedId = ref.watch(selectedIdStateProvider);
     final codePaneVisible = ref.watch(codePaneVisibleStateProvider);
-    final tabIndex = ref.watch(selectedRequestModelProvider
-        .select((value) => value?.websocketRequestModel?.requestTabIndex));
+    final tabIndex = ref.watch(
+      selectedRequestModelProvider.select(
+        (value) => value?.websocketRequestModel?.requestTabIndex,
+      ),
+    );
     final requestModel = ref.watch(selectedRequestModelProvider);
     final wsModel = requestModel?.websocketRequestModel;
 
@@ -42,12 +45,7 @@ class EditWebSocketRequestPane extends ConsumerWidget {
         headerLength > 0, // Headers
         false, // Settings
       ],
-      tabLabels: const [
-        'Message',
-        'URL Params',
-        'Headers',
-        'Settings',
-      ],
+      tabLabels: const ['Message', 'URL Params', 'Headers', 'Settings'],
       children: const [
         EditWebSocketMessagesPane(),
         EditWebSocketURLParams(),

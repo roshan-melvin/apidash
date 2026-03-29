@@ -75,6 +75,9 @@ _WebSocketRequestModel _$WebSocketRequestModelFromJson(
   requestTabIndex: (json['requestTabIndex'] as num?)?.toInt() ?? 0,
   filterIndex: (json['filterIndex'] as num?)?.toInt() ?? 0,
   pingInterval: (json['pingInterval'] as num?)?.toInt() ?? 0,
+  autoReconnect: json['autoReconnect'] as bool? ?? false,
+  reconnectInterval: (json['reconnectInterval'] as num?)?.toInt() ?? 5,
+  maxRetries: (json['maxRetries'] as num?)?.toInt() ?? 5,
 );
 
 Map<String, dynamic> _$WebSocketRequestModelToJson(
@@ -90,4 +93,7 @@ Map<String, dynamic> _$WebSocketRequestModelToJson(
   'requestTabIndex': instance.requestTabIndex,
   'filterIndex': instance.filterIndex,
   'pingInterval': instance.pingInterval,
+  'autoReconnect': instance.autoReconnect,
+  'reconnectInterval': instance.reconnectInterval,
+  'maxRetries': instance.maxRetries,
 };

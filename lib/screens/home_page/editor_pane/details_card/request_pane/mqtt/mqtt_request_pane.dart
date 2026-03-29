@@ -1,5 +1,8 @@
 import 'package:apidash_design_system/apidash_design_system.dart';
 import 'package:data_table_2/data_table_2.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../websocket/websocket_template_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apidash/consts.dart';
@@ -55,7 +58,93 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
     super.dispose();
   }
 
+
+  // Templates
+  List<Map<String, dynamic>> _templates = [];
+  String? _currentRequestId;
+
+  void _checkRequestId(String newId) {
+    if (_currentRequestId != newId) {
+      _currentRequestId = newId;
+      _loadTemplates(newId);
+    }
+  }
+
+  Future<void> _loadTemplates(String requestId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final str = prefs.getString('mqtt_publish_templates_$requestId');
+    if (str != null) {
+      try {
+        final List<dynamic> list = jsonDecode(str);
+        setState(() {
+          _templates = list.cast<Map<String, dynamic>>();
+        });
+      } catch (_) {
+        setState(() {
+          _templates = [];
+        });
+      }
+    } else {
+      setState(() {
+        _templates = [];
+      });
+    }
+  }
+
+  Future<void> _saveTemplates() async {
+    if (_currentRequestId == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      'mqtt_publish_templates_$_currentRequestId',
+      jsonEncode(_templates),
+    );
+  }
+
+  void _saveNewTemplate(String name, String currentPayload) {
+    setState(() {
+      _templates.insert(0, {'name': name.trim(), 'payload': currentPayload});
+    });
+    _saveTemplates();
+  }
+
+  void _deleteTemplate(int index) {
+    setState(() {
+      _templates.removeAt(index);
+    });
+    _saveTemplates();
+  }
+
+  void _applyTemplate(Map<String, dynamic> template) {
+    final newPayload = template['payload'] ?? '';
+    _update((m) => m.copyWith(publishPayload: newPayload));
+  }
+
+  void _openTemplatesPanel(BuildContext ctx, String currentPayload, {bool initialIsSavingView = false}) {
+    showDialog(
+      context: ctx,
+      barrierColor: Theme.of(ctx).colorScheme.scrim.withValues(alpha: 0.5),
+      builder: (context) {
+        return WebSocketTemplatePanel(
+          templates: _templates,
+          initialIsSavingView: initialIsSavingView,
+          currentPayload: currentPayload,
+          onClose: () => Navigator.of(context).pop(),
+          onSave: (name) {
+            _saveNewTemplate(name, currentPayload);
+            Navigator.of(context).pop();
+          },
+          onDelete: _deleteTemplate,
+          onSelect: (t) {
+            _applyTemplate(t);
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
+  }
+
   void _update(MQTTRequestModel Function(MQTTRequestModel) fn) {
+
     final updated = fn(ref.read(mqttRequestProvider));
     ref.read(mqttRequestProvider.notifier).state = updated;
 
@@ -128,6 +217,10 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedId = ref.watch(selectedIdStateProvider);
+    if (selectedId != null) {
+      _checkRequestId(selectedId);
+    }
     final connState = ref.watch(mqttConnectionStateProvider).value;
     final isConnected = connState?.isConnected ?? false;
     final topics = ref.watch(mqttTopicsProvider);
@@ -222,25 +315,29 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                     Expanded(
                       child: Padding(
                         padding: kPt5o10,
-                        child: _publishContentType == 'json'
-                            ? JsonTextFieldEditor(
-                                key: const Key("mqtt-json-body"),
-                                fieldKey: "mqtt-json-body-editor",
-                                isDark:
-                                    Theme.of(context).brightness ==
-                                    Brightness.dark,
-                                initialValue: model.publishPayload,
-                                onChanged: (String value) => _update(
-                                  (m) => m.copyWith(publishPayload: value),
+                        child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                  borderRadius: kBorderRadius8,
                                 ),
-                              )
-                            : TextFieldEditor(
-                                key: const Key("mqtt-text-body"),
-                                fieldKey: "mqtt-text-body-editor",
-                                initialValue: model.publishPayload,
-                                onChanged: (String value) => _update(
-                                  (m) => m.copyWith(publishPayload: value),
-                                ),
+                                child: _publishContentType == 'json'
+                                    ? JsonTextFieldEditor(
+                                        key: Key("mqtt-json-body-${model.publishPayload.hashCode}"),
+                                        fieldKey: "mqtt-json-body-editor",
+                                        isDark: Theme.of(context).brightness == Brightness.dark,
+                                        initialValue: model.publishPayload,
+                                        onChanged: (String value) => _update(
+                                          (m) => m.copyWith(publishPayload: value),
+                                        ),
+                                      )
+                                    : TextFieldEditor(
+                                        key: Key("mqtt-text-body-${model.publishPayload.hashCode}"),
+                                        fieldKey: "mqtt-text-body-editor",
+                                        initialValue: model.publishPayload,
+                                        onChanged: (String value) => _update(
+                                          (m) => m.copyWith(publishPayload: value),
+                                        ),
+                                      ),
                               ),
                       ),
                     ),
@@ -274,19 +371,46 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                             ).colorScheme.primary,
                           ),
                           kHSpacer12,
-                          FilledButton.icon(
-                            onPressed: isConnected ? _publish : null,
-                            style: FilledButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 12,
+                          SizedBox(
+                            height: 40,
+                            child: FilledButton.icon(
+                              onPressed: () => _openTemplatesPanel(
+                                  context, model.publishPayload,
+                                  initialIsSavingView: false),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                shape: RoundedRectangleBorder(borderRadius: kBorderRadius8),
+                                side: BorderSide(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withValues(alpha: 0.5),
+                                ),
+                                foregroundColor: Theme.of(context).colorScheme.primary,
+                                textStyle: const TextStyle(fontSize: 14),
                               ),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: kBorderRadius8,
+                              icon: Icon(
+                                Icons.library_books_rounded,
+                                size: 16,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
+                              label: const Text('Templates'),
                             ),
-                            icon: const Icon(Icons.send_rounded, size: 16),
-                            label: const Text('Publish'),
+                          ),
+                          kHSpacer8,
+                          SizedBox(
+                            height: 40,
+                            child: FilledButton.icon(
+                              onPressed: isConnected ? _publish : null,
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                shape: RoundedRectangleBorder(borderRadius: kBorderRadius8),
+                                textStyle: const TextStyle(fontSize: 14),
+                              ),
+                              icon: const Icon(Icons.send, size: 16),
+                              label: const Text('Publish'),
+                            ),
                           ),
                         ],
                       ),
@@ -337,10 +461,11 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                             values: const [(0, '0'), (1, '1'), (2, '2')],
                             onChanged: !isConnected
                                 ? (v) {
-                                    if (v != null)
+                                    if (v != null) {
                                       _update(
                                         (m) => m.copyWith(lastWillQos: v),
                                       );
+                                    }
                                   }
                                 : null,
                           ),

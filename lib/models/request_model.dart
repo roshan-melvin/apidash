@@ -12,10 +12,7 @@ part 'request_model.g.dart';
 
 @freezed
 abstract class RequestModel with _$RequestModel {
-  @JsonSerializable(
-    explicitToJson: true,
-    anyMap: true,
-  )
+  @JsonSerializable(explicitToJson: true, anyMap: true)
   const factory RequestModel({
     required String id,
     @Default(APIType.rest) APIType apiType,

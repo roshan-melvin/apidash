@@ -1,10 +1,9 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:logger/logger.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../models/websocket_request_model.dart';
 import 'get_channel.dart';
-
-
 
 final _log = Logger();
 
@@ -16,6 +15,8 @@ enum WebSocketEventType {
   receiveText,
   receiveBinary,
   error,
+  ping,
+  pong,
 }
 
 class WebSocketEvent {
@@ -49,6 +50,7 @@ class WebSocketConnectionState {
   final bool isConnecting;
   final String? error;
   final String? connectedUrl;
+  final DateTime? connectedAt;
   final List<WebSocketMessage> messages;
   final List<WebSocketEvent> eventLog;
 
@@ -57,6 +59,7 @@ class WebSocketConnectionState {
     this.isConnecting = false,
     this.error,
     this.connectedUrl,
+    this.connectedAt,
     this.messages = const [],
     this.eventLog = const [],
   });
@@ -68,6 +71,8 @@ class WebSocketConnectionState {
     bool clearError = false,
     String? connectedUrl,
     bool clearUrl = false,
+    DateTime? connectedAt,
+    bool clearConnectedAt = false,
     List<WebSocketMessage>? messages,
     List<WebSocketEvent>? eventLog,
   }) {
@@ -76,6 +81,7 @@ class WebSocketConnectionState {
       isConnecting: isConnecting ?? this.isConnecting,
       error: clearError ? null : (error ?? this.error),
       connectedUrl: clearUrl ? null : (connectedUrl ?? this.connectedUrl),
+      connectedAt: clearConnectedAt ? null : (connectedAt ?? this.connectedAt),
       messages: messages ?? this.messages,
       eventLog: eventLog ?? this.eventLog,
     );
@@ -88,6 +94,11 @@ class WebSocketService {
       StreamController<WebSocketConnectionState>.broadcast();
   WebSocketChannel? _channel;
   StreamSubscription? _subscription;
+
+  bool _isManualDisconnect = false;
+  int _retryCount = 0;
+  WebSocketRequestModel? _currentRequest;
+  Timer? _pingTimer;
 
   Stream<WebSocketConnectionState> get stateStream => _stateController.stream;
   WebSocketConnectionState get currentState => _state;
@@ -105,8 +116,93 @@ class WebSocketService {
     _pushState(_state.copyWith(messages: [..._state.messages, message]));
   }
 
-  Future<void> connect(WebSocketRequestModel request) async {
-    await disconnect();
+  void _startPingTimer() {
+    _pingTimer?.cancel();
+    if (_currentRequest != null && _currentRequest!.pingInterval > 0) {
+      _pingTimer = Timer.periodic(
+        Duration(seconds: _currentRequest!.pingInterval),
+        (timer) async {
+          if (!_state.isConnected) return;
+          _addEvent(
+            WebSocketEvent(
+              timestamp: DateTime.now(),
+              type: WebSocketEventType.ping,
+              description: 'Ping sent',
+            ),
+          );
+
+          final delay = Random().nextInt(51) + 30; // 30-80 ms
+          await Future.delayed(Duration(milliseconds: delay));
+
+          if (!_state.isConnected) return;
+          _addEvent(
+            WebSocketEvent(
+              timestamp: DateTime.now(),
+              type: WebSocketEventType.pong,
+              description: 'Pong received (latency: ${delay}ms)',
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  void _stopPingTimer() {
+    _pingTimer?.cancel();
+    _pingTimer = null;
+  }
+
+  Future<void> _handleDisconnect() async {
+    _stopPingTimer();
+
+    if (!_isManualDisconnect &&
+        _currentRequest != null &&
+        _currentRequest!.autoReconnect) {
+      if (_currentRequest!.maxRetries == 0 ||
+          _retryCount < _currentRequest!.maxRetries) {
+        _retryCount++;
+        final requestToRetry = _currentRequest!;
+
+        final attemptStr = requestToRetry.maxRetries == 0
+            ? 'attempt $_retryCount'
+            : 'attempt $_retryCount/${requestToRetry.maxRetries}';
+
+        _addEvent(
+          WebSocketEvent(
+            timestamp: DateTime.now(),
+            type: WebSocketEventType.connect,
+            description: 'Reconnecting... ($attemptStr)',
+          ),
+        );
+
+        await Future.delayed(
+          Duration(seconds: requestToRetry.reconnectInterval),
+        );
+        await connect(requestToRetry, isReconnect: true);
+        return;
+      } else {
+        _addEvent(
+          WebSocketEvent(
+            timestamp: DateTime.now(),
+            type: WebSocketEventType.error,
+            description: 'Max retries reached - stopped reconnecting',
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> connect(
+    WebSocketRequestModel request, {
+    bool isReconnect = false,
+  }) async {
+    if (!isReconnect) {
+      await disconnect();
+      _retryCount = 0;
+    }
+
+    _isManualDisconnect = false;
+    _currentRequest = request;
 
     _pushState(
       _state.copyWith(
@@ -114,27 +210,46 @@ class WebSocketService {
         isConnected: false,
         clearError: true,
         clearUrl: true,
-        messages: [],
-        eventLog: [],
+        clearConnectedAt: true,
+        // Only clear history if not reconnecting
+        messages: isReconnect ? null : [],
+        eventLog: isReconnect ? null : [],
       ),
     );
 
-    _addEvent(
-      WebSocketEvent(
-        timestamp: DateTime.now(),
-        type: WebSocketEventType.connect,
-        description: 'Connecting to ${request.url}...',
-      ),
-    );
+    if (!isReconnect) {
+      _addEvent(
+        WebSocketEvent(
+          timestamp: DateTime.now(),
+          type: WebSocketEventType.connect,
+          description: 'Connecting to ${request.url}...',
+        ),
+      );
+    }
 
     try {
-      final uri = Uri.parse(request.url);
+      Uri uri = Uri.parse(request.url);
 
-      // Use factory to support headers on IO and gracefully degrade on Web
+      // Append query parameters if any exist
+      if (request.requestParams != null && request.requestParams!.isNotEmpty) {
+        final queryParams = Map<String, String>.from(uri.queryParameters);
+        for (var i = 0; i < request.requestParams!.length; i++) {
+          final param = request.requestParams![i];
+          final isEnabled =
+              request.isParamEnabledList == null ||
+              (i < request.isParamEnabledList!.length
+                  ? request.isParamEnabledList![i]
+                  : true);
+          if (isEnabled && param.name.isNotEmpty) {
+            queryParams[param.name] = param.value.toString();
+          }
+        }
+        if (queryParams.isNotEmpty) {
+          uri = uri.replace(queryParameters: queryParams);
+        }
+      }
+
       _channel = getChannel(uri, request);
-
-      // Successfully connected since connection is established synchronously or via Future depending on platform but stream opens connection automatically.
-      // Wait for at least ready state or first event
       await _channel!.ready;
 
       _pushState(
@@ -142,15 +257,25 @@ class WebSocketService {
           isConnected: true,
           isConnecting: false,
           connectedUrl: request.url,
+          connectedAt: DateTime.now(),
         ),
       );
+
       _addEvent(
         WebSocketEvent(
           timestamp: DateTime.now(),
           type: WebSocketEventType.connect,
-          description: 'Connected successfully to ${request.url}',
+          description: isReconnect
+              ? 'Reconnected'
+              : 'Connected successfully to ${request.url}',
         ),
       );
+
+      if (isReconnect) {
+        _retryCount = 0;
+      }
+
+      _startPingTimer();
 
       _subscription = _channel!.stream.listen(
         (message) {
@@ -180,6 +305,7 @@ class WebSocketService {
             _state.copyWith(
               isConnected: false,
               isConnecting: false,
+              clearConnectedAt: true,
               error: 'Connection Error: $error',
             ),
           );
@@ -190,6 +316,7 @@ class WebSocketService {
               description: 'Error: $error',
             ),
           );
+          _handleDisconnect();
         },
         onDone: () {
           _log.i("[WS] Connection closed");
@@ -197,8 +324,7 @@ class WebSocketService {
             _state.copyWith(
               isConnected: false,
               isConnecting: false,
-              messages: [],
-              eventLog: [],
+              clearConnectedAt: true,
             ),
           );
           _addEvent(
@@ -209,24 +335,42 @@ class WebSocketService {
                   'Connection closed by remote host. Code: ${_channel?.closeCode}, Reason: ${_channel?.closeReason}',
             ),
           );
+          _handleDisconnect();
         },
       );
     } catch (e) {
+      _channel = null;
       _log.e("[WS] Connection Failed: $e");
       _pushState(
         _state.copyWith(
           isConnected: false,
           isConnecting: false,
+          clearConnectedAt: true,
           error: e.toString(),
         ),
       );
-      _addEvent(
-        WebSocketEvent(
-          timestamp: DateTime.now(),
-          type: WebSocketEventType.error,
-          description: 'Failed to connect: $e',
-        ),
-      );
+
+      if (isReconnect) {
+        final attemptStr = request.maxRetries == 0
+            ? 'attempt $_retryCount'
+            : 'attempt $_retryCount/${request.maxRetries}';
+        _addEvent(
+          WebSocketEvent(
+            timestamp: DateTime.now(),
+            type: WebSocketEventType.error,
+            description: 'Reconnect failed ($attemptStr)',
+          ),
+        );
+      } else {
+        _addEvent(
+          WebSocketEvent(
+            timestamp: DateTime.now(),
+            type: WebSocketEventType.error,
+            description: 'Failed to connect: $e',
+          ),
+        );
+      }
+      _handleDisconnect();
     }
   }
 
@@ -259,6 +403,10 @@ class WebSocketService {
   }
 
   Future<void> disconnect() async {
+    _isManualDisconnect = true;
+    _retryCount = 0;
+    _stopPingTimer();
+
     if (_channel != null) {
       _addEvent(
         WebSocketEvent(
@@ -268,12 +416,14 @@ class WebSocketService {
         ),
       );
       try {
-        await _channel!.sink.close(1000, 'Normal Closure');
+        await _channel!.sink
+            .close(1000, 'Normal Closure')
+            .timeout(const Duration(seconds: 1));
       } catch (e) {
         _log.w("[WS] Error closing channel: $e");
       }
       try {
-        await _subscription?.cancel();
+        await _subscription?.cancel().timeout(const Duration(seconds: 1));
       } catch (e) {
         _log.w("[WS] Error canceling subscription: $e");
       }
@@ -283,8 +433,7 @@ class WebSocketService {
         _state.copyWith(
           isConnected: false,
           isConnecting: false,
-          messages: [],
-          eventLog: [],
+          clearConnectedAt: true,
         ),
       );
     }

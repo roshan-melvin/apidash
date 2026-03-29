@@ -40,7 +40,9 @@ class CodePane extends ConsumerWidget {
 
     // TODO: Add WebSocket Codegen
     if (selectedRequestModel?.apiType == APIType.websocket) {
-      return const ErrorMessage(message: 'Code generation for WebSocket is not available yet.');
+      return const ErrorMessage(
+        message: 'Code generation for WebSocket is not available yet.',
+      );
     }
 
     final defaultUriScheme = ref.watch(

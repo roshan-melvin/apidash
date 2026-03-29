@@ -11,7 +11,9 @@ final grpcServiceProvider = Provider<GrpcService>((ref) {
   return service;
 });
 
-final grpcStateProvider = StreamProvider.autoDispose<GrpcConnectionState>((ref) async* {
+final grpcStateProvider = StreamProvider.autoDispose<GrpcConnectionState>((
+  ref,
+) async* {
   final service = ref.watch(grpcServiceProvider);
   yield service.currentState;
   yield* service.stateStream;
@@ -28,24 +30,26 @@ final grpcRequestProvider = StateProvider<GrpcRequestModel>((ref) {
   return const GrpcRequestModel();
 });
 
-final grpcMessagesProvider = Provider.autoDispose.family<List<GrpcMessage>, String>((ref, id) {
-  final liveStateAsync = ref.watch(grpcStateProvider);
-  final liveMessages = liveStateAsync.value?.messages;
-  
-  if (liveMessages != null && liveMessages.isNotEmpty) {
-    return liveMessages;
-  }
-  
-  return [];
-});
+final grpcMessagesProvider = Provider.autoDispose
+    .family<List<GrpcMessage>, String>((ref, id) {
+      final liveStateAsync = ref.watch(grpcStateProvider);
+      final liveMessages = liveStateAsync.value?.messages;
 
-final grpcEventLogProvider = Provider.autoDispose.family<List<GrpcEvent>, String>((ref, id) {
-  final liveStateAsync = ref.watch(grpcStateProvider);
-  final liveEventLog = liveStateAsync.value?.eventLog;
-  
-  if (liveEventLog != null && liveEventLog.isNotEmpty) {
-    return liveEventLog;
-  }
-  
-  return [];
-});
+      if (liveMessages != null && liveMessages.isNotEmpty) {
+        return liveMessages;
+      }
+
+      return [];
+    });
+
+final grpcEventLogProvider = Provider.autoDispose
+    .family<List<GrpcEvent>, String>((ref, id) {
+      final liveStateAsync = ref.watch(grpcStateProvider);
+      final liveEventLog = liveStateAsync.value?.eventLog;
+
+      if (liveEventLog != null && liveEventLog.isNotEmpty) {
+        return liveEventLog;
+      }
+
+      return [];
+    });

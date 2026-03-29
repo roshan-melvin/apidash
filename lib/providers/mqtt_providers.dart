@@ -13,8 +13,7 @@ final mqttServiceProvider = Provider<MQTTService>((ref) {
 });
 
 /// Stream of live connection state (connected, messages, event log).
-final mqttConnectionStateProvider =
-    StreamProvider<MQTTConnectionState>((ref) {
+final mqttConnectionStateProvider = StreamProvider<MQTTConnectionState>((ref) {
   return ref.watch(mqttServiceProvider).stateStream;
 });
 
@@ -48,14 +47,16 @@ final mqttMessagesProvider = Provider<List<MQTTMessage>>((ref) {
   // Otherwise fall back to the last saved messages from Hive
   final saved = ref.watch(mqttRequestProvider).savedMessages;
   return saved
-      .map((s) => MQTTMessage(
-            topic: s.topic,
-            payload: s.payload,
-            timestamp: s.timestamp,
-            isIncoming: s.isIncoming,
-            qos: s.qos,
-            isRetained: s.isRetained,
-          ))
+      .map(
+        (s) => MQTTMessage(
+          topic: s.topic,
+          payload: s.payload,
+          timestamp: s.timestamp,
+          isIncoming: s.isIncoming,
+          qos: s.qos,
+          isRetained: s.isRetained,
+        ),
+      )
       .toList();
 });
 
@@ -72,16 +73,18 @@ final mqttEventLogProvider = Provider<List<MQTTEvent>>((ref) {
   // Otherwise fall back to the last saved event log from Hive
   final saved = ref.watch(mqttRequestProvider).savedEventLog;
   return saved
-      .map((e) => MQTTEvent(
-            timestamp: e.timestamp,
-            type: MQTTEventType.values.firstWhere(
-              (t) => t.name == e.eventType,
-              orElse: () => MQTTEventType.connect,
-            ),
-            topic: e.topic,
-            payload: e.payload,
-            description: e.description,
-          ))
+      .map(
+        (e) => MQTTEvent(
+          timestamp: e.timestamp,
+          type: MQTTEventType.values.firstWhere(
+            (t) => t.name == e.eventType,
+            orElse: () => MQTTEventType.connect,
+          ),
+          topic: e.topic,
+          payload: e.payload,
+          description: e.description,
+        ),
+      )
       .toList();
 });
 
@@ -89,43 +92,41 @@ final mqttEventLogProvider = Provider<List<MQTTEvent>>((ref) {
 /// so the sidebar badge, messages, and event log survive app restarts.
 final mqttStateSyncProvider = Provider<void>((ref) {
   final selectedId = ref.watch(selectedIdStateProvider);
-  final notifier =
-      ref.watch(collectionStateNotifierProvider.notifier);
+  final notifier = ref.watch(collectionStateNotifierProvider.notifier);
 
   ref.listen(mqttConnectionStateProvider, (_, next) {
     if (next.hasValue && selectedId != null) {
-      final model = ref
-          .read(collectionStateNotifierProvider)
-          ?[selectedId];
+      final model = ref.read(collectionStateNotifierProvider)?[selectedId];
       if (model != null && model.apiType == APIType.mqtt) {
         // Convert live MQTTMessage -> MQTTSavedMessage for persistence
         final savedMsgs = next.value!.messages
-            .map((m) => MQTTSavedMessage(
-                  topic: m.topic,
-                  payload: m.payload,
-                  timestamp: m.timestamp,
-                  isIncoming: m.isIncoming,
-                  qos: m.qos,
-                  isRetained: m.isRetained,
-                ))
+            .map(
+              (m) => MQTTSavedMessage(
+                topic: m.topic,
+                payload: m.payload,
+                timestamp: m.timestamp,
+                isIncoming: m.isIncoming,
+                qos: m.qos,
+                isRetained: m.isRetained,
+              ),
+            )
             .toList();
 
         // Convert live MQTTEvent -> MQTTSavedEvent for persistence
         final savedEvents = next.value!.eventLog
-            .map((e) => MQTTSavedEvent(
-                  timestamp: e.timestamp,
-                  eventType: e.type.name,
-                  description: e.description,
-                  topic: e.topic,
-                  payload: e.payload,
-                ))
+            .map(
+              (e) => MQTTSavedEvent(
+                timestamp: e.timestamp,
+                eventType: e.type.name,
+                description: e.description,
+                topic: e.topic,
+                payload: e.payload,
+              ),
+            )
             .toList();
 
         final updatedMqtt = (model.mqttRequestModel ?? kMQTTRequestEmptyModel)
-            .copyWith(
-          savedMessages: savedMsgs,
-          savedEventLog: savedEvents,
-        );
+            .copyWith(savedMessages: savedMsgs, savedEventLog: savedEvents);
 
         notifier.updateMQTTState(
           id: selectedId,

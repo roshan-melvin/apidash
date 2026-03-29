@@ -14,12 +14,14 @@ Future<void> main() async {
     print('Connecting insecurely to secure port...');
     final conn = await channel.getConnection().timeout(Duration(seconds: 4));
     print('TCP Connection successful. Assuming it got stuck after this.');
-    
+
     // Now trigger reflection.
     final r = GrpcReflectionService();
     try {
       final t = DateTime.now();
-      final d = await r.loadDescriptorsViaReflection(channel: channel, host: 'grpcb.in').timeout(Duration(seconds: 4));
+      final d = await r
+          .loadDescriptorsViaReflection(channel: channel, host: 'grpcb.in')
+          .timeout(Duration(seconds: 4));
       print('len: \${d.length}');
     } catch (e) {
       print('Reflection failed: \$e');

@@ -3,11 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'mqtt_request_model.freezed.dart';
 part 'mqtt_request_model.g.dart';
 
-enum MQTTProtocolVersion {
-  v31,
-  v311,
-  v5,
-}
+enum MQTTProtocolVersion { v31, v311, v5 }
 
 @freezed
 abstract class MQTTRequestModel with _$MQTTRequestModel {

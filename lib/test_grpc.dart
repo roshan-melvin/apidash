@@ -5,14 +5,15 @@ Future<void> main() async {
   final channel = ClientChannel(
     'grpcb.in',
     port: 9001,
-    options: ChannelOptions(
-      credentials: ChannelCredentials.secure(),
-    ),
+    options: ChannelOptions(credentials: ChannelCredentials.secure()),
   );
   try {
     print('Connecting...');
     final r = GrpcReflectionService();
-    final d = await r.loadDescriptorsViaReflection(channel: channel, host: 'grpcb.in');
+    final d = await r.loadDescriptorsViaReflection(
+      channel: channel,
+      host: 'grpcb.in',
+    );
     print('Connected! length=${d.length}');
   } catch (e) {
     print('Error: $e');

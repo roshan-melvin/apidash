@@ -222,7 +222,7 @@ Map<String, dynamic> requestModelJson = {
   'aiRequestModel': null,
   'mqttRequestModel': null,
   'websocketRequestModel': null,
-  'grpcRequestModel': null
+  'grpcRequestModel': null,
 };
 
 /// Basic GET request model for apidash.dev

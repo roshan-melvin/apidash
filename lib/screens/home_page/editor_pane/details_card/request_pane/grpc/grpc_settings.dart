@@ -10,8 +10,10 @@ class GrpcSettings extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedId = ref.watch(selectedIdStateProvider);
-    final requestModel = ref.watch(collectionStateNotifierProvider)?[selectedId];
-    
+    final requestModel = ref.watch(
+      collectionStateNotifierProvider,
+    )?[selectedId];
+
     if (requestModel == null || requestModel.grpcRequestModel == null) {
       return const SizedBox.shrink();
     }
@@ -28,7 +30,10 @@ class GrpcSettings extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Use TLS", style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    "Use TLS",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   Text(
                     grpcModel.useTls
                         ? "Connection is encrypted"
@@ -40,10 +45,9 @@ class GrpcSettings extends ConsumerWidget {
               Switch(
                 value: grpcModel.useTls,
                 onChanged: (val) {
-                  ref.read(collectionStateNotifierProvider.notifier).updateGrpcModel(
-                        id: selectedId,
-                        useTls: val,
-                      );
+                  ref
+                      .read(collectionStateNotifierProvider.notifier)
+                      .updateGrpcModel(id: selectedId, useTls: val);
                 },
               ),
             ],
@@ -57,19 +61,28 @@ class GrpcSettings extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Text("Use Server Reflection", style: Theme.of(context).textTheme.titleMedium),
-                   Text(
+                  Text(
+                    "Use Server Reflection",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text(
                     "Discover services via gRPC server reflection",
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
               ),
               Switch(
-                value: grpcModel.descriptorSource == GrpcDescriptorSource.reflection,
+                value:
+                    grpcModel.descriptorSource ==
+                    GrpcDescriptorSource.reflection,
                 onChanged: (val) {
-                  ref.read(collectionStateNotifierProvider.notifier).updateGrpcModel(
+                  ref
+                      .read(collectionStateNotifierProvider.notifier)
+                      .updateGrpcModel(
                         id: selectedId,
-                        descriptorSource: val ? GrpcDescriptorSource.reflection : GrpcDescriptorSource.protoUpload,
+                        descriptorSource: val
+                            ? GrpcDescriptorSource.reflection
+                            : GrpcDescriptorSource.protoUpload,
                       );
                 },
               ),
