@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:apidash/providers/providers.dart';
 import 'package:apidash/services/mqtt_service.dart';
+import 'package:apidash/models/mqtt_request_model.dart';
 import 'mqtt_packet_inspector.dart';
 
 final _timeFmt = DateFormat('HH:mm:ss.SSS');
@@ -1814,7 +1815,7 @@ class _HistoryView extends StatelessWidget {
               : ListView.separated(
                   padding: const EdgeInsets.all(8),
                   itemCount: messages.length,
-                  separatorBuilder: (_, __) => kVSpacer4,
+                  separatorBuilder: (_, _) => kVSpacer4,
                   itemBuilder: (ctx, idx) {
                     final m = messages[messages.length - 1 - idx];
                     return Container(
@@ -2155,7 +2156,7 @@ class _StatusBarState extends State<_StatusBar> {
 
 // ─── Message List ─────────────────────────────────────────────────────────────
 
-class _MessageList extends StatelessWidget {
+class _MessageList extends ConsumerWidget {
   final List<MQTTMessage> messages;
   final String? replaySuccessKey;
   final Future<void> Function(MQTTMessage) onReplay;
@@ -2166,14 +2167,33 @@ class _MessageList extends StatelessWidget {
     required this.onReplay,
   });
 
+  String _protoLabel(MQTTProtocolVersion v) {
+    switch (v) {
+      case MQTTProtocolVersion.v31:
+        return 'MQTT v3.1';
+      case MQTTProtocolVersion.v311:
+        return 'MQTT v3.1.1';
+      case MQTTProtocolVersion.v5:
+        return 'MQTT v5.0';
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (messages.isEmpty) return const Center(child: Text('No messages yet.'));
+
+    // Read connection metadata for the Connection Context section
+    final mqttModel = ref.watch(mqttRequestProvider);
+    final brokerHost = mqttModel.brokerUrl.isNotEmpty ? mqttModel.brokerUrl : null;
+    final port = mqttModel.port;
+    final protocolVersion = _protoLabel(mqttModel.protocolVersion);
+    final clientId = mqttModel.clientId.isNotEmpty ? mqttModel.clientId : null;
+
     final reversed = messages.reversed.toList();
     return ListView.separated(
       padding: const EdgeInsets.all(12),
       itemCount: reversed.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (ctx, idx) {
         final m = reversed[idx];
         final key = '${m.topic}_${m.timestamp.millisecondsSinceEpoch}';
@@ -2181,6 +2201,10 @@ class _MessageList extends StatelessWidget {
           message: m,
           showReplaySuccess: replaySuccessKey == key,
           onReplay: () => onReplay(m),
+          brokerHost: brokerHost,
+          port: port,
+          protocolVersion: protocolVersion,
+          clientId: clientId,
         );
       },
     );
@@ -2191,11 +2215,19 @@ class _MessageTile extends StatefulWidget {
   final MQTTMessage message;
   final bool showReplaySuccess;
   final VoidCallback onReplay;
+  final String? brokerHost;
+  final int? port;
+  final String? protocolVersion;
+  final String? clientId;
 
   const _MessageTile({
     required this.message,
     required this.showReplaySuccess,
     required this.onReplay,
+    this.brokerHost,
+    this.port,
+    this.protocolVersion,
+    this.clientId,
   });
 
   @override
@@ -2208,7 +2240,13 @@ class _MessageTileState extends State<_MessageTile> {
   /// Build the payload widget — JSON gets syntax highlighting, else monospace.
   Widget _buildPayload(BuildContext context, ColorScheme clr) {
     if (_isRawView) {
-      return MqttPacketInspector(message: widget.message);
+      return MqttPacketInspector(
+        message: widget.message,
+        brokerHost: widget.brokerHost,
+        port: widget.port,
+        protocolVersion: widget.protocolVersion,
+        clientId: widget.clientId,
+      );
     }
     final payload = widget.message.payload;
     if (payload.isEmpty) {

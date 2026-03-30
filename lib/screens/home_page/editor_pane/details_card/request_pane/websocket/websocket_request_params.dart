@@ -43,6 +43,8 @@ class EditWebSocketURLParamsState
   Widget build(BuildContext context) {
     dataTableShowLogs = false;
     final selectedId = ref.watch(selectedIdStateProvider);
+    ref.watch(webSocketStateProvider);
+    final isConnected = ref.read(webSocketServiceProvider).currentState.isConnected;
     ref.watch(
       selectedRequestModelProvider.select(
         (value) => value?.websocketRequestModel?.requestParams?.length,
@@ -83,7 +85,7 @@ class EditWebSocketURLParamsState
             ADCheckBox(
               keyId: "ws-$selectedId-$index-params-c-$seed",
               value: isRowEnabledList[index],
-              onChanged: isLast
+              onChanged: isLast || !isConnected
                   ? null
                   : (value) {
                       setState(() {
@@ -96,6 +98,7 @@ class EditWebSocketURLParamsState
           ),
           DataCell(
             EnvCellField(
+              enabled: isConnected,
               keyId: "ws-$selectedId-$index-params-k-$seed",
               initialValue: paramRows[index].name,
               hintText: kHintAddURLParam,
@@ -115,6 +118,7 @@ class EditWebSocketURLParamsState
           DataCell(Center(child: Text("=", style: kCodeStyle))),
           DataCell(
             EnvCellField(
+              enabled: isConnected,
               keyId: "ws-$selectedId-$index-params-v-$seed",
               initialValue: paramRows[index].value,
               hintText: kHintAddValue,
@@ -133,7 +137,7 @@ class EditWebSocketURLParamsState
           ),
           DataCell(
             InkWell(
-              onTap: isLast
+              onTap: isLast || !isConnected
                   ? null
                   : () {
                       seed = random.nextInt(kRandMax);
@@ -148,9 +152,11 @@ class EditWebSocketURLParamsState
                       }
                       _onFieldChange();
                     },
-              child: Theme.of(context).brightness == Brightness.dark
-                  ? kIconRemoveDark
-                  : kIconRemoveLight,
+              child: isLast || !isConnected
+                  ? Icon(Icons.remove_circle, size: 16, color: Theme.of(context).disabledColor)
+                  : (Theme.of(context).brightness == Brightness.dark
+                      ? kIconRemoveDark
+                      : kIconRemoveLight),
             ),
           ),
         ],
@@ -192,7 +198,9 @@ class EditWebSocketURLParamsState
             child: Padding(
               padding: kPb15,
               child: ElevatedButton.icon(
-                onPressed: () {
+                onPressed: !isConnected
+                    ? null
+                    : () {
                   paramRows.add(kNameValueEmptyModel);
                   isRowEnabledList.add(false);
                   _onFieldChange();

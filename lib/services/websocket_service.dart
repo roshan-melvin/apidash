@@ -118,33 +118,37 @@ class WebSocketService {
 
   void _startPingTimer() {
     _pingTimer?.cancel();
-    if (_currentRequest != null && _currentRequest!.pingInterval > 0) {
-      _pingTimer = Timer.periodic(
-        Duration(seconds: _currentRequest!.pingInterval),
-        (timer) async {
-          if (!_state.isConnected) return;
-          _addEvent(
-            WebSocketEvent(
-              timestamp: DateTime.now(),
-              type: WebSocketEventType.ping,
-              description: 'Ping sent',
-            ),
-          );
-
-          final delay = Random().nextInt(51) + 30; // 30-80 ms
-          await Future.delayed(Duration(milliseconds: delay));
-
-          if (!_state.isConnected) return;
-          _addEvent(
-            WebSocketEvent(
-              timestamp: DateTime.now(),
-              type: WebSocketEventType.pong,
-              description: 'Pong received (latency: ${delay}ms)',
-            ),
-          );
-        },
-      );
+    int interval = _currentRequest?.pingInterval ?? 0;
+    // Use a default ping of 30 seconds if not specified, to prevent idle timeouts
+    if (interval <= 0) {
+      interval = 30;
     }
+
+    _pingTimer = Timer.periodic(
+      Duration(seconds: interval),
+      (timer) async {
+        if (!_state.isConnected) return;
+        _addEvent(
+          WebSocketEvent(
+            timestamp: DateTime.now(),
+            type: WebSocketEventType.ping,
+            description: 'Ping sent',
+          ),
+        );
+
+        final delay = Random().nextInt(51) + 30; // 30-80 ms
+        await Future.delayed(Duration(milliseconds: delay));
+
+        if (!_state.isConnected) return;
+        _addEvent(
+          WebSocketEvent(
+            timestamp: DateTime.now(),
+            type: WebSocketEventType.pong,
+            description: 'Pong received (latency: ${delay}ms)',
+          ),
+        );
+      },
+    );
   }
 
   void _stopPingTimer() {

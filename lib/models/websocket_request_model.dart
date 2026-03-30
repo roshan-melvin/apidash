@@ -44,8 +44,8 @@ abstract class WebSocketRequestModel with _$WebSocketRequestModel {
     @Default([]) List<WebSocketSavedEvent> savedEventLog,
     @Default(0) int requestTabIndex,
     @Default(0) int filterIndex,
-    @Default(0) int pingInterval,
-    @Default(false) bool autoReconnect,
+    @Default(5) int pingInterval,
+    @Default(true) bool autoReconnect,
     @Default(5) int reconnectInterval,
     @Default(5) int maxRetries,
   }) = _WebSocketRequestModel;

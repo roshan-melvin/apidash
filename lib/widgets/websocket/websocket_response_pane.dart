@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:apidash/providers/providers.dart';
 import 'package:apidash/services/websocket_service.dart';
+import 'ws_frame_inspector.dart';
 
 final _timeFmt = DateFormat('HH:mm:ss.SSS');
 
@@ -614,6 +615,36 @@ class _MessageStream extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (messages.isEmpty) return const Center(child: Text('No messages yet.'));
 
+    // Read connection URL, params and headers for the Handshake Context section
+    final wsModel = ref.watch(webSocketRequestProvider);
+    final rawUrl = wsModel.url.isNotEmpty ? wsModel.url : null;
+
+    // Build enabled params map
+    final queryParams = wsModel.requestParams ?? [];
+    final paramEnabled = wsModel.isParamEnabledList ?? [];
+    final Map<String, String> enabledParams = {};
+    for (int i = 0; i < queryParams.length; i++) {
+      final enabled = i < paramEnabled.length ? paramEnabled[i] : true;
+      if (enabled) {
+        final name = queryParams[i].name.trim();
+        final value = (queryParams[i].value?.toString() ?? '').trim();
+        if (name.isNotEmpty) enabledParams[name] = value;
+      }
+    }
+
+    // Build enabled headers map
+    final headerParams = wsModel.requestHeaders ?? [];
+    final headerEnabled = wsModel.isHeaderEnabledList ?? [];
+    final Map<String, String> enabledHeaders = {};
+    for (int i = 0; i < headerParams.length; i++) {
+      final enabled = i < headerEnabled.length ? headerEnabled[i] : true;
+      if (enabled) {
+        final name = headerParams[i].name.trim();
+        final value = (headerParams[i].value?.toString() ?? '').trim();
+        if (name.isNotEmpty) enabledHeaders[name] = value;
+      }
+    }
+
     return ListView.separated(
       padding: kP12,
       // Render newest messages at the bottom
@@ -624,6 +655,9 @@ class _MessageStream extends ConsumerWidget {
         return _MessageBubble(
           msg: m,
           isConnected: isConnected,
+          connectionUrl: rawUrl,
+          connectionHeaders: enabledHeaders,
+          connectionParams: enabledParams,
           onReplay: () {
             if (isConnected) {
               ref
@@ -648,10 +682,16 @@ class _MessageBubble extends StatefulWidget {
   const _MessageBubble({
     required this.msg,
     required this.isConnected,
+    this.connectionUrl,
+    this.connectionHeaders,
+    this.connectionParams,
     this.onReplay,
   });
   final WebSocketMessage msg;
   final bool isConnected;
+  final String? connectionUrl;
+  final Map<String, String>? connectionHeaders;
+  final Map<String, String>? connectionParams;
   final VoidCallback? onReplay;
 
   @override
@@ -659,8 +699,22 @@ class _MessageBubble extends StatefulWidget {
 }
 
 class _MessageBubbleState extends State<_MessageBubble> {
+  bool _isRawView = false;
   bool _showCopySuccess = false;
   bool _showReplaySuccess = false;
+  late final ScrollController _messageScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _messageScrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _messageScrollController.dispose();
+    super.dispose();
+  }
 
   void _copy() {
     Clipboard.setData(ClipboardData(text: widget.msg.payload.toString()));
@@ -680,6 +734,84 @@ class _MessageBubbleState extends State<_MessageBubble> {
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) setState(() => _showReplaySuccess = false);
     });
+  }
+
+  
+  Widget _buildPayload(BuildContext context, ColorScheme clr, String payloadStr) {
+    if (_isRawView) {
+      return WsFrameInspector(
+        message: widget.msg,
+        connectionUrl: widget.connectionUrl,
+        connectionHeaders: widget.connectionHeaders,
+        connectionParams: widget.connectionParams,
+      );
+    }
+    if (payloadStr.isEmpty) {
+      return Text(
+        '(empty)',
+        style: TextStyle(
+          color: clr.outline,
+          fontSize: 12,
+          fontStyle: FontStyle.italic,
+        ),
+      );
+    }
+    try {
+      final decoded = jsonDecode(payloadStr);
+      if (decoded is Map || decoded is List) {
+        final pretty = const JsonEncoder.withIndent('  ').convert(decoded);
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 300),
+          child: Scrollbar(
+            controller: _messageScrollController,
+            thickness: 4,
+            child: SingleChildScrollView(
+              controller: _messageScrollController,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: clr.surfaceContainerLowest,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: clr.outlineVariant.withAlpha(50)),
+                ),
+                child: _JsonHighlightText(json: pretty, clr: clr),
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (_) {}
+
+    final parsed = double.tryParse(payloadStr);
+    if (parsed != null) {
+      return SelectableText(
+        payloadStr,
+        style: TextStyle(
+          color: clr.secondary,
+          fontFamily: 'monospace',
+          fontSize: 12,
+        ),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: clr.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: clr.outlineVariant.withAlpha(50)),
+      ),
+      child: SelectableText(
+        payloadStr,
+        style: TextStyle(
+          color: clr.onSurface,
+          fontFamily: 'monospace',
+          fontSize: 12,
+        ),
+      ),
+    );
   }
 
   @override
@@ -800,6 +932,30 @@ class _MessageBubbleState extends State<_MessageBubble> {
                                 ),
                               ),
                             const SizedBox(width: 4),
+                            // RAW Protocol View Toggle
+                            InkWell(
+                              onTap: () => setState(() => _isRawView = !_isRawView),
+                              borderRadius: BorderRadius.circular(4),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: _isRawView ? clr.primary : clr.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: _isRawView ? clr.primary : clr.outlineVariant,
+                                  ),
+                                ),
+                                child: Text(
+                                  'RAW',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: _isRawView ? FontWeight.bold : FontWeight.normal,
+                                    color: _isRawView ? clr.onPrimary : clr.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
                             // Timestamp
                             Text(
                               _timeFmt.format(widget.msg.timestamp),
@@ -820,14 +976,7 @@ class _MessageBubbleState extends State<_MessageBubble> {
                           ),
                         ),
                         // ── Payload ───────────────────────────────────────
-                        SelectableText(
-                          payloadString,
-                          style: TextStyle(
-                            color: clr.onSurface,
-                            fontFamily: 'monospace',
-                            fontSize: 12,
-                          ),
-                        ),
+                        _buildPayload(context, clr, payloadString),
                         // ── Footer: byte size ─────────────────────────────
                         const SizedBox(height: 6),
                         Row(
@@ -1851,4 +2000,46 @@ String _fmtNum(double v) {
   if (s.endsWith('.00')) return s.substring(0, s.length - 3);
   if (s[s.length - 1] == '0') return s.substring(0, s.length - 1);
   return s;
+}
+
+
+class _JsonHighlightText extends StatelessWidget {
+  final String json;
+  final ColorScheme clr;
+
+  const _JsonHighlightText({required this.json, required this.clr});
+
+  @override
+  Widget build(BuildContext context) {
+    final spans = <TextSpan>[];
+    final regex = RegExp(r'("(?:\\.|[^\\"])*")|(\b\d+\b)|(\btrue\b|\bfalse\b|\bnull\b)|([{}\[\]:,])');
+    var lastMatchEnd = 0;
+
+    for (final match in regex.allMatches(json)) {
+      if (match.start > lastMatchEnd) {
+        spans.add(TextSpan(text: json.substring(lastMatchEnd, match.start), style: TextStyle(color: clr.onSurface)));
+      }
+      final str = match.group(0)!;
+      Color color = clr.onSurface;
+      if (match.group(1) != null) {
+        color = Colors.orange; // String
+      } else if (match.group(2) != null) {
+        color = Colors.blue; // Number
+      } else if (match.group(3) != null) {
+        color = Colors.cyan; // Bool/Null
+      } else if (match.group(4) != null) {
+        color = Colors.green; // Syntax
+      }
+      spans.add(TextSpan(text: str, style: TextStyle(color: color)));
+      lastMatchEnd = match.end;
+    }
+    if (lastMatchEnd < json.length) {
+      spans.add(TextSpan(text: json.substring(lastMatchEnd), style: TextStyle(color: clr.onSurface)));
+    }
+
+    return SelectableText.rich(
+      TextSpan(children: spans),
+      style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+    );
+  }
 }

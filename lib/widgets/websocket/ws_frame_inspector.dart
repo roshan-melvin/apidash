@@ -1,29 +1,27 @@
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../../services/mqtt_service.dart';
+import '../../services/websocket_service.dart';
 
-class MqttPacketInspector extends StatefulWidget {
-  final MQTTMessage message;
-  final String? brokerHost;
-  final int? port;
-  final String? protocolVersion;
-  final String? clientId;
+class WsFrameInspector extends StatefulWidget {
+  final WebSocketMessage message;
+  final String? connectionUrl;
+  final Map<String, String>? connectionHeaders;
+  final Map<String, String>? connectionParams;
 
-  const MqttPacketInspector({
+  const WsFrameInspector({
     super.key,
     required this.message,
-    this.brokerHost,
-    this.port,
-    this.protocolVersion,
-    this.clientId,
+    this.connectionUrl,
+    this.connectionHeaders,
+    this.connectionParams,
   });
 
   @override
-  State<MqttPacketInspector> createState() => _MqttPacketInspectorState();
+  State<WsFrameInspector> createState() => _WsFrameInspectorState();
 }
 
-class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTickerProviderStateMixin {
+class _WsFrameInspectorState extends State<WsFrameInspector> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -36,34 +34,6 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  String _getPacketTypeName(int? byte, int qos) {
-    if (byte != null) {
-      final typeNumber = (byte >> 4) & 0x0F;
-      if (typeNumber == 3) {
-        return "PUBLISH (0x${byte.toRadixString(16).padLeft(2, '0').toUpperCase()})";
-      }
-      switch (typeNumber) {
-        case 1: return "CONNECT (0x10)";
-        case 2: return "CONNACK (0x20)";
-        case 4: return "PUBACK (0x40)";
-        case 5: return "PUBREC (0x50)";
-        case 6: return "PUBREL (0x60)";
-        case 7: return "PUBCOMP (0x70)";
-        case 8: return "SUBSCRIBE (0x80)";
-        case 9: return "SUBACK (0x90)";
-        case 10: return "UNSUBSCRIBE (0xA0)";
-        case 11: return "UNSUBACK (0xB0)";
-        case 12: return "PINGREQ (0xC0)";
-        case 13: return "PINGRESP (0xD0)";
-        case 14: return "DISCONNECT (0xE0)";
-        default: return "Unknown (0x${typeNumber.toRadixString(16).toUpperCase()})";
-      }
-    }
-    // Default fallback for PUBLISH since all list items are PUBLISH
-    final typeByte = 0x30 | (qos << 1);
-    return "PUBLISH (0x${typeByte.toRadixString(16).padLeft(2, '0').toUpperCase()})";
   }
 
   String _detectFormat(Uint8List bytes) {
@@ -80,10 +50,10 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
     }
   }
 
-  String _getUtf8Text(String payload) {
-    if (payload.isEmpty) return "";
+  String _getUtf8Text(Uint8List bytes) {
+    if (bytes.isEmpty) return "";
     try {
-      final str = payload;
+      final str = utf8.decode(bytes);
       try {
         final decoded = jsonDecode(str);
         if (decoded is Map || decoded is List) {
@@ -94,13 +64,6 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
     } catch (_) {
       return "Invalid UTF-8 sequence / Binary data";
     }
-  }
-
-  int _getRemainingLengthFieldSize(int length) {
-    if (length < 128) return 1;
-    if (length < 16384) return 2;
-    if (length < 2097152) return 3;
-    return 4;
   }
 
   Widget _buildPropertyRow(String label, String value, ColorScheme clr) {
@@ -117,12 +80,15 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
               fontWeight: FontWeight.w600,
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              color: clr.onSurface,
-              fontSize: 12,
-              fontFamily: 'monospace',
+          Flexible(
+            child: Text(
+              value,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: clr.onSurface,
+                fontSize: 12,
+                fontFamily: 'monospace',
+              ),
             ),
           ),
         ],
@@ -134,19 +100,47 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
   Widget build(BuildContext context) {
     final clr = Theme.of(context).colorScheme;
     final msg = widget.message;
+    final isOut = !msg.isIncoming;
     
-    // Fallback encoding if raw bytes aren't injected yet by the service layer
-    final pBytes = msg.payloadBytes ?? Uint8List.fromList(utf8.encode(msg.payload));
-    final tBytesLength = msg.topicBytes?.length ?? utf8.encode(msg.topic).length;
+    Uint8List pBytes;
+    if (msg.payload is String) {
+      pBytes = Uint8List.fromList(utf8.encode(msg.payload as String));
+    } else if (msg.payload is List<int>) {
+      pBytes = Uint8List.fromList(msg.payload as List<int>);
+    } else {
+      pBytes = Uint8List(0);
+    }
     
     final payloadLength = pBytes.length;
-    final packetIdLength = (msg.qos > 0) ? 2 : 0;
-    // 2 bytes for topic length prefix
-    final remainingLength = 2 + tBytesLength + payloadLength + packetIdLength; 
-    final rmLengthHex = "0x${remainingLength.toRadixString(16).toUpperCase()}";
     
-    final rmFieldValueSize = _getRemainingLengthFieldSize(remainingLength);
-    final totalPacketSize = 1 + rmFieldValueSize + remainingLength;
+    // Opcode detection
+    final String opcodeStr;
+    if (msg.isText) {
+      opcodeStr = "0x1 (Text Frame)";
+    } else {
+      opcodeStr = "0x2 (Binary Frame)";
+    }
+
+    final bool isMasked = isOut;
+    final maskingKeyStr = isMasked ? "00 00 00 00 (simulated)" : "N/A";
+    final int maskingKeyBytes = isMasked ? 4 : 0;
+
+    String lengthEncodingStr;
+    int lengthBytes;
+    if (payloadLength <= 125) {
+      lengthEncodingStr = "7-bit";
+      lengthBytes = 0; // base header includes 7-bit length portion
+    } else if (payloadLength <= 65535) {
+      lengthEncodingStr = "16-bit extended (0x7E)";
+      lengthBytes = 2;
+    } else {
+      lengthEncodingStr = "64-bit extended (0x7F)";
+      lengthBytes = 8;
+    }
+    
+    final int baseHeaderBytes = 2;
+    final int totalFrameSize = baseHeaderBytes + maskingKeyBytes + lengthBytes + payloadLength;
+    final rmLengthHex = "0x${payloadLength.toRadixString(16).toUpperCase()}";
 
     return Container(
       decoration: BoxDecoration(
@@ -159,48 +153,42 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ── Connection Context ──
-          _ConnectionContextSection(
-            brokerHost: widget.brokerHost,
-            port: widget.port,
-            protocolVersion: widget.protocolVersion,
-            clientId: widget.clientId,
-            topic: msg.topic,
+          // ── Handshake Context ──
+          _HandshakeContextSection(
+            connectionUrl: widget.connectionUrl,
+            connectionHeaders: widget.connectionHeaders,
+            connectionParams: widget.connectionParams,
           ),
           Divider(
             height: 16,
             thickness: 0.5,
             color: clr.outlineVariant.withAlpha(80),
           ),
-          // ── Fixed Header ──
           Text("Fixed Header", style: TextStyle(color: clr.primary, fontSize: 12, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           Wrap(
             spacing: 24,
             children: [
-              _buildPropertyRow("Type", _getPacketTypeName(msg.packetTypeByte, msg.qos), clr),
-              _buildPropertyRow("QoS", msg.qos.toString(), clr),
-              _buildPropertyRow("Retain", msg.isRetained.toString(), clr),
-              _buildPropertyRow("DUP", msg.dupFlag.toString(), clr),
+              _buildPropertyRow("FIN", "true", clr),
+              _buildPropertyRow("Opcode", opcodeStr, clr),
+              _buildPropertyRow("Masked", isMasked.toString(), clr),
+              _buildPropertyRow("RSV1/2/3", "false", clr),
             ],
           ),
-          _buildPropertyRow("Remaining Length", "$remainingLength bytes ($rmLengthHex)", clr),
           const SizedBox(height: 12),
           
-          // ── Variable Header ──
-          Text("Variable Header", style: TextStyle(color: clr.primary, fontSize: 12, fontWeight: FontWeight.bold)),
+          Text("Frame Length", style: TextStyle(color: clr.primary, fontSize: 12, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           Wrap(
             spacing: 24,
             children: [
-              _buildPropertyRow("Topic", '"${msg.topic}"', clr),
-              _buildPropertyRow("Length", "$tBytesLength bytes", clr),
-              _buildPropertyRow("Packet ID", (msg.qos > 0) ? "Auto" : "N/A", clr),
+              _buildPropertyRow("Length Encoding", lengthEncodingStr, clr),
+              _buildPropertyRow("Payload Length", "$payloadLength bytes ($rmLengthHex)", clr),
+              _buildPropertyRow("Masking Key", maskingKeyStr, clr),
             ],
           ),
           const SizedBox(height: 16),
 
-          // ── Payload Section ──
           Text("Detected Format: ${_detectFormat(pBytes)}", 
             style: TextStyle(color: clr.primary, fontSize: 12, fontWeight: FontWeight.bold)
           ),
@@ -228,9 +216,8 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
                 return IndexedStack(
                   index: _tabController.index,
                   children: [
-                    HexDumpViewer(data: pBytes),
+                    WsHexDumpViewer(data: pBytes),
                     
-                    // UTF-8 Decoded Tab
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -243,14 +230,13 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
                         thickness: 4,
                         child: SingleChildScrollView(
                           child: SelectableText(
-                            _getUtf8Text(msg.payload),
+                            _getUtf8Text(pBytes),
                             style: TextStyle(fontFamily: 'monospace', fontSize: 13, color: clr.onSurface),
                           ),
                         ),
                       ),
                     ),
 
-                    // Base64 Tab
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -279,7 +265,7 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                "Payload: $payloadLength B    Total Packet: $totalPacketSize B",
+                "Payload: $payloadLength B    Total Frame: $totalFrameSize B",
                 style: TextStyle(
                   color: clr.outline,
                   fontSize: 10,
@@ -294,74 +280,138 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
   }
 }
 
+// ── Handshake Context Section ──────────────────────────────────────────────
 
-// ── Connection Context Section ─────────────────────────────────────────────
+class _HandshakeContextSection extends StatelessWidget {
+  final String? connectionUrl;
+  final Map<String, String>? connectionHeaders;
+  final Map<String, String>? connectionParams;
 
-class _ConnectionContextSection extends StatelessWidget {
-  final String? brokerHost;
-  final int? port;
-  final String? protocolVersion;
-  final String? clientId;
-  final String topic;
-
-  const _ConnectionContextSection({
-    this.brokerHost,
-    this.port,
-    this.protocolVersion,
-    this.clientId,
-    required this.topic,
+  const _HandshakeContextSection({
+    this.connectionUrl,
+    this.connectionHeaders,
+    this.connectionParams,
   });
 
   @override
   Widget build(BuildContext context) {
     final clr = Theme.of(context).colorScheme;
 
-    Widget buildRow(String label, String value) => Padding(
-          padding: const EdgeInsets.only(bottom: 2),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 100,
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: clr.outline,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: SelectableText(
-                  value,
-                  style: TextStyle(
-                    color: clr.onSurface,
-                    fontSize: 12,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ),
-            ],
+    // Parse URL
+    final rawUrl = connectionUrl ?? '';
+    Uri? parsed;
+    String baseUrl = 'N/A';
+    Map<String, String> queryParams = {};
+
+    if (rawUrl.isNotEmpty) {
+      try {
+        parsed = Uri.parse(rawUrl);
+        // Base URL without query string or fragment
+        baseUrl = parsed.replace(queryParameters: {}, fragment: null).toString();
+        // Remove trailing '?' or '#' if any parser implementation keeps them
+        if (baseUrl.endsWith('?') || baseUrl.endsWith('#')) {
+          baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+        }
+        
+        queryParams = Map<String, String>.from(
+          parsed.queryParameters,
+        );
+      } catch (_) {
+        baseUrl = rawUrl;
+      }
+    }
+
+    // Merge connection params
+    if (connectionParams != null) {
+      queryParams.addAll(connectionParams!);
+    }
+
+    final enabledHeaders = connectionHeaders ?? {};
+
+    Widget buildLabel(String text) => SizedBox(
+          width: 100,
+          child: Text(
+            text,
+            style: TextStyle(
+              color: clr.outline,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         );
 
-    final brokerDisplay = (brokerHost != null && brokerHost!.isNotEmpty)
-        ? brokerHost!
-        : 'N/A';
-    final portDisplay = port != null ? port.toString() : 'N/A';
-    final protoDisplay = (protocolVersion != null && protocolVersion!.isNotEmpty)
-        ? protocolVersion!
-        : 'N/A';
-    final clientIdDisplay = (clientId != null && clientId!.isNotEmpty)
-        ? clientId!
-        : 'auto-generated';
-    final topicDisplay = topic.isNotEmpty ? topic : 'N/A';
+    Widget buildValue(String text) => Expanded(
+          child: SelectableText(
+            text,
+            style: TextStyle(
+              color: clr.onSurface,
+              fontSize: 12,
+              fontFamily: 'monospace',
+            ),
+          ),
+        );
+
+    // Build query param rows
+    Widget queryParamsWidget;
+    if (queryParams.isEmpty) {
+      queryParamsWidget = Row(
+        children: [
+          buildLabel('Query Params:'),
+          buildValue('(none)'),
+        ],
+      );
+    } else {
+      final entries = queryParams.entries.toList();
+      queryParamsWidget = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (int i = 0; i < entries.length; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Row(
+                children: [
+                  buildLabel(i == 0 ? 'Query Params:' : ''),
+                  buildValue('${entries[i].key} = ${entries[i].value}'),
+                ],
+              ),
+            ),
+        ],
+      );
+    }
+
+    // Build header rows
+    Widget headersWidget;
+    if (enabledHeaders.isEmpty) {
+      headersWidget = Row(
+        children: [
+          buildLabel('Headers:'),
+          buildValue('(none)'),
+        ],
+      );
+    } else {
+      final entries = enabledHeaders.entries.toList();
+      headersWidget = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (int i = 0; i < entries.length; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Row(
+                children: [
+                  buildLabel(i == 0 ? 'Headers:' : ''),
+                  buildValue('${entries[i].key} = ${entries[i].value}'),
+                ],
+              ),
+            ),
+        ],
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Connection Context',
+          'Handshake Context',
           style: TextStyle(
             color: clr.primary,
             fontSize: 12,
@@ -369,33 +419,42 @@ class _ConnectionContextSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        buildRow('Broker:', brokerDisplay),
-        buildRow('Port:', portDisplay),
-        buildRow('Protocol:', protoDisplay),
-        buildRow('Client ID:', clientIdDisplay),
-        buildRow('Topic:', topicDisplay),
+        Row(
+          children: [
+            buildLabel('Upgrade URL:'),
+            buildValue(baseUrl),
+          ],
+        ),
+        const SizedBox(height: 2),
+        queryParamsWidget,
+        const SizedBox(height: 2),
+        headersWidget,
+        const SizedBox(height: 2),
+        Row(
+          children: [
+            buildLabel('Protocol:'),
+            buildValue('WebSocket/HTTP 1.1'),
+          ],
+        ),
       ],
     );
   }
 }
 
-class HexDumpViewer extends StatelessWidget {
+class WsHexDumpViewer extends StatelessWidget {
   final Uint8List data;
 
-  const HexDumpViewer({super.key, required this.data});
+  const WsHexDumpViewer({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
     final clr = Theme.of(context).colorScheme;
     
-    // Build hex dump map lines
     final buffer = StringBuffer();
     for (int i = 0; i < data.length; i += 16) {
-      // Memory Offset column
       buffer.write(i.toRadixString(16).padLeft(4, '0').toUpperCase());
       buffer.write('  ');
       
-      // Hex representation column
       final end = (i + 16 < data.length) ? i + 16 : data.length;
       for (int j = i; j < i + 16; j++) {
         if (j < end) {
@@ -404,22 +463,21 @@ class HexDumpViewer extends StatelessWidget {
         } else {
           buffer.write('   ');
         }
-        if (j == i + 7) buffer.write(' '); // Additional spacing at halfway mark
+        if (j == i + 7) buffer.write(' ');
       }
       
       buffer.write('  ');
       
-      // ASCII interpretation column
       for (int j = i; j < end; j++) {
         final byte = data[j];
         if (byte >= 32 && byte <= 126) {
           buffer.writeCharCode(byte);
         } else {
-          buffer.write('.'); // Unprintable
+          buffer.write('.');
         }
       }
       if (end < data.length) {
-        buffer.writeln(); // Next line
+        buffer.writeln();
       }
     }
 

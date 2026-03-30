@@ -14,6 +14,7 @@ class EnvCellField extends StatelessWidget {
     this.colorScheme,
     this.autocompleteNoTrigger,
     this.focusNode,
+    this.enabled = true,
   });
 
   final String keyId;
@@ -23,6 +24,7 @@ class EnvCellField extends StatelessWidget {
   final ColorScheme? colorScheme;
   final AutocompleteNoTrigger? autocompleteNoTrigger;
   final FocusNode? focusNode;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class EnvCellField extends StatelessWidget {
       initialValue: initialValue,
       focusNode: focusNode,
       style: kCodeStyle.copyWith(
-        color: clrScheme.onSurface,
+        color: enabled ? clrScheme.onSurface : Theme.of(context).disabledColor,
         fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
       ),
       decoration: getTextFieldInputDecoration(
@@ -43,6 +45,7 @@ class EnvCellField extends StatelessWidget {
       ),
       autocompleteNoTrigger: autocompleteNoTrigger,
       onChanged: onChanged,
+      readOnly: !enabled,
     );
   }
 }
