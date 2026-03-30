@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:apidash_design_system/apidash_design_system.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'dart:convert';
@@ -29,6 +30,10 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
   late final TextEditingController _lastWillMessageCtrl;
   String _publishContentType = 'json';
 
+  bool _isValidJson = true;
+  String? _jsonError;
+  Timer? _debounceTimer;
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +49,8 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
+
     for (final c in [
       _clientIdCtrl,
       _userCtrl,
@@ -58,8 +65,31 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
     super.dispose();
   }
 
+  void _validateJson(String value) {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      try {
+        if (value.trim().isNotEmpty) {
+          jsonDecode(value);
+        }
+        setState(() {
+          _isValidJson = true;
+          _jsonError = null;
+        });
+      } catch (e) {
+        setState(() {
+          _isValidJson = false;
+          _jsonError = e.toString().contains('FormatException:')
+              ? e.toString().split('FormatException: ')[1]
+              : e.toString();
+        });
+      }
+    });
+  }
 
   // Templates
+
   List<Map<String, dynamic>> _templates = [];
   String? _currentRequestId;
 
@@ -119,7 +149,11 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
     _update((m) => m.copyWith(publishPayload: newPayload));
   }
 
-  void _openTemplatesPanel(BuildContext ctx, String currentPayload, {bool initialIsSavingView = false}) {
+  void _openTemplatesPanel(
+    BuildContext ctx,
+    String currentPayload, {
+    bool initialIsSavingView = false,
+  }) {
     showDialog(
       context: ctx,
       barrierColor: Theme.of(ctx).colorScheme.scrim.withValues(alpha: 0.5),
@@ -144,7 +178,6 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
   }
 
   void _update(MQTTRequestModel Function(MQTTRequestModel) fn) {
-
     final updated = fn(ref.read(mqttRequestProvider));
     ref.read(mqttRequestProvider.notifier).state = updated;
 
@@ -316,29 +349,101 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                       child: Padding(
                         padding: kPt5o10,
                         child: Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                  borderRadius: kBorderRadius8,
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
+                            border:
+                                _publishContentType == 'json' &&
+                                    !_isValidJson &&
+                                    model.publishPayload.trim().isNotEmpty
+                                ? Border.all(
+                                    color: Theme.of(context).colorScheme.error,
+                                  )
+                                : null,
+                            borderRadius: kBorderRadius8,
+                          ),
+                          child: _publishContentType == 'json'
+                              ? JsonTextFieldEditor(
+                                  key: Key("mqtt-json-body-${selectedId}"),
+                                  fieldKey: "mqtt-json-body-editor",
+                                  isDark:
+                                      Theme.of(context).brightness ==
+                                      Brightness.dark,
+                                  initialValue: model.publishPayload,
+                                  onChanged: (String value) {
+                                    _update(
+                                      (m) => m.copyWith(publishPayload: value),
+                                    );
+                                    _validateJson(value);
+                                  },
+                                )
+                              : TextFieldEditor(
+                                  key: Key("mqtt-text-body-${selectedId}"),
+                                  fieldKey: "mqtt-text-body-editor",
+                                  initialValue: model.publishPayload,
+                                  onChanged: (String value) {
+                                    _update(
+                                      (m) => m.copyWith(publishPayload: value),
+                                    );
+                                    _validateJson(value);
+                                  },
                                 ),
-                                child: _publishContentType == 'json'
-                                    ? JsonTextFieldEditor(
-                                        key: Key("mqtt-json-body-${model.publishPayload.hashCode}"),
-                                        fieldKey: "mqtt-json-body-editor",
-                                        isDark: Theme.of(context).brightness == Brightness.dark,
-                                        initialValue: model.publishPayload,
-                                        onChanged: (String value) => _update(
-                                          (m) => m.copyWith(publishPayload: value),
-                                        ),
-                                      )
-                                    : TextFieldEditor(
-                                        key: Key("mqtt-text-body-${model.publishPayload.hashCode}"),
-                                        fieldKey: "mqtt-text-body-editor",
-                                        initialValue: model.publishPayload,
-                                        onChanged: (String value) => _update(
-                                          (m) => m.copyWith(publishPayload: value),
-                                        ),
-                                      ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 4,
+                        bottom: 8,
+                        left: 10,
+                        right: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            model.publishPayload.trim().isEmpty ||
+                                    _publishContentType != 'json'
+                                ? Icons.check_circle
+                                : (_isValidJson
+                                      ? Icons.check_circle
+                                      : Icons.cancel),
+                            size: 14,
+                            color:
+                                model.publishPayload.trim().isEmpty ||
+                                    _publishContentType != 'json'
+                                ? Theme.of(context).colorScheme.outline
+                                : (_isValidJson
+                                      ? Colors.green
+                                      : Theme.of(context).colorScheme.error),
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              _publishContentType != 'json'
+                                  ? 'Text payload'
+                                  : (model.publishPayload.trim().isEmpty
+                                        ? 'Enter JSON payload'
+                                        : (_isValidJson
+                                              ? 'Valid JSON'
+                                              : 'Invalid JSON: ${_jsonError ?? ''}')),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color:
+                                    model.publishPayload.trim().isEmpty ||
+                                        _publishContentType != 'json'
+                                    ? Theme.of(context).colorScheme.outline
+                                    : (_isValidJson
+                                          ? Colors.green
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.error),
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Padding(
@@ -375,19 +480,26 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                             height: 40,
                             child: FilledButton.icon(
                               onPressed: () => _openTemplatesPanel(
-                                  context, model.publishPayload,
-                                  initialIsSavingView: false),
+                                context,
+                                model.publishPayload,
+                                initialIsSavingView: false,
+                              ),
                               style: FilledButton.styleFrom(
                                 backgroundColor: Colors.transparent,
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                shape: RoundedRectangleBorder(borderRadius: kBorderRadius8),
-                                side: BorderSide(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primary
-                                      .withValues(alpha: 0.5),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
                                 ),
-                                foregroundColor: Theme.of(context).colorScheme.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: kBorderRadius8,
+                                ),
+                                side: BorderSide(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.5),
+                                ),
+                                foregroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
                                 textStyle: const TextStyle(fontSize: 14),
                               ),
                               icon: Icon(
@@ -402,10 +514,19 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                           SizedBox(
                             height: 40,
                             child: FilledButton.icon(
-                              onPressed: isConnected ? _publish : null,
+                              onPressed:
+                                  (isConnected &&
+                                      !(_publishContentType == 'json' &&
+                                          !_isValidJson))
+                                  ? _publish
+                                  : null,
                               style: FilledButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                shape: RoundedRectangleBorder(borderRadius: kBorderRadius8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: kBorderRadius8,
+                                ),
                                 textStyle: const TextStyle(fontSize: 14),
                               ),
                               icon: const Icon(Icons.send, size: 16),
@@ -421,10 +542,15 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                   padding: kPt5o10,
                   child: ListView(
                     children: [
-                      Text('Last Will Topic',
-                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: isConnected ? Theme.of(context).disabledColor : null,
-                          )),
+                      Text(
+                        'Last Will Topic',
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              color: isConnected
+                                  ? Theme.of(context).disabledColor
+                                  : null,
+                            ),
+                      ),
                       kVSpacer8,
                       TextFormField(
                         controller: _lastWillTopicCtrl,
@@ -436,10 +562,15 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                             _update((m) => m.copyWith(lastWillTopic: v)),
                       ),
                       kVSpacer16,
-                      Text('Last Will Message',
-                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: isConnected ? Theme.of(context).disabledColor : null,
-                          )),
+                      Text(
+                        'Last Will Message',
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              color: isConnected
+                                  ? Theme.of(context).disabledColor
+                                  : null,
+                            ),
+                      ),
                       kVSpacer8,
                       TextFormField(
                         controller: _lastWillMessageCtrl,
@@ -454,7 +585,14 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                       kVSpacer16,
                       Row(
                         children: [
-                          Text('Last Will QoS: ', style: TextStyle(color: isConnected ? Theme.of(context).disabledColor : null)),
+                          Text(
+                            'Last Will QoS: ',
+                            style: TextStyle(
+                              color: isConnected
+                                  ? Theme.of(context).disabledColor
+                                  : null,
+                            ),
+                          ),
                           kHSpacer8,
                           ADDropdownButton<int>(
                             value: model.lastWillQos,
@@ -470,7 +608,14 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                                 : null,
                           ),
                           const Spacer(),
-                          Text('Retain Last Will: ', style: TextStyle(color: isConnected ? Theme.of(context).disabledColor : null)),
+                          Text(
+                            'Retain Last Will: ',
+                            style: TextStyle(
+                              color: isConnected
+                                  ? Theme.of(context).disabledColor
+                                  : null,
+                            ),
+                          ),
                           Switch(
                             value: model.lastWillRetain,
                             onChanged: !isConnected
@@ -655,11 +800,14 @@ class _TopicsTab extends StatelessWidget {
                           hintText: 'home/sensor',
                           onChanged: (v) => onUpdate(i, t.copyWith(topic: v)),
                           suffixIcon: Tooltip(
-                            message: 'Wildcards:\n+ : Single level (e.g. home/+/temp)\n# : Multi level (e.g. home/#)',
+                            message:
+                                'Wildcards:\n+ : Single level (e.g. home/+/temp)\n# : Multi level (e.g. home/#)',
                             child: Icon(
                               Icons.info_outline,
                               size: 14,
-                              color: Theme.of(context).colorScheme.outlineVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outlineVariant,
                             ),
                           ),
                         ),
