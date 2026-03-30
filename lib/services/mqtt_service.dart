@@ -316,7 +316,6 @@ class MQTTService {
                 : (request.port == 0 ? 1883 : request.port));
 
     client.connectTimeoutPeriod = 4000; // 10s timeout
-    client.connectTimeoutPeriod = 4000; // 4s timeout
     client.keepAlivePeriod = request.keepAlive;
     client.disconnectOnNoResponsePeriod = request.keepAlive > 0
         ? request.keepAlive * 2
@@ -426,7 +425,6 @@ class MQTTService {
                 ? uri.port
                 : (request.port == 0 ? 1883 : request.port));
 
-    client.connectTimeoutPeriod = 4000; // 4s timeout
     client.keepAlivePeriod = request.keepAlive;
     client.disconnectOnNoResponsePeriod = request.keepAlive > 0
         ? request.keepAlive * 2
