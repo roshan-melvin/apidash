@@ -27,26 +27,69 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
     super.dispose();
   }
 
-  String _getPacketTypeName(int? byte) {
-    if (byte == null) return "Unknown";
-    final typeNumber = (byte >> 4) & 0x0F;
-    switch (typeNumber) {
-      case 1: return "CONNECT (0x10)";
-      case 2: return "CONNACK (0x20)";
-      case 3: return "PUBLISH (0x30)";
-      case 4: return "PUBACK (0x40)";
-      case 5: return "PUBREC (0x50)";
-      case 6: return "PUBREL (0x60)";
-      case 7: return "PUBCOMP (0x70)";
-      case 8: return "SUBSCRIBE (0x80)";
-      case 9: return "SUBACK (0x90)";
-      case 10: return "UNSUBSCRIBE (0xA0)";
-      case 11: return "UNSUBACK (0xB0)";
-      case 12: return "PINGREQ (0xC0)";
-      case 13: return "PINGRESP (0xD0)";
-      case 14: return "DISCONNECT (0xE0)";
-      default: return "Unknown (0x${typeNumber.toRadixString(16).toUpperCase()})";
+  String _getPacketTypeName(int? byte, int qos) {
+    if (byte != null) {
+      final typeNumber = (byte >> 4) & 0x0F;
+      if (typeNumber == 3) {
+        return "PUBLISH (0x${byte.toRadixString(16).padLeft(2, '0').toUpperCase()})";
+      }
+      switch (typeNumber) {
+        case 1: return "CONNECT (0x10)";
+        case 2: return "CONNACK (0x20)";
+        case 4: return "PUBACK (0x40)";
+        case 5: return "PUBREC (0x50)";
+        case 6: return "PUBREL (0x60)";
+        case 7: return "PUBCOMP (0x70)";
+        case 8: return "SUBSCRIBE (0x80)";
+        case 9: return "SUBACK (0x90)";
+        case 10: return "UNSUBSCRIBE (0xA0)";
+        case 11: return "UNSUBACK (0xB0)";
+        case 12: return "PINGREQ (0xC0)";
+        case 13: return "PINGRESP (0xD0)";
+        case 14: return "DISCONNECT (0xE0)";
+        default: return "Unknown (0x${typeNumber.toRadixString(16).toUpperCase()})";
+      }
     }
+    // Default fallback for PUBLISH since all list items are PUBLISH
+    final typeByte = 0x30 | (qos << 1);
+    return "PUBLISH (0x${typeByte.toRadixString(16).padLeft(2, '0').toUpperCase()})";
+  }
+
+  String _detectFormat(Uint8List bytes) {
+    if (bytes.isEmpty) return "Empty";
+    try {
+      final str = utf8.decode(bytes); // if valid UTF-8
+      try {
+        final decoded = jsonDecode(str);
+        if (decoded is Map || decoded is List) return "JSON";
+      } catch (_) {}
+      return "UTF-8 Text";
+    } catch (_) {
+      return "Binary";
+    }
+  }
+
+  String _getUtf8Text(String payload) {
+    if (payload.isEmpty) return "";
+    try {
+      final str = payload;
+      try {
+        final decoded = jsonDecode(str);
+        if (decoded is Map || decoded is List) {
+          return const JsonEncoder.withIndent('  ').convert(decoded);
+        }
+      } catch (_) {}
+      return str;
+    } catch (_) {
+      return "Invalid UTF-8 sequence / Binary data";
+    }
+  }
+
+  int _getRemainingLengthFieldSize(int length) {
+    if (length < 128) return 1;
+    if (length < 16384) return 2;
+    if (length < 2097152) return 3;
+    return 4;
   }
 
   Widget _buildPropertyRow(String label, String value, ColorScheme clr) {
@@ -84,6 +127,15 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
     // Fallback encoding if raw bytes aren't injected yet by the service layer
     final pBytes = msg.payloadBytes ?? Uint8List.fromList(utf8.encode(msg.payload));
     final tBytesLength = msg.topicBytes?.length ?? utf8.encode(msg.topic).length;
+    
+    final payloadLength = pBytes.length;
+    final packetIdLength = (msg.qos > 0) ? 2 : 0;
+    // 2 bytes for topic length prefix
+    final remainingLength = 2 + tBytesLength + payloadLength + packetIdLength; 
+    final rmLengthHex = "0x${remainingLength.toRadixString(16).toUpperCase()}";
+    
+    final rmFieldValueSize = _getRemainingLengthFieldSize(remainingLength);
+    final totalPacketSize = 1 + rmFieldValueSize + remainingLength;
 
     return Container(
       decoration: BoxDecoration(
@@ -102,12 +154,13 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
           Wrap(
             spacing: 24,
             children: [
-              _buildPropertyRow("Type", _getPacketTypeName(msg.packetTypeByte), clr),
+              _buildPropertyRow("Type", _getPacketTypeName(msg.packetTypeByte, msg.qos), clr),
               _buildPropertyRow("QoS", msg.qos.toString(), clr),
               _buildPropertyRow("Retain", msg.isRetained.toString(), clr),
               _buildPropertyRow("DUP", msg.dupFlag.toString(), clr),
             ],
           ),
+          _buildPropertyRow("Remaining Length", "$remainingLength bytes ($rmLengthHex)", clr),
           const SizedBox(height: 12),
           
           // ── Variable Header ──
@@ -124,6 +177,10 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
           const SizedBox(height: 16),
 
           // ── Payload Section ──
+          Text("Detected Format: ${_detectFormat(pBytes)}", 
+            style: TextStyle(color: clr.primary, fontSize: 12, fontWeight: FontWeight.bold)
+          ),
+          const SizedBox(height: 8),
           TabBar(
             controller: _tabController,
             isScrollable: true,
@@ -157,11 +214,12 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(color: clr.outlineVariant.withAlpha(50)),
                       ),
+                      width: double.infinity,
                       child: Scrollbar(
                         thickness: 4,
                         child: SingleChildScrollView(
                           child: SelectableText(
-                            msg.payload,
+                            _getUtf8Text(msg.payload),
                             style: TextStyle(fontFamily: 'monospace', fontSize: 13, color: clr.onSurface),
                           ),
                         ),
@@ -176,6 +234,7 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(color: clr.outlineVariant.withAlpha(50)),
                       ),
+                      width: double.infinity,
                       child: Scrollbar(
                         thickness: 4,
                         child: SingleChildScrollView(
@@ -190,6 +249,20 @@ class _MqttPacketInspectorState extends State<MqttPacketInspector> with SingleTi
                 );
               },
             ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                "Payload: $payloadLength B    Total Packet: $totalPacketSize B",
+                style: TextStyle(
+                  color: clr.outline,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ],
       ),
