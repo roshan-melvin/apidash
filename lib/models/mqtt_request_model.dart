@@ -17,6 +17,7 @@ abstract class MQTTRequestModel with _$MQTTRequestModel {
     @Default(60) int keepAlive,
     @Default(false) bool cleanSession,
     @Default(3) int connectTimeout,
+    @Default(true) bool autoReconnect,
     @Default(MQTTProtocolVersion.v311) MQTTProtocolVersion protocolVersion,
     @Default(false) bool useTls,
     @Default([]) List<MQTTTopicModel> topics,

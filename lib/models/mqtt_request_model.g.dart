@@ -15,6 +15,7 @@ _MQTTRequestModel _$MQTTRequestModelFromJson(Map json) => _MQTTRequestModel(
   keepAlive: (json['keepAlive'] as num?)?.toInt() ?? 60,
   cleanSession: json['cleanSession'] as bool? ?? false,
   connectTimeout: (json['connectTimeout'] as num?)?.toInt() ?? 3,
+  autoReconnect: json['autoReconnect'] as bool? ?? true,
   protocolVersion:
       $enumDecodeNullable(
         _$MQTTProtocolVersionEnumMap,
@@ -65,6 +66,7 @@ Map<String, dynamic> _$MQTTRequestModelToJson(
   'keepAlive': instance.keepAlive,
   'cleanSession': instance.cleanSession,
   'connectTimeout': instance.connectTimeout,
+  'autoReconnect': instance.autoReconnect,
   'protocolVersion': _$MQTTProtocolVersionEnumMap[instance.protocolVersion]!,
   'useTls': instance.useTls,
   'topics': instance.topics.map((e) => e.toJson()).toList(),

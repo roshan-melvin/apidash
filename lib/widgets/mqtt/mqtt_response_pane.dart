@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:apidash/providers/providers.dart';
 import 'package:apidash/services/mqtt_service.dart';
+import 'mqtt_packet_inspector.dart';
 
 final _timeFmt = DateFormat('HH:mm:ss.SSS');
 
@@ -2186,7 +2187,7 @@ class _MessageList extends StatelessWidget {
   }
 }
 
-class _MessageTile extends StatelessWidget {
+class _MessageTile extends StatefulWidget {
   final MQTTMessage message;
   final bool showReplaySuccess;
   final VoidCallback onReplay;
@@ -2197,9 +2198,19 @@ class _MessageTile extends StatelessWidget {
     required this.onReplay,
   });
 
+  @override
+  State<_MessageTile> createState() => _MessageTileState();
+}
+
+class _MessageTileState extends State<_MessageTile> {
+  bool _isRawView = false;
+
   /// Build the payload widget — JSON gets syntax highlighting, else monospace.
   Widget _buildPayload(BuildContext context, ColorScheme clr) {
-    final payload = message.payload;
+    if (_isRawView) {
+      return MqttPacketInspector(message: widget.message);
+    }
+    final payload = widget.message.payload;
     if (payload.isEmpty) {
       return Text(
         '(empty)',
@@ -2260,10 +2271,10 @@ class _MessageTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clr = Theme.of(context).colorScheme;
-    final isIn = message.isIncoming;
+    final isIn = widget.message.isIncoming;
     // IN → primary blue accent, OUT → secondary/teal accent
     final accentColor = isIn ? clr.primary : clr.secondary;
-    final payloadBytes = utf8.encode(message.payload).length;
+    final payloadBytes = utf8.encode(widget.message.payload).length;
 
     return Align(
       alignment: isIn ? Alignment.centerLeft : Alignment.centerRight,
@@ -2335,13 +2346,13 @@ class _MessageTile extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             // QoS badge
-                            _QosBadge(qos: message.qos, clr: clr),
-                            if (message.isRetained) _RetainedBadge(),
+                            _QosBadge(qos: widget.message.qos, clr: clr),
+                            if (widget.message.isRetained) _RetainedBadge(),
                             const SizedBox(width: 6),
                             // Topic name
                             Expanded(
                               child: Text(
-                                message.topic,
+                                widget.message.topic,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 13,
@@ -2361,7 +2372,7 @@ class _MessageTile extends StatelessWidget {
                                   color: clr.onSurfaceVariant,
                                 ),
                                 onPressed: () => Clipboard.setData(
-                                  ClipboardData(text: message.payload),
+                                  ClipboardData(text: widget.message.payload),
                                 ),
                                 padding: EdgeInsets.zero,
                                 tooltip: 'Copy payload',
@@ -2374,23 +2385,49 @@ class _MessageTile extends StatelessWidget {
                                 height: 24,
                                 child: IconButton(
                                   icon: Icon(
-                                    showReplaySuccess
+                                    widget.showReplaySuccess
                                         ? Icons.check_circle_outline
                                         : Icons.replay,
                                     size: 13,
-                                    color: showReplaySuccess
+                                    color: widget.showReplaySuccess
                                         ? clr.primary
                                         : clr.onSurfaceVariant,
                                   ),
-                                  onPressed: onReplay,
+                                  onPressed: widget.onReplay,
                                   padding: EdgeInsets.zero,
                                   tooltip: 'Re-publish',
                                 ),
                               ),
                             const SizedBox(width: 4),
+                            
+                            // RAW Protocol View Toggle
+                            InkWell(
+                              onTap: () => setState(() => _isRawView = !_isRawView),
+                              borderRadius: BorderRadius.circular(4),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: _isRawView ? clr.primary : clr.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: _isRawView ? clr.primary : clr.outlineVariant,
+                                  ),
+                                ),
+                                child: Text(
+                                  'RAW',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: _isRawView ? FontWeight.bold : FontWeight.normal,
+                                    color: _isRawView ? clr.onPrimary : clr.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            
                             // Timestamp
                             Text(
-                              _timeFmt.format(message.timestamp),
+                              _timeFmt.format(widget.message.timestamp),
                               style: TextStyle(
                                 fontSize: 10,
                                 color: clr.outline,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:logger/logger.dart';
 import 'package:mqtt_client/mqtt_client.dart' as mqtt3;
 import 'package:mqtt_client/mqtt_server_client.dart' as mqtt3_server;
@@ -46,6 +47,12 @@ class MQTTMessage {
   final int qos; // 0, 1, or 2
   final bool isRetained; // broker-flagged retained
 
+  // --- NEW FIELDS FOR RAW PROTOCOL VIEW ---
+  final int? packetTypeByte; 
+  final bool dupFlag;
+  final Uint8List? topicBytes;
+  final Uint8List? payloadBytes;
+
   const MQTTMessage({
     required this.topic,
     required this.payload,
@@ -53,6 +60,10 @@ class MQTTMessage {
     required this.isIncoming,
     this.qos = 0,
     this.isRetained = false,
+    this.packetTypeByte,
+    this.dupFlag = false,
+    this.topicBytes,
+    this.payloadBytes,
   });
 }
 
@@ -304,7 +315,8 @@ class MQTTService {
                 ? uri.port
                 : (request.port == 0 ? 1883 : request.port));
 
-    client.connectTimeoutPeriod = 10000; // 10s timeout
+    client.connectTimeoutPeriod = 4000; // 10s timeout
+    client.connectTimeoutPeriod = 4000; // 4s timeout
     client.keepAlivePeriod = request.keepAlive;
     client.disconnectOnNoResponsePeriod = request.keepAlive > 0
         ? request.keepAlive * 2
@@ -315,7 +327,7 @@ class MQTTService {
     }
     client.onDisconnected = _onDisconnected;
     client.onConnected = _onConnected;
-    client.autoReconnect = true;
+    client.autoReconnect = request.autoReconnect;
     client.onAutoReconnect = () {
       _log.i('[MQTT] Auto-reconnecting...');
       _addEvent(
@@ -414,6 +426,7 @@ class MQTTService {
                 ? uri.port
                 : (request.port == 0 ? 1883 : request.port));
 
+    client.connectTimeoutPeriod = 4000; // 4s timeout
     client.keepAlivePeriod = request.keepAlive;
     client.disconnectOnNoResponsePeriod = request.keepAlive > 0
         ? request.keepAlive * 2
@@ -424,7 +437,7 @@ class MQTTService {
     }
     client.onDisconnected = _onDisconnected;
     client.onConnected = _onConnected;
-    client.autoReconnect = true;
+    client.autoReconnect = request.autoReconnect;
     client.onAutoReconnect = () {
       _log.i('[MQTT] Auto-reconnecting...');
       _addEvent(

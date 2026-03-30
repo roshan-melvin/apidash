@@ -682,6 +682,18 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                       ),
                       SwitchListTile(
                         title: const Text(
+                          'Auto Reconnect',
+                          style: TextStyle(fontSize: 13),
+                        ),
+                        contentPadding: EdgeInsets.zero,
+                        value: model.autoReconnect,
+                        onChanged: isConnected
+                            ? null
+                            : (v) =>
+                                  _update((m) => m.copyWith(autoReconnect: v)),
+                      ),
+                      SwitchListTile(
+                        title: const Text(
                           'Clean Session',
                           style: TextStyle(fontSize: 13),
                         ),
