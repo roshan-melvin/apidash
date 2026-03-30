@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:apidash/providers/providers.dart';
 import 'package:apidash/services/grpc_service.dart';
+import 'grpc_frame_inspector.dart';
 
 final _timeFmt = DateFormat('HH:mm:ss.SSS');
 
@@ -571,6 +572,11 @@ class _MessageStream extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (messages.isEmpty) return const Center(child: Text('No messages yet.'));
 
+    final requestModel = ref.read(collectionStateNotifierProvider)?[selectedId]?.grpcRequestModel;
+    final serverUrl = requestModel?.url ?? '';
+    final serviceName = requestModel?.serviceName ?? '';
+    final methodName = requestModel?.methodName ?? '';
+
     return ListView.separated(
       padding: kP12,
       itemCount: messages.length,
@@ -580,6 +586,9 @@ class _MessageStream extends ConsumerWidget {
         return _MessageBubble(
           msg: m,
           isConnected: isConnected,
+          serverUrl: serverUrl,
+          serviceName: serviceName,
+          methodName: methodName,
           onReplay: m.isIncoming
               ? null
               : () {
@@ -602,10 +611,16 @@ class _MessageBubble extends StatefulWidget {
   const _MessageBubble({
     required this.msg,
     required this.isConnected,
+    this.serverUrl = '',
+    this.serviceName = '',
+    this.methodName = '',
     this.onReplay,
   });
   final GrpcMessage msg;
   final bool isConnected;
+  final String serverUrl;
+  final String serviceName;
+  final String methodName;
   final VoidCallback? onReplay;
 
   @override
@@ -613,6 +628,7 @@ class _MessageBubble extends StatefulWidget {
 }
 
 class _MessageBubbleState extends State<_MessageBubble> {
+  bool _isRawView = false;
   bool _showCopySuccess = false;
   bool _showReplaySuccess = false;
 
@@ -637,6 +653,15 @@ class _MessageBubbleState extends State<_MessageBubble> {
   }
 
   Widget _buildPayload(BuildContext context, ColorScheme clr) {
+    if (_isRawView) {
+      return GrpcFrameInspector(
+        payloadBytes: utf8.encode(widget.msg.payload),
+        isOutgoing: !widget.msg.isIncoming,
+        serverUrl: widget.serverUrl,
+        serviceName: widget.serviceName,
+        methodName: widget.methodName,
+      );
+    }
     final payload = widget.msg.payload;
     if (payload.isEmpty) {
       return Text(
@@ -762,6 +787,34 @@ class _MessageBubbleState extends State<_MessageBubble> {
                                     ),
                                   ),
                                 ],
+                              ),
+                            ),
+                            kHSpacer8,
+                            // RAW Toggle chip
+                            InkWell(
+                              onTap: () => setState(() => _isRawView = !_isRawView),
+                              borderRadius: BorderRadius.circular(20),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: _isRawView ? clr.primary : Colors.transparent,
+                                  border: Border.all(
+                                    color: clr.primary.withAlpha(_isRawView ? 255 : 100),
+                                    width: 0.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  'RAW',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: _isRawView ? clr.onPrimary : clr.primary,
+                                  ),
+                                ),
                               ),
                             ),
                             const Spacer(),
