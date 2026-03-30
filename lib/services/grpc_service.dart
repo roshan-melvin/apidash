@@ -88,6 +88,7 @@ class GrpcService {
   GrpcConnectionState get currentState => _currentState;
 
   Future<void> connect(GrpcRequestModel requestModel) async {
+    debugPrint("CONNECTING - URL: ${requestModel.url}, TLS: ${requestModel.useTls}");
     await disconnect(); // Always close any lingering channel/state
     _currentRequestModel = requestModel;
 
@@ -113,7 +114,15 @@ class GrpcService {
           : requestModel.url;
       final uri = Uri.parse(uriStr);
       final host = uri.host;
-      final port = uri.hasPort ? uri.port : 80;
+      int port;
+      if (uri.hasPort) {
+        port = uri.port;
+      } else if (requestModel.url.startsWith('https://') ||
+          requestModel.useTls) {
+        port = 443;
+      } else {
+        port = 80;
+      }
 
       _channel = ClientChannel(
         host,

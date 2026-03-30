@@ -21,7 +21,7 @@ class GrpcSettings extends ConsumerWidget {
     final grpcModel = requestModel.grpcRequestModel!;
 
     return Padding(
-      padding: kPh20,
+      padding: kP20,
       child: Column(
         children: [
           Row(

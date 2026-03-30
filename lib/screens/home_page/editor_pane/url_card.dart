@@ -370,7 +370,15 @@ class _GrpcInvokeButtonState extends ConsumerState<GrpcInvokeButton> {
   }
 
   void _send() async {
-    final activeRequestModel = ref.read(grpcRequestProvider);
+    final requestModel = ref.read(selectedRequestModelProvider);
+    if (requestModel == null) return;
+
+    final latestModel = ref
+        .read(collectionStateNotifierProvider.notifier)
+        .getRequestModel(requestModel.id)!;
+
+    final activeRequestModel =
+        latestModel.grpcRequestModel ?? const GrpcRequestModel();
     final message = activeRequestModel.requestJson;
     if (message.isNotEmpty) {
       await ref
@@ -390,17 +398,21 @@ class _GrpcInvokeButtonState extends ConsumerState<GrpcInvokeButton> {
   @override
   Widget build(BuildContext context) {
     final grpcState = ref.watch(grpcStateProvider);
-    final activeRequestModel = ref.watch(grpcRequestProvider);
+    final activeRequestModel = ref.watch(
+      collectionStateNotifierProvider.select(
+        (v) => v?[ref.watch(selectedIdStateProvider)]?.grpcRequestModel,
+      ),
+    );
 
     final isActiveUrlConnected =
         (grpcState.value?.isConnected ?? false) &&
-        (grpcState.value?.connectedUrl == activeRequestModel.url);
+        (grpcState.value?.connectedUrl == activeRequestModel?.url);
     final isConnecting = grpcState.value?.isConnecting ?? false;
 
     final showLoading =
         isConnecting &&
         (grpcState.value?.connectedUrl == null ||
-            grpcState.value?.connectedUrl == activeRequestModel.url);
+            grpcState.value?.connectedUrl == activeRequestModel?.url);
 
     final isConnected = isActiveUrlConnected;
 

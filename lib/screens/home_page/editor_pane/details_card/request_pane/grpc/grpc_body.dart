@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:apidash_design_system/apidash_design_system.dart';
@@ -17,6 +18,52 @@ class GrpcBody extends ConsumerStatefulWidget {
 class _GrpcBodyState extends ConsumerState<GrpcBody> {
   List<Map<String, dynamic>> _templates = [];
   String? _currentRequestId;
+  bool _isValidJson = true;
+  String? _jsonError;
+  Timer? _debounceTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final selectedId = ref.read(selectedIdStateProvider);
+      final reqModel = ref
+          .read(collectionStateNotifierProvider)?[selectedId]
+          ?.grpcRequestModel;
+      if (reqModel != null && reqModel.requestJson.isNotEmpty) {
+        _validateJson(reqModel.requestJson);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  void _validateJson(String value) {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      try {
+        if (value.trim().isNotEmpty) {
+          jsonDecode(value);
+        }
+        setState(() {
+          _isValidJson = true;
+          _jsonError = null;
+        });
+      } catch (e) {
+        setState(() {
+          _isValidJson = false;
+          _jsonError = e.toString().contains('FormatException:')
+              ? e.toString().split('FormatException: ')[1]
+              : e.toString();
+        });
+      }
+    });
+  }
 
   void _checkRequestId(String newId) {
     if (_currentRequestId != newId) {
@@ -84,6 +131,7 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
     ref
         .read(collectionStateNotifierProvider.notifier)
         .updateGrpcModel(id: selectedId, requestJson: newPayload);
+    _validateJson(newPayload);
   }
 
   void _openTemplatesPanel(
@@ -348,10 +396,11 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
           kVSpacer5,
           Expanded(
             child: Container(
-              margin: const EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant,
+                  color: !_isValidJson
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).colorScheme.outlineVariant,
                 ),
                 borderRadius: kBorderRadius8,
               ),
@@ -364,15 +413,54 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
                   ref
                       .read(collectionStateNotifierProvider.notifier)
                       .updateGrpcModel(id: selectedId, requestJson: value);
+                  _validateJson(value);
                 },
                 hintText: "Enter JSON body for gRPC payload...",
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4, bottom: 8),
+            child: Row(
+              children: [
+                Icon(
+                  requestModel.requestJson.trim().isEmpty
+                      ? Icons.check_circle
+                      : (_isValidJson ? Icons.check_circle : Icons.cancel),
+                  size: 14,
+                  color: requestModel.requestJson.trim().isEmpty
+                      ? Theme.of(context).colorScheme.outline
+                      : (_isValidJson
+                            ? Colors.green
+                            : Theme.of(context).colorScheme.error),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    requestModel.requestJson.trim().isEmpty
+                        ? 'Enter JSON payload'
+                        : (_isValidJson
+                              ? 'Valid JSON'
+                              : 'Invalid JSON: ${_jsonError ?? ''}'),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: requestModel.requestJson.trim().isEmpty
+                          ? Theme.of(context).colorScheme.outline
+                          : (_isValidJson
+                                ? Colors.green
+                                : Theme.of(context).colorScheme.error),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Align(
             alignment: Alignment.centerRight,
             child: FilledButton.icon(
-              onPressed: isActiveUrlConnected
+              onPressed: (isActiveUrlConnected && _isValidJson)
                   ? () async {
                       final message = requestModel.requestJson;
                       if (message.isNotEmpty) {

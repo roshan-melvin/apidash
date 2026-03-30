@@ -444,7 +444,7 @@ class _StatusBarState extends State<_StatusBar> {
                 Expanded(
                   child: Text(
                     isLongError && !_showErrorDetails
-                        ? '${widget.error!.replaceAll('\n', ' ').substring(0, 100)}...'
+                        ? '${widget.error!.replaceAll('\n', ' ').substring(0, widget.error!.length > 100 ? 100 : widget.error!.length)}...'
                         : widget.error!.replaceAll('\n', ' '),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: clrScheme.onErrorContainer,
