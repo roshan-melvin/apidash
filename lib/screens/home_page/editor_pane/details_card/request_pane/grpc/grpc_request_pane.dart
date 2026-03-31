@@ -3,13 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apidash/providers/providers.dart';
 
+import 'package:apidash/consts.dart';
+
 import 'grpc_metadata.dart';
 import 'grpc_body.dart';
 import 'grpc_service_def.dart';
 import 'grpc_settings.dart';
 
 class EditGrpcRequestPane extends ConsumerStatefulWidget {
-  const EditGrpcRequestPane({super.key});
+  const EditGrpcRequestPane({super.key, this.showViewCodeButton = true});
+
+  final bool showViewCodeButton;
+
 
   @override
   ConsumerState<EditGrpcRequestPane> createState() =>
@@ -29,13 +34,51 @@ class _EditGrpcRequestPaneState extends ConsumerState<EditGrpcRequestPane> {
     }
 
     final currentIndex = requestModel.grpcRequestModel!.requestTabIndex;
+    final codePaneVisible = ref.watch(codePaneVisibleStateProvider);
 
     return DefaultTabController(
       length: 4,
       initialIndex: currentIndex,
       child: Column(
         children: [
-          kVSpacer10,
+          widget.showViewCodeButton
+              ? Padding(
+                  padding: kP8,
+                  child: SizedBox(
+                    height: kHeaderHeight,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        FilledButton.tonalIcon(
+                          style: FilledButton.styleFrom(
+                            padding: kPh12,
+                            minimumSize: const Size(44, 44),
+                          ),
+                          onPressed: () {
+                            ref
+                                .read(codePaneVisibleStateProvider.notifier)
+                                .state = !codePaneVisible;
+                          },
+                          icon: Icon(
+                            codePaneVisible
+                                ? Icons.code_off_rounded
+                                : Icons.code_rounded,
+                            size: 18,
+                          ),
+                          label: SizedBox(
+                            width: 80,
+                            child: Text(
+                              codePaneVisible ? kLabelHideCode : kLabelViewCode,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : kVSpacer10,
           TabBar(
             padding: kPh20,
             isScrollable: true,

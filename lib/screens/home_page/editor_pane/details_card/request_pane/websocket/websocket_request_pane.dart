@@ -8,7 +8,9 @@ import 'websocket_request_params.dart';
 import 'websocket_settings_pane.dart';
 
 class EditWebSocketRequestPane extends ConsumerWidget {
-  const EditWebSocketRequestPane({super.key});
+  const EditWebSocketRequestPane({super.key, this.showViewCodeButton = true});
+
+  final bool showViewCodeButton;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,7 +29,7 @@ class EditWebSocketRequestPane extends ConsumerWidget {
 
     return RequestPane(
       selectedId: selectedId,
-      showViewCodeButton: false,
+      showViewCodeButton: showViewCodeButton,
       codePaneVisible: codePaneVisible,
       tabIndex: tabIndex ?? 0,
       onPressedCodeButton: () {

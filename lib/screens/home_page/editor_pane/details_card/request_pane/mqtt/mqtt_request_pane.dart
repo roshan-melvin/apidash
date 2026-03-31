@@ -13,7 +13,9 @@ import 'package:apidash/widgets/widgets.dart';
 import 'package:apidash/widgets/mqtt_topic_autocomplete.dart';
 
 class EditMQTTRequestPane extends ConsumerStatefulWidget {
-  const EditMQTTRequestPane({super.key});
+  const EditMQTTRequestPane({super.key, this.showViewCodeButton = true});
+
+  final bool showViewCodeButton;
 
   @override
   ConsumerState<EditMQTTRequestPane> createState() =>
@@ -282,11 +284,51 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
       isDense: true,
     );
 
+    final codePaneVisible = ref.watch(codePaneVisibleStateProvider);
+
     return DefaultTabController(
       length: 4,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          widget.showViewCodeButton
+              ? Padding(
+                  padding: kP8,
+                  child: SizedBox(
+                    height: kHeaderHeight,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        FilledButton.tonalIcon(
+                          style: FilledButton.styleFrom(
+                            padding: kPh12,
+                            minimumSize: const Size(44, 44),
+                          ),
+                          onPressed: () {
+                            ref
+                                .read(codePaneVisibleStateProvider.notifier)
+                                .state = !codePaneVisible;
+                          },
+                          icon: Icon(
+                            codePaneVisible
+                                ? Icons.code_off_rounded
+                                : Icons.code_rounded,
+                            size: 18,
+                          ),
+                          label: SizedBox(
+                            width: 80,
+                            child: Text(
+                              codePaneVisible ? kLabelHideCode : kLabelViewCode,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : kVSpacer10,
           const TabBar(
             tabs: [
               Tab(text: 'Topics'),
@@ -455,7 +497,6 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                       child: Row(
                         children: [
                           const Text('QoS: '),
-                          kHSpacer8,
                           ADDropdownButton<int>(
                             value: model.publishQos,
                             values: const [(0, '0'), (1, '1'), (2, '2')],
@@ -465,7 +506,7 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                               }
                             },
                           ),
-                          const Spacer(),
+                          kHSpacer8,
                           const Text('Retain: '),
                           Switch(
                             value: model.publishRetain,
@@ -475,7 +516,7 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                               context,
                             ).colorScheme.primary,
                           ),
-                          kHSpacer12,
+                          const Spacer(),
                           SizedBox(
                             height: 40,
                             child: FilledButton.icon(

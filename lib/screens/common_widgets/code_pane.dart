@@ -6,6 +6,7 @@ import 'package:apidash/widgets/widgets.dart';
 import 'package:apidash/codegen/codegen.dart';
 import 'package:apidash/utils/utils.dart';
 import 'package:apidash/consts.dart';
+import 'protocol_code_pane.dart';
 
 final Codegen codegen = Codegen();
 
@@ -33,16 +34,35 @@ class CodePane extends ConsumerWidget {
       return const ErrorMessage(message: kMsgCodegenAINotAvailable);
     }
 
-    // TODO: Add MQTT Codegen (paho-mqtt, dart_mqtt)
+    // MQTT Codegen
     if (selectedRequestModel?.apiType == APIType.mqtt) {
-      return const ErrorMessage(message: kMsgCodegenMQTTNotAvailable);
+      final mqttModel = selectedRequestModel!.mqttRequestModel;
+      if (mqttModel == null) {
+        return const ErrorMessage(message: kMsgCodegenMQTTNotAvailable);
+      }
+      return MQTTCodePane(model: mqttModel);
     }
 
-    // TODO: Add WebSocket Codegen
+    // WebSocket Codegen
     if (selectedRequestModel?.apiType == APIType.websocket) {
-      return const ErrorMessage(
-        message: 'Code generation for WebSocket is not available yet.',
-      );
+      final wsModel = selectedRequestModel!.websocketRequestModel;
+      if (wsModel == null) {
+        return const ErrorMessage(
+          message: 'Code generation for WebSocket is not available yet.',
+        );
+      }
+      return WebSocketCodePane(model: wsModel);
+    }
+
+    // gRPC Codegen
+    if (selectedRequestModel?.apiType == APIType.grpc) {
+      final grpcModel = selectedRequestModel!.grpcRequestModel;
+      if (grpcModel == null) {
+        return const ErrorMessage(
+          message: 'Code generation for gRPC is not available yet.',
+        );
+      }
+      return GrpcCodePane(model: grpcModel);
     }
 
     final defaultUriScheme = ref.watch(

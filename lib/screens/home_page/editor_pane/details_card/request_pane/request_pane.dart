@@ -63,9 +63,15 @@ class EditRequestPane extends ConsumerWidget {
                         APIType.ai => EditAIRequestPane(
                           showViewCodeButton: false,
                         ),
-                        APIType.mqtt => const EditMQTTRequestPane(),
-                        APIType.websocket => const EditWebSocketRequestPane(),
-                        APIType.grpc => const EditGrpcRequestPane(),
+                        APIType.mqtt => EditMQTTRequestPane(
+                          showViewCodeButton: false,
+                        ),
+                        APIType.websocket => EditWebSocketRequestPane(
+                          showViewCodeButton: false,
+                        ),
+                        APIType.grpc => EditGrpcRequestPane(
+                          showViewCodeButton: false,
+                        ),
                         _ => kSizedBoxEmpty,
                       },
                       ResponsePane(),
@@ -89,9 +95,9 @@ class EditRequestPane extends ConsumerWidget {
         showViewCodeButton: showViewCodeButton,
       ),
       APIType.ai => EditAIRequestPane(showViewCodeButton: showViewCodeButton),
-      APIType.mqtt => const EditMQTTRequestPane(),
-      APIType.websocket => const EditWebSocketRequestPane(),
-      APIType.grpc => const EditGrpcRequestPane(),
+      APIType.mqtt => EditMQTTRequestPane(showViewCodeButton: showViewCodeButton),
+      APIType.websocket => EditWebSocketRequestPane(showViewCodeButton: showViewCodeButton),
+      APIType.grpc => EditGrpcRequestPane(showViewCodeButton: showViewCodeButton),
       _ => kSizedBoxEmpty,
     };
   }

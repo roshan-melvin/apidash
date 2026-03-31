@@ -357,8 +357,17 @@ class MQTTService {
     }
 
     final connMsg = mqtt3.MqttConnectMessage()
-        .withClientIdentifier(clientId)
-        .withWillQos(mqtt3.MqttQos.atMostOnce);
+        .withClientIdentifier(clientId);
+
+    if (request.lastWillTopic.isNotEmpty) {
+      connMsg
+          .withWillTopic(request.lastWillTopic)
+          .withWillMessage(request.lastWillMessage)
+          .withWillQos(mqtt3.MqttQos.values[request.lastWillQos.clamp(0, 2)]);
+      if (request.lastWillRetain) {
+        connMsg.withWillRetain();
+      }
+    }
 
     if (request.cleanSession) connMsg.startClean();
 
@@ -460,8 +469,19 @@ class MQTTService {
     };
 
     final connMsg = mqtt5.MqttConnectMessage()
-        .withClientIdentifier(clientId)
-        .withWillQos(mqtt5.MqttQos.atMostOnce);
+        .withClientIdentifier(clientId);
+
+    if (request.lastWillTopic.isNotEmpty) {
+      final builder = mqtt5.MqttPayloadBuilder()..addString(request.lastWillMessage);
+      connMsg
+          .will()
+          .withWillTopic(request.lastWillTopic)
+          .withWillPayload(builder.payload!)
+          .withWillQos(mqtt5.MqttQos.values[request.lastWillQos.clamp(0, 2)]);
+      if (request.lastWillRetain) {
+        connMsg.withWillRetain();
+      }
+    }
 
     if (request.cleanSession) connMsg.startClean();
 
