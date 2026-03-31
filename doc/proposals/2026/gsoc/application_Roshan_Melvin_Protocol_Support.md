@@ -8,7 +8,7 @@ The main goal of this project is natively integrating **WebSocket**, **MQTT**, a
 
 **Owner:** rocroshanga@gmail.com  
 **Contributors:** Roshan Melvin G A  
-**Approvers:** Ankit Mohato (`@animator`), Ashita Prasad (`@ashitaprasad`)  
+**Approvers:** Ashita Prasad (`@ashitaprasad`)  
 **Status:** For Review  
 **Created:** 31/03/2026
 
@@ -54,7 +54,7 @@ Yes. Before writing this proposal, I built the thing. PR `#1529` - submitted dir
 - **Open PR [#1529](https://github.com/foss42/apidash/issues/1529):** [https://github.com/foss42/apidash/pull/1529](https://github.com/foss42/apidash/pull/1529)
 - **Active Development Branch:** [`feat/gsoc-2026-protocol-support`](https://github.com/roshan-melvin/apidash/tree/feat/gsoc-2026-protocol-support)
 
-> **Maintainer Review Status:** The PR has been reviewed by `@animator` and `@ashitaprasad`. The maintainers applied the `needs: demo-video` label and explicitly requested a video walkthrough of the working PoC - which I am recording now. This is the only open action item before the PR moves to the next review stage.
+> **Maintainer Review Status:** The PR has been reviewed by `@ashitaprasad`. The maintainer applied the `needs: demo-video` label and explicitly requested a video walkthrough of the working PoC - which I am recording now. This is the only open action item before the PR moves to the next review stage.
 
 To prove the depth of research behind the PoC - not just the code - I published a technical deep-dive on the architectural trap that silently kills naive WebSocket implementations in Flutter: the `channel.ready` timing problem. Maintainers and community members can read it here: [Why Your WebSocket Messages Silently Vanish: The `channel.ready` Trap in Dart](https://dev.to/roshan_melvin/why-your-websocket-messages-silently-vanish-the-channelready-trap-in-dart-3mi5). Writing that article required tracing the full WebSocket handshake at the TCP level - the same analysis that informed the implementation.
 
@@ -164,7 +164,7 @@ widget state, not in Riverpod providers. When a user switched tabs, the
 entire connection - messages, status, socket handle - was lost. The
 author noted headers weren't incorporated into the connection, and
 listed open items including query param handling on reconnect. The
-maintainer (`@animator`) requested changes referencing issue [#307](https://github.com/foss42/apidash/issues/307)
+maintainer (`@ashitaprasad`) requested changes referencing issue [#307](https://github.com/foss42/apidash/issues/307)
 (protocol dropdown unification); the PR was never updated and was
 closed by the author.
 
@@ -192,7 +192,7 @@ fatal problems:
 
 The PR was closed by `@ashitaprasad` in May 2024 with the note:
 *"Closing this PR as request model has now been updated."* When another
-contributor asked to revive it in 2025, `@animator` responded:
+contributor asked to revive it in 2025, `@ashitaprasad` responded:
 *"Better to start things from scratch as the codebase has evolved."*
 
 **My fix:** `MqttRequestModel` is a fully separate Hive type. MQTT
