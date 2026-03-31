@@ -1,3 +1,4 @@
+
 ![](./images/GSOCBANNER_APIDASH.jpg)
 
 # Advanced Protocol Support: Bringing Native gRPC, MQTT, and WebSocket Capabilities to API Dash
@@ -136,16 +137,32 @@ Before writing a single line of feature code, I read every closed protocol PR th
 Before reviewing the architecture breakdowns, please watch the actively working PoC (integrated in PR `#1529`) functioning natively against real servers:
 
 **Complete Protocol Overview (All Features)**
-https://github.com/user-attachments/assets/7281f250-1d54-40c6-a9c5-484c46746b65
+
+
+https://github.com/user-attachments/assets/2a89d590-d32e-4fab-9f9e-a78528da2659
+
+
 
 **MQTT v3.1.1 + v5.0 Demo (`broker.hivemq.com`)**
-https://github.com/user-attachments/assets/29ee3ed3-6951-4c09-a73d-95bd9a89f8a6
+
+
+https://github.com/user-attachments/assets/7cea55a7-85af-4569-947b-cd23fe63a4f0
+
+
 
 **WebSocket Engine Test (`wss://echo.websocket.events`)**
-https://github.com/user-attachments/assets/2643cd81-00e5-4158-9c49-38c8af82c97b
+
+
+https://github.com/user-attachments/assets/fd396060-0d94-4951-ac8d-b2bc55892abe
+
+
 
 **gRPC Reflection & Unary Call (`grpcb.in:9000`)**
-https://github.com/user-attachments/assets/bfd0a8f3-23e4-40fc-b7f7-125fc655978c
+
+
+https://github.com/user-attachments/assets/2d022ad2-fcf5-4bd8-a7c2-bc882bd92520
+
+
 
 ---
 
