@@ -2714,13 +2714,19 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final clr = Theme.of(context).colorScheme;
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 48, color: clr.outlineVariant),
-          const SizedBox(height: 12),
-          Text(label, style: TextStyle(color: clr.outline)),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 48, color: clr.outlineVariant),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              style: TextStyle(color: clr.outline),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -77,3 +77,4 @@ export 'widget_not_sent.dart';
 export 'widget_sending.dart';
 // export 'window_caption.dart';
 export 'workspace_selector.dart';
+export 'scrollable_pane_wrapper.dart';

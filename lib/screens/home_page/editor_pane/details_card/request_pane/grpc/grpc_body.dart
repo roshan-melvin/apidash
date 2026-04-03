@@ -228,7 +228,7 @@ class _GrpcBodyState extends ConsumerState<GrpcBody> {
 
     return Padding(
       padding: kPt5o10.copyWith(bottom: 10, left: 20, right: 20),
-      child: Column(
+      child: ScrollablePaneWrapper(
         children: [
           Row(
             children: [

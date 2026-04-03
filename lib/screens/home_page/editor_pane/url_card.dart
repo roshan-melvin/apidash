@@ -229,7 +229,8 @@ class SendRequestButton extends ConsumerWidget {
 }
 
 class WebSocketConnectButton extends ConsumerStatefulWidget {
-  const WebSocketConnectButton({super.key});
+  final Function()? onTap;
+  const WebSocketConnectButton({super.key, this.onTap});
 
   @override
   ConsumerState<WebSocketConnectButton> createState() =>
@@ -330,7 +331,7 @@ class _WebSocketConnectButtonState
         children: [
           btn,
           const SizedBox(width: 8),
-          FilledButton.icon(
+          FilledButton(
             onPressed: () {
               ref.read(webSocketServiceProvider).disconnect();
               setState(() => _isConnecting = false);
@@ -339,11 +340,10 @@ class _WebSocketConnectButtonState
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
               foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
               shape: const RoundedRectangleBorder(borderRadius: kBorderRadius8),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              minimumSize: const Size(100, 36),
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(36, 36),
             ),
-            icon: const Icon(Icons.close, size: 16),
-            label: const Text('Cancel', style: kTextStyleButton),
+            child: const Icon(Icons.close, size: 18),
           ),
         ],
       );
@@ -353,7 +353,8 @@ class _WebSocketConnectButtonState
 }
 
 class GrpcInvokeButton extends ConsumerStatefulWidget {
-  const GrpcInvokeButton({super.key});
+  final Function()? onTap;
+  const GrpcInvokeButton({super.key, this.onTap});
 
   @override
   ConsumerState<GrpcInvokeButton> createState() => _GrpcInvokeButtonState();
@@ -366,28 +367,6 @@ class _GrpcInvokeButtonState extends ConsumerState<GrpcInvokeButton> {
       await ref.read(grpcServiceProvider).connect(activeRequestModel);
     } catch (e) {
       debugPrint("gRPC connect panel error: $e");
-    }
-  }
-
-  void _send() async {
-    final requestModel = ref.read(selectedRequestModelProvider);
-    if (requestModel == null) return;
-
-    final latestModel = ref
-        .read(collectionStateNotifierProvider.notifier)
-        .getRequestModel(requestModel.id)!;
-
-    final activeRequestModel =
-        latestModel.grpcRequestModel ?? const GrpcRequestModel();
-    final message = activeRequestModel.requestJson;
-    if (message.isNotEmpty) {
-      await ref
-          .read(grpcServiceProvider)
-          .send(message: message, requestModel: activeRequestModel);
-    } else {
-      await ref
-          .read(grpcServiceProvider)
-          .send(message: "{}", requestModel: activeRequestModel);
     }
   }
 
@@ -416,12 +395,11 @@ class _GrpcInvokeButtonState extends ConsumerState<GrpcInvokeButton> {
 
     final isConnected = isActiveUrlConnected;
 
-    if (isConnected) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FilledButton.icon(
-            onPressed: _disconnect,
+    final btn = isConnected
+        ? FilledButton.icon(
+            onPressed: () {
+              _disconnect();
+            },
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
@@ -431,44 +409,57 @@ class _GrpcInvokeButtonState extends ConsumerState<GrpcInvokeButton> {
             ),
             icon: const Icon(Icons.cable, size: 16),
             label: const Text('Disconnect', style: kTextStyleButton),
-          ),
-          const SizedBox(width: 8),
-          FilledButton.icon(
-            onPressed: isConnecting ? null : _send,
+          )
+        : FilledButton.icon(
+            onPressed: showLoading ? null : () {
+              widget.onTap?.call();
+              _connect();
+            },
             style: FilledButton.styleFrom(
               shape: const RoundedRectangleBorder(borderRadius: kBorderRadius8),
               padding: const EdgeInsets.symmetric(horizontal: 16),
               minimumSize: const Size(100, 36),
             ),
-            icon: const Icon(Icons.send, size: 16),
-            label: const Text('Send', style: kTextStyleButton),
+            icon: showLoading
+                ? const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white70,
+                    ),
+                  )
+                : const Icon(Icons.rocket_launch, size: 16),
+            label: Text(
+              showLoading ? 'Connecting...' : 'Connect',
+              style: kTextStyleButton,
+            ),
+          );
+
+    if (showLoading && !isConnected) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          btn,
+          const SizedBox(width: 8),
+          FilledButton(
+            onPressed: () {
+              _disconnect();
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
+              shape: const RoundedRectangleBorder(borderRadius: kBorderRadius8),
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(36, 36),
+            ),
+            child: const Icon(Icons.close, size: 18),
           ),
         ],
       );
-    } else {
-      return FilledButton.icon(
-        onPressed: showLoading ? null : _connect,
-        style: FilledButton.styleFrom(
-          shape: const RoundedRectangleBorder(borderRadius: kBorderRadius8),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          minimumSize: const Size(100, 36),
-        ),
-        icon: showLoading
-            ? const SizedBox(
-                width: 14,
-                height: 14,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white70,
-                ),
-              )
-            : const Icon(Icons.rocket_launch, size: 16),
-        label: Text(
-          showLoading ? 'Connecting...' : 'Connect',
-          style: kTextStyleButton,
-        ),
-      );
     }
+
+    return btn;
   }
 }
 
@@ -542,7 +533,8 @@ class MQTTPortField extends ConsumerWidget {
 }
 
 class MQTTConnectButton extends ConsumerStatefulWidget {
-  const MQTTConnectButton({super.key});
+  final Function()? onTap;
+  const MQTTConnectButton({super.key, this.onTap});
 
   @override
   ConsumerState<MQTTConnectButton> createState() => _MQTTConnectButtonState();
@@ -625,20 +617,18 @@ class _MQTTConnectButtonState extends ConsumerState<MQTTConnectButton> {
         children: [
           btn,
           const SizedBox(width: 8),
-          FilledButton.icon(
+          FilledButton(
             onPressed: () {
-              ref.read(webSocketServiceProvider).disconnect();
-              setState(() => _isConnecting = false);
+              _disconnect();
             },
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
               foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
               shape: const RoundedRectangleBorder(borderRadius: kBorderRadius8),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              minimumSize: const Size(100, 36),
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(36, 36),
             ),
-            icon: const Icon(Icons.close, size: 16),
-            label: const Text('Cancel', style: kTextStyleButton),
+            child: const Icon(Icons.close, size: 18),
           ),
         ],
       );

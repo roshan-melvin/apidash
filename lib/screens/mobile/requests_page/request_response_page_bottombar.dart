@@ -1,5 +1,6 @@
 import 'package:apidash/consts.dart';
 import 'package:apidash/providers/providers.dart';
+import 'package:apidash_core/apidash_core.dart';
 import 'package:apidash_design_system/apidash_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,11 +57,27 @@ class RequestResponsePageBottombar extends ConsumerWidget {
             const Spacer(),
             SizedBox(
               height: 36,
-              child: SendRequestButton(
-                onTap: () {
-                  ref.read(dashbotShowMobileProvider.notifier).state = false;
-                  if (requestTabController.index != 1) {
-                    requestTabController.animateTo(1);
+              child: Builder(
+                builder: (context) {
+                  final apiType = ref.watch(
+                    selectedRequestModelProvider.select((value) => value?.apiType),
+                  );
+                  void handleTap() {
+                    ref.read(dashbotShowMobileProvider.notifier).state = false;
+                    if (requestTabController.index != 1) {
+                      requestTabController.animateTo(1);
+                    }
+                  }
+
+                  switch (apiType) {
+                    case APIType.mqtt:
+                      return MQTTConnectButton(onTap: handleTap);
+                    case APIType.websocket:
+                      return WebSocketConnectButton(onTap: handleTap);
+                    case APIType.grpc:
+                      return GrpcInvokeButton(onTap: handleTap);
+                    default:
+                      return SendRequestButton(onTap: handleTap);
                   }
                 },
               ),

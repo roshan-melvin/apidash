@@ -348,26 +348,46 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                   onUpdate: _updateTopic,
                   mqttService: ref.read(mqttServiceProvider),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                ScrollablePaneWrapper(
                   children: [
-                    SizedBox(
-                      height: kHeaderHeight,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    Container(
+                      constraints: const BoxConstraints(minHeight: kHeaderHeight),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                      width: double.infinity,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 16.0,
+                        runSpacing: 8.0,
                         children: [
-                          const Text(kLabelSelectContentType),
-                          kHSpacer8,
-                          ADDropdownButton<String>(
-                            value: _publishContentType,
-                            values: const [('json', 'json'), ('text', 'text')],
-                            onChanged: (v) {
-                              if (v != null) {
-                                setState(() {
-                                  _publishContentType = v;
-                                });
-                              }
-                            },
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(kLabelSelectContentType),
+                              kHSpacer8,
+                              ADDropdownButton<String>(
+                                value: _publishContentType,
+                                values: const [('json', 'json'), ('text', 'text')],
+                                onChanged: (v) {
+                                  if (v != null) {
+                                    setState(() {
+                                      _publishContentType = v;
+                                    });
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('Retain: '),
+                              Switch(
+                                value: model.publishRetain,
+                                onChanged: (v) => _update((m) => m.copyWith(publishRetain: v)),
+                                activeThumbColor: Theme.of(context).colorScheme.primary,
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -505,16 +525,6 @@ class _EditMQTTRequestPaneState extends ConsumerState<EditMQTTRequestPane> {
                                 _update((m) => m.copyWith(publishQos: v));
                               }
                             },
-                          ),
-                          kHSpacer8,
-                          const Text('Retain: '),
-                          Switch(
-                            value: model.publishRetain,
-                            onChanged: (v) =>
-                                _update((m) => m.copyWith(publishRetain: v)),
-                            activeThumbColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
                           ),
                           const Spacer(),
                           SizedBox(
