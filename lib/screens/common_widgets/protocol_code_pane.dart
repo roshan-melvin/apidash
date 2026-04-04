@@ -4,6 +4,9 @@ import 'package:apidash/consts.dart';
 import 'package:apidash/models/mqtt_request_model.dart';
 import 'package:apidash/models/websocket_request_model.dart';
 import 'package:apidash/models/grpc_request_model.dart';
+import 'package:apidash/codegen/mqtt_codegen.dart';
+import 'package:apidash/codegen/grpc_codegen.dart';
+import 'package:apidash/codegen/websocket_codegen.dart';
 import 'package:apidash/widgets/previewer_codegen.dart';
 import 'package:apidash/widgets/button_copy.dart';
 import 'package:apidash/widgets/button_save_download.dart';
@@ -31,6 +34,12 @@ String generateWebSocketCode(
       .toList();
 
   switch (lang) {
+    case WSLang.curl:
+      return WebSocketCurlCodeGen().getCode(model);
+    case WSLang.har:
+      return WebSocketHarCodeGen().getCode(model);
+    case WSLang.julia:
+      return WebSocketJuliaCodeGen().getCode(model);
     case WSLang.javascript:
       final buf = StringBuffer();
       buf.writeln('// WebSocket Client - JavaScript');
@@ -128,7 +137,25 @@ String generateWebSocketCode(
       buf.writeln('');
       buf.writeln("ws.on('error', (err) => console.error('Error:', err));");
       return buf.toString();
-  }
+      case WSLang.c:
+      return WebSocketCCodeGen().getCode(model);
+    case WSLang.csharp:
+      return WebSocketCSharpCodeGen().getCode(model);
+    case WSLang.go:
+      return WebSocketGoCodeGen().getCode(model);
+    case WSLang.java:
+      return WebSocketJavaCodeGen().getCode(model);
+    case WSLang.kotlin:
+      return WebSocketKotlinCodeGen().getCode(model);
+    case WSLang.php:
+      return WebSocketPHPCodeGen().getCode(model);
+    case WSLang.ruby:
+      return WebSocketRubyCodeGen().getCode(model);
+    case WSLang.rust:
+      return WebSocketRustCodeGen().getCode(model);
+    case WSLang.swift:
+      return WebSocketSwiftCodeGen().getCode(model);
+}
 }
 
 String _jsHeaders(List<dynamic> headers) {
@@ -154,6 +181,12 @@ String generateMQTTCode(MQTTRequestModel model, MQTTLang lang) {
   final scheme = tls ? (port == 443 ? 'wss' : 'mqtts') : 'mqtt';
 
   switch (lang) {
+    case MQTTLang.curl:
+      return MQTTCurlCodeGen().getCode(model);
+    case MQTTLang.har:
+      return MQTTHarCodeGen().getCode(model);
+    case MQTTLang.julia:
+      return MQTTJuliaCodeGen().getCode(model);
     case MQTTLang.python:
       final buf = StringBuffer();
       buf.writeln('# MQTT Client - Python (paho-mqtt)');
@@ -289,7 +322,25 @@ String generateMQTTCode(MQTTRequestModel model, MQTTLang lang) {
       buf.writeln('  client.publishMessage("$pubTopic", MqttQos.atMostOnce, builder.payload!);');
       buf.writeln('}');
       return buf.toString();
-  }
+      case MQTTLang.c:
+      return MQTTCMosquittoCodeGen().getCode(model);
+    case MQTTLang.csharp:
+      return MQTTCSharpMQTTnetCodeGen().getCode(model);
+    case MQTTLang.go:
+      return MQTTGoCodeGen().getCode(model);
+    case MQTTLang.java:
+      return MQTTJavaCodeGen().getCode(model);
+    case MQTTLang.kotlin:
+      return MQTTKotlinCodeGen().getCode(model);
+    case MQTTLang.php:
+      return MQTTPhpCodeGen().getCode(model);
+    case MQTTLang.ruby:
+      return MQTTRubyCodeGen().getCode(model);
+    case MQTTLang.rust:
+      return MQTTRustCodeGen().getCode(model);
+    case MQTTLang.swift:
+      return MQTTSwiftCodeGen().getCode(model);
+}
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -313,6 +364,12 @@ String generateGrpcCode(GrpcRequestModel model, GrpcLang lang) {
   final tls = model.useTls;
 
   switch (lang) {
+    case GrpcLang.curl:
+      return GrpcCurlCodeGen().getCode(model);
+    case GrpcLang.har:
+      return GrpcHarCodeGen().getCode(model);
+    case GrpcLang.julia:
+      return GrpcJuliaCodeGen().getCode(model);
     case GrpcLang.python:
       final buf = StringBuffer();
       buf.writeln('# gRPC Client - Python');
@@ -439,18 +496,36 @@ String generateGrpcCode(GrpcRequestModel model, GrpcLang lang) {
       buf.writeln('  await channel.shutdown();');
       buf.writeln('}');
       return buf.toString();
-  }
+      case GrpcLang.c:
+      return GRPCCCodeGen().getCode(model);
+    case GrpcLang.csharp:
+      return GRPCCSharpCodeGen().getCode(model);
+    case GrpcLang.go:
+      return GRPCGoCodeGen().getCode(model);
+    case GrpcLang.java:
+      return GRPCJavaCodeGen().getCode(model);
+    case GrpcLang.kotlin:
+      return GRPCKotlinCodeGen().getCode(model);
+    case GrpcLang.php:
+      return GRPCPHPCodeGen().getCode(model);
+    case GrpcLang.ruby:
+      return GRPCRubyCodeGen().getCode(model);
+    case GrpcLang.rust:
+      return GRPCRustCodeGen().getCode(model);
+    case GrpcLang.swift:
+      return GRPCSwiftCodeGen().getCode(model);
+}
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Enums for supported languages per protocol
 // ──────────────────────────────────────────────────────────────────────────────
 
-enum WSLang { javascript, nodejs, python, dart }
+enum WSLang { c, csharp, dart, go, java, javascript, julia, kotlin, nodejs, php, python, ruby, rust, swift, curl, har }
 
-enum MQTTLang { python, javascript, dart }
+enum MQTTLang { c, csharp, dart, go, java, javascript, julia, kotlin, php, python, ruby, rust, swift, curl, har }
 
-enum GrpcLang { python, javascript, dart }
+enum GrpcLang { c, csharp, dart, go, java, javascript, julia, kotlin, php, python, ruby, rust, swift, curl, har }
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Widget: WebSocketCodePane
@@ -484,6 +559,18 @@ class _WebSocketCodePaneState extends State<WebSocketCodePane> {
             (WSLang.nodejs, 'Node.js (ws)'),
             (WSLang.python, 'Python (websockets)'),
             (WSLang.dart, 'Dart'),
+            (WSLang.curl, 'cURL'),
+            (WSLang.har, 'HAR'),
+            (WSLang.julia, 'Julia'),
+            (WSLang.c, 'C (libwebsockets)'),
+            (WSLang.csharp, 'C# (ClientWebSocket)'),
+            (WSLang.go, 'Go (gorilla/websocket)'),
+            (WSLang.java, 'Java (Java-WebSocket)'),
+            (WSLang.kotlin, 'Kotlin (Java-WebSocket)'),
+            (WSLang.php, 'PHP (Ratchet)'),
+            (WSLang.ruby, 'Ruby (websocket-client-simple)'),
+            (WSLang.rust, 'Rust (tungstenite)'),
+            (WSLang.swift, 'Swift (URLSessionWebSocketTask)'),
           ],
           onChanged: (v) {
             if (v != null) setState(() => _lang = v);
@@ -529,6 +616,18 @@ class _MQTTCodePaneState extends State<MQTTCodePane> {
             (MQTTLang.python, 'Python (paho-mqtt)'),
             (MQTTLang.javascript, 'JavaScript (mqtt.js)'),
             (MQTTLang.dart, 'Dart (mqtt_client)'),
+              (MQTTLang.curl, 'cURL'),
+              (MQTTLang.har, 'HAR'),
+              (MQTTLang.julia, 'Julia'),
+              (MQTTLang.c, 'C (Mosquitto)'),
+              (MQTTLang.csharp, 'C# (MQTTnet)'),
+              (MQTTLang.go, 'Go (paho.mqtt)'),
+              (MQTTLang.java, 'Java (paho.mqtt)'),
+              (MQTTLang.kotlin, 'Kotlin (paho.mqtt)'),
+              (MQTTLang.php, 'PHP (php-mqtt)'),
+              (MQTTLang.ruby, 'Ruby (mqtt)'),
+              (MQTTLang.rust, 'Rust (rumqttc)'),
+              (MQTTLang.swift, 'Swift (CocoaMQTT)'),
           ],
           onChanged: (v) {
             if (v != null) setState(() => _lang = v);
@@ -574,6 +673,18 @@ class _GrpcCodePaneState extends State<GrpcCodePane> {
             (GrpcLang.python, 'Python (grpcio)'),
             (GrpcLang.javascript, 'JavaScript (@grpc/grpc-js)'),
             (GrpcLang.dart, 'Dart (grpc)'),
+              (GrpcLang.curl, 'cURL'),
+              (GrpcLang.har, 'HAR'),
+              (GrpcLang.julia, 'Julia'),
+              (GrpcLang.c, 'C (gRPC)'),
+              (GrpcLang.csharp, 'C# (gRPC.Net.Client)'),
+              (GrpcLang.go, 'Go (grpc-go)'),
+              (GrpcLang.java, 'Java (grpc-java)'),
+              (GrpcLang.kotlin, 'Kotlin (grpc-kotlin)'),
+              (GrpcLang.php, 'PHP (grpc)'),
+              (GrpcLang.ruby, 'Ruby (grpc)'),
+              (GrpcLang.rust, 'Rust (tonic)'),
+              (GrpcLang.swift, 'Swift (grpc-swift)'),
           ],
           onChanged: (v) {
             if (v != null) setState(() => _lang = v);
