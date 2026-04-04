@@ -59,7 +59,10 @@ class RequestEditorDefault extends ConsumerWidget {
                   vertical: 16,
                 ),
               ),
-              child: Text(kLabelPlusNew, style: kTextStyleButton),
+              child: Text(
+                kLabelPlusNew,
+                style: kTextStyleButton,
+              ),
             ),
             const SizedBox(height: 40),
 
@@ -68,9 +71,8 @@ class RequestEditorDefault extends ConsumerWidget {
               constraints: const BoxConstraints(maxWidth: 500),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withValues(
-                  alpha: 0.3,
-                ),
+                color:
+                    colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: colorScheme.outlineVariant.withValues(alpha: 0.5),
@@ -135,7 +137,11 @@ class RequestEditorDefault extends ConsumerWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: colorScheme.primary.withValues(alpha: 0.8)),
+        Icon(
+          icon,
+          size: 18,
+          color: colorScheme.primary.withValues(alpha: 0.8),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Text(

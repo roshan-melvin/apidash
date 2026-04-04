@@ -31,7 +31,10 @@ Future<void> saveToDownloads(
   String? name,
 }) async {
   var message = "";
-  var path = await getFileDownloadpath(name, ext ?? getFileExtension(mimeType));
+  var path = await getFileDownloadpath(
+    name,
+    ext ?? getFileExtension(mimeType),
+  );
   if (path != null) {
     try {
       await saveFile(path, content!);

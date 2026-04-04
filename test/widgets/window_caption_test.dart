@@ -7,7 +7,9 @@ void main() {
     await tester.pumpWidget(
       const MaterialApp(
         title: 'Window caption',
-        home: Scaffold(body: WindowCaption()),
+        home: Scaffold(
+          body: WindowCaption(),
+        ),
       ),
     );
 

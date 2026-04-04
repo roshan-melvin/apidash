@@ -13,8 +13,9 @@ import 'package:flutter_test/flutter_test.dart';
 import '../widgets/action_buttons/test_utils.dart';
 
 Finder _taskButton(String snippet) => find.byWidgetPredicate(
-  (widget) => widget is HomeScreenTaskButton && widget.label.contains(snippet),
-);
+      (widget) =>
+          widget is HomeScreenTaskButton && widget.label.contains(snippet),
+    );
 
 Future<RecordingDashbotWindowNotifier> _pumpHomePage(
   WidgetTester tester, {
@@ -45,9 +46,8 @@ Future<RecordingDashbotWindowNotifier> _pumpHomePage(
 }
 
 void main() {
-  testWidgets('DashbotHomePage renders greeting and quick actions', (
-    tester,
-  ) async {
+  testWidgets('DashbotHomePage renders greeting and quick actions',
+      (tester) async {
     await _pumpHomePage(tester, onRoute: (_, __) {});
 
     expect(find.textContaining('Hello there'), findsOneWidget);
@@ -57,9 +57,8 @@ void main() {
     expect(find.textContaining('Generate documentation'), findsOneWidget);
   });
 
-  testWidgets('Chat with Dashbot button appears and works in debug mode', (
-    tester,
-  ) async {
+  testWidgets('Chat with Dashbot button appears and works in debug mode',
+      (tester) async {
     // In debug mode (which tests run in), the button should be present
     String? capturedRoute;
     Object? capturedArgs;
@@ -77,9 +76,10 @@ void main() {
     expect(buttonFinder, findsOneWidget);
 
     // Tap the button
-    await tester.tap(
-      find.descendant(of: buttonFinder, matching: find.byType(TextButton)),
-    );
+    await tester.tap(find.descendant(
+      of: buttonFinder,
+      matching: find.byType(TextButton),
+    ));
     await tester.pumpAndSettle();
 
     // Should navigate to chat without any initial task arguments
@@ -103,9 +103,10 @@ void main() {
       final buttonFinder = _taskButton('Explain me this response');
       expect(buttonFinder, findsOneWidget);
 
-      await tester.tap(
-        find.descendant(of: buttonFinder, matching: find.byType(TextButton)),
-      );
+      await tester.tap(find.descendant(
+        of: buttonFinder,
+        matching: find.byType(TextButton),
+      ));
       await tester.pumpAndSettle();
 
       expect(capturedRoute, DashbotRoutes.dashbotChat);
@@ -127,9 +128,10 @@ void main() {
       final buttonFinder = _taskButton('Help me debug this error');
       expect(buttonFinder, findsOneWidget);
 
-      await tester.tap(
-        find.descendant(of: buttonFinder, matching: find.byType(TextButton)),
-      );
+      await tester.tap(find.descendant(
+        of: buttonFinder,
+        matching: find.byType(TextButton),
+      ));
       await tester.pumpAndSettle();
 
       expect(capturedRoute, DashbotRoutes.dashbotChat);
@@ -151,9 +153,10 @@ void main() {
       final buttonFinder = _taskButton('Generate documentation');
       expect(buttonFinder, findsOneWidget);
 
-      await tester.tap(
-        find.descendant(of: buttonFinder, matching: find.byType(TextButton)),
-      );
+      await tester.tap(find.descendant(
+        of: buttonFinder,
+        matching: find.byType(TextButton),
+      ));
       await tester.pumpAndSettle();
 
       expect(capturedRoute, DashbotRoutes.dashbotChat);
@@ -175,9 +178,10 @@ void main() {
       final buttonFinder = _taskButton('Generate Tests');
       expect(buttonFinder, findsOneWidget);
 
-      await tester.tap(
-        find.descendant(of: buttonFinder, matching: find.byType(TextButton)),
-      );
+      await tester.tap(find.descendant(
+        of: buttonFinder,
+        matching: find.byType(TextButton),
+      ));
       await tester.pumpAndSettle();
 
       expect(capturedRoute, DashbotRoutes.dashbotChat);
@@ -199,9 +203,10 @@ void main() {
       final buttonFinder = _taskButton('Generate Code');
       expect(buttonFinder, findsOneWidget);
 
-      await tester.tap(
-        find.descendant(of: buttonFinder, matching: find.byType(TextButton)),
-      );
+      await tester.tap(find.descendant(
+        of: buttonFinder,
+        matching: find.byType(TextButton),
+      ));
       await tester.pumpAndSettle();
 
       expect(capturedRoute, DashbotRoutes.dashbotChat);
@@ -223,9 +228,10 @@ void main() {
       final buttonFinder = _taskButton('Import cURL');
       expect(buttonFinder, findsOneWidget);
 
-      await tester.tap(
-        find.descendant(of: buttonFinder, matching: find.byType(TextButton)),
-      );
+      await tester.tap(find.descendant(
+        of: buttonFinder,
+        matching: find.byType(TextButton),
+      ));
       await tester.pumpAndSettle();
 
       expect(capturedRoute, DashbotRoutes.dashbotChat);
@@ -247,9 +253,10 @@ void main() {
       final buttonFinder = _taskButton('Import OpenAPI');
       expect(buttonFinder, findsOneWidget);
 
-      await tester.tap(
-        find.descendant(of: buttonFinder, matching: find.byType(TextButton)),
-      );
+      await tester.tap(find.descendant(
+        of: buttonFinder,
+        matching: find.byType(TextButton),
+      ));
       await tester.pumpAndSettle();
 
       expect(capturedRoute, DashbotRoutes.dashbotChat);
@@ -258,21 +265,19 @@ void main() {
   });
 
   testWidgets(
-    'Generate Tool hides and shows dashbot window even without response',
-    (tester) async {
-      final notifier = await _pumpHomePage(tester, onRoute: (_, __) {});
+      'Generate Tool hides and shows dashbot window even without response',
+      (tester) async {
+    final notifier = await _pumpHomePage(tester, onRoute: (_, __) {});
 
-      await tester.tap(find.text('🛠️ Generate Tool'));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('🛠️ Generate Tool'));
+    await tester.pumpAndSettle();
 
-      expect(notifier.hideCalls, 1);
-      expect(notifier.showCalls, 1);
-    },
-  );
+    expect(notifier.hideCalls, 1);
+    expect(notifier.showCalls, 1);
+  });
 
-  testWidgets('Generate UI opens dialog and restores dashbot window', (
-    tester,
-  ) async {
+  testWidgets('Generate UI opens dialog and restores dashbot window',
+      (tester) async {
     final responseModel = const HttpResponseModel(
       body: 'example response',
       formattedBody: 'formatted',

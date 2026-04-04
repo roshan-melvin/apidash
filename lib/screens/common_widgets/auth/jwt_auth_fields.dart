@@ -54,7 +54,10 @@ class _JwtAuthFieldsState extends State<JwtAuthFields> {
       children: [
         Text(
           kMsgAddToken,
-          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 14,
+          ),
         ),
         SizedBox(height: 4),
         ADPopupMenu<String>(
@@ -76,7 +79,10 @@ class _JwtAuthFieldsState extends State<JwtAuthFields> {
         const SizedBox(height: 16),
         Text(
           kTextAlgo,
-          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 14,
+          ),
         ),
         SizedBox(height: 4),
         ADPopupMenu<String>(
@@ -112,7 +118,10 @@ class _JwtAuthFieldsState extends State<JwtAuthFields> {
           CheckboxListTile(
             title: Text(
               kMsgSecret,
-              style: TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
+              style: TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+              ),
             ),
             value: _isSecretBase64Encoded,
             contentPadding: EdgeInsets.zero,
@@ -128,7 +137,10 @@ class _JwtAuthFieldsState extends State<JwtAuthFields> {
         ] else ...[
           Text(
             kMsgPrivateKey,
-            style: TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+            ),
           ),
           SizedBox(height: 4),
           TextField(
@@ -164,7 +176,10 @@ class _JwtAuthFieldsState extends State<JwtAuthFields> {
         const SizedBox(height: 16),
         Text(
           kMsgPayload,
-          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 14,
+          ),
         ),
         SizedBox(height: 4),
         TextField(
@@ -180,7 +195,9 @@ class _JwtAuthFieldsState extends State<JwtAuthFields> {
             contentPadding: const EdgeInsets.all(18),
             hintText: kHintJson,
             hintStyle: Theme.of(context).textTheme.bodyMedium,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(
                 color: Theme.of(context).colorScheme.outline,
@@ -211,8 +228,14 @@ class _JwtAuthFieldsState extends State<JwtAuthFields> {
       header: '',
     );
     widget.updateAuth?.call(
-      widget.authData?.copyWith(type: APIAuthType.jwt, jwt: jwt) ??
-          AuthModel(type: APIAuthType.jwt, jwt: jwt),
+      widget.authData?.copyWith(
+            type: APIAuthType.jwt,
+            jwt: jwt,
+          ) ??
+          AuthModel(
+            type: APIAuthType.jwt,
+            jwt: jwt,
+          ),
     );
   }
 }

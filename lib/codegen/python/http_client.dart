@@ -80,7 +80,10 @@ def build_data_list(fields):
 dataList = build_data_list({{fields_list}})
 body = b'\r\n'.join(dataList)
 ''';
-  String? getCode(HttpRequestModel requestModel, {String? boundary}) {
+  String? getCode(
+    HttpRequestModel requestModel, {
+    String? boundary,
+  }) {
     try {
       String result = "";
       bool hasHeaders = false;
@@ -88,9 +91,11 @@ body = b'\r\n'.join(dataList)
       bool hasBody = false;
 
       var templateStartUrl = jj.Template(kTemplateStart);
-      result += templateStartUrl.render({
-        "hasFormData": requestModel.hasFormData,
-      });
+      result += templateStartUrl.render(
+        {
+          "hasFormData": requestModel.hasFormData,
+        },
+      );
       var rec = getValidRequestUri(
         requestModel.url,
         requestModel.enabledParams,
@@ -128,11 +133,12 @@ body = b'\r\n'.join(dataList)
                 headers[HttpHeaders.contentTypeHeader] =
                     requestModel.bodyContentType.header;
               } else if (requestModel.hasFormData) {
-                var formHeaderTemplate = jj.Template(
-                  kTemplateFormHeaderContentType,
-                );
-                headers[HttpHeaders.contentTypeHeader] = formHeaderTemplate
-                    .render({"boundary": boundary});
+                var formHeaderTemplate =
+                    jj.Template(kTemplateFormHeaderContentType);
+                headers[HttpHeaders.contentTypeHeader] =
+                    formHeaderTemplate.render({
+                  "boundary": boundary,
+                });
               }
             }
             var headersString = kJsonEncoder.convert(headers);
@@ -142,15 +148,17 @@ body = b'\r\n'.join(dataList)
         }
         if (requestModel.hasFormData) {
           var formDataBodyData = jj.Template(kStringFormDataBody);
-          result += formDataBodyData.render({
-            "fields_list": json.encode(requestModel.formDataMapList),
-            "boundary": boundary,
-          });
+          result += formDataBodyData.render(
+            {
+              "fields_list": json.encode(requestModel.formDataMapList),
+              "boundary": boundary,
+            },
+          );
         }
         var templateConnection = jj.Template(kTemplateConnection);
         result += templateConnection.render({
           "isHttps": uri.scheme == "https" ? "S" : "",
-          "authority": uri.authority,
+          "authority": uri.authority
         });
 
         var templateRequest = jj.Template(kTemplateRequest);

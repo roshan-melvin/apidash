@@ -43,41 +43,38 @@ void main() {
       });
 
       test(
-        'should return MaterialPageRoute for dashbotChat route with ChatMessageType argument',
-        () {
-          // Arrange
-          const initialTask = ChatMessageType.generateTest;
-          const settings = RouteSettings(
-            name: DashbotRoutes.dashbotChat,
-            arguments: initialTask,
-          );
+          'should return MaterialPageRoute for dashbotChat route with ChatMessageType argument',
+          () {
+        // Arrange
+        const initialTask = ChatMessageType.generateTest;
+        const settings = RouteSettings(
+          name: DashbotRoutes.dashbotChat,
+          arguments: initialTask,
+        );
 
-          // Act
-          final route = generateRoute(settings);
+        // Act
+        final route = generateRoute(settings);
 
-          // Assert
-          expect(route, isA<MaterialPageRoute>());
-          expect(route!.settings.name, equals(DashbotRoutes.dashbotChat));
-        },
-      );
+        // Assert
+        expect(route, isA<MaterialPageRoute>());
+        expect(route!.settings.name, equals(DashbotRoutes.dashbotChat));
+      });
 
-      test(
-        'should handle dashbotChat route with non-ChatMessageType argument',
-        () {
-          // Arrange
-          const settings = RouteSettings(
-            name: DashbotRoutes.dashbotChat,
-            arguments: 'invalid_argument',
-          );
+      test('should handle dashbotChat route with non-ChatMessageType argument',
+          () {
+        // Arrange
+        const settings = RouteSettings(
+          name: DashbotRoutes.dashbotChat,
+          arguments: 'invalid_argument',
+        );
 
-          // Act
-          final route = generateRoute(settings);
+        // Act
+        final route = generateRoute(settings);
 
-          // Assert
-          expect(route, isA<MaterialPageRoute>());
-          expect(route!.settings.name, equals(DashbotRoutes.dashbotChat));
-        },
-      );
+        // Assert
+        expect(route, isA<MaterialPageRoute>());
+        expect(route!.settings.name, equals(DashbotRoutes.dashbotChat));
+      });
 
       test('should return default route for unknown route names', () {
         // Arrange
@@ -196,11 +193,8 @@ void main() {
           final route = generateRoute(settings);
 
           // Assert
-          expect(
-            route,
-            isNotNull,
-            reason: 'Route should not be null for route name: $routeName',
-          );
+          expect(route, isNotNull,
+              reason: 'Route should not be null for route name: $routeName');
           expect(route, isA<MaterialPageRoute>());
         }
       });

@@ -19,8 +19,7 @@ class ReadOnlyTextField extends StatelessWidget {
       readOnly: true,
       controller: TextEditingController(text: initialValue),
       style: style,
-      decoration:
-          decoration ??
+      decoration: decoration ??
           const InputDecoration(
             isDense: true,
             border: InputBorder.none,

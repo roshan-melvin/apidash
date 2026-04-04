@@ -19,9 +19,8 @@ void main() {
   );
 
   group('DashbotAddTestButton', () {
-    testWidgets('renders label and invokes applyAutoFix on press', (
-      tester,
-    ) async {
+    testWidgets('renders label and invokes applyAutoFix on press',
+        (tester) async {
       late TestChatViewmodel notifier;
       await tester.pumpWidget(
         ProviderScope(
@@ -33,7 +32,9 @@ void main() {
           ],
           child: MaterialApp(
             theme: kThemeDataLight,
-            home: Scaffold(body: DashbotAddTestButton(action: action)),
+            home: Scaffold(
+              body: DashbotAddTestButton(action: action),
+            ),
           ),
         ),
       );

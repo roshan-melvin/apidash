@@ -27,10 +27,7 @@ void main() {
     test('log system entries and clear', () {
       controller.logSystem(category: 'ui', message: 'opened');
       controller.logSystem(
-        category: 'provider',
-        message: 'updated',
-        level: TerminalLevel.warn,
-      );
+          category: 'provider', message: 'updated', level: TerminalLevel.warn);
       final state = container.read(terminalStateProvider);
       expect(state.entries.length, 2);
       expect(state.entries.first.system?.category, anyOf('ui', 'provider'));
@@ -75,7 +72,11 @@ void main() {
 
       controller.addNetworkChunk(
         id,
-        BodyChunk(ts: DateTime.now(), text: 'chunk1', sizeBytes: 6),
+        BodyChunk(
+          ts: DateTime.now(),
+          text: 'chunk1',
+          sizeBytes: 6,
+        ),
       );
 
       controller.completeNetwork(
@@ -123,11 +124,8 @@ void main() {
         method: HTTPVerb.get,
         url: 'https://api',
       );
-      controller.completeNetwork(
-        id,
-        statusCode: 404,
-        responseBodyPreview: 'nf',
-      );
+      controller.completeNetwork(id,
+          statusCode: 404, responseBodyPreview: 'nf');
       final e = container.read(terminalStateProvider).entries.first;
       expect(e.level, TerminalLevel.error);
       expect(e.network?.responseStatus, 404);

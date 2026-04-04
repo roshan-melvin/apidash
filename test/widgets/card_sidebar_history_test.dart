@@ -16,7 +16,7 @@ void main() {
       method: HTTPVerb.get,
       timeStamp: DateTime.now(),
       responseStatus: 200,
-    ),
+    )
   ];
   testWidgets('Testing Sidebar History Card', (tester) async {
     dynamic changedValue;
@@ -46,14 +46,10 @@ void main() {
     expect(find.byType(InkWell), findsOneWidget);
 
     expect(find.text('https://api.apidash.dev'), findsOneWidget);
+    expect(find.widgetWithText(SizedBox, 'https://api.apidash.dev'),
+        findsOneWidget);
     expect(
-      find.widgetWithText(SizedBox, 'https://api.apidash.dev'),
-      findsOneWidget,
-    );
-    expect(
-      find.widgetWithText(Card, 'https://api.apidash.dev'),
-      findsOneWidget,
-    );
+        find.widgetWithText(Card, 'https://api.apidash.dev'), findsOneWidget);
     await tester.pumpAndSettle();
     var tappable = find.widgetWithText(Card, 'https://api.apidash.dev');
     await tester.tap(tappable);
@@ -90,14 +86,10 @@ void main() {
     expect(find.byType(InkWell), findsOneWidget);
 
     expect(find.text('https://api.apidash.dev'), findsOneWidget);
+    expect(find.widgetWithText(SizedBox, 'https://api.apidash.dev'),
+        findsOneWidget);
     expect(
-      find.widgetWithText(SizedBox, 'https://api.apidash.dev'),
-      findsOneWidget,
-    );
-    expect(
-      find.widgetWithText(Card, 'https://api.apidash.dev'),
-      findsOneWidget,
-    );
+        find.widgetWithText(Card, 'https://api.apidash.dev'), findsOneWidget);
     await tester.pumpAndSettle();
     var tappable = find.widgetWithText(Card, 'https://api.apidash.dev');
     await tester.tap(tappable);

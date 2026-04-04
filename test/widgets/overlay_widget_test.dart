@@ -31,7 +31,11 @@ void main() {
   testWidgets('SavingOverlay Test', (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: Scaffold(body: SavingOverlay(saveCompleted: false)),
+        home: Scaffold(
+          body: SavingOverlay(
+            saveCompleted: false,
+          ),
+        ),
       ),
     );
     expect(find.byType(Card), findsOneWidget);
@@ -40,7 +44,11 @@ void main() {
 
     await tester.pumpWidget(
       const MaterialApp(
-        home: Scaffold(body: SavingOverlay(saveCompleted: true)),
+        home: Scaffold(
+          body: SavingOverlay(
+            saveCompleted: true,
+          ),
+        ),
       ),
     );
     expect(find.byType(Card), findsOneWidget);

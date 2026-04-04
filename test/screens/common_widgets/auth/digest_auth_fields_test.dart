@@ -19,9 +19,8 @@ void main() {
       };
     });
 
-    testWidgets('renders with default values when authData is null', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders with default values when authData is null',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(
@@ -49,9 +48,8 @@ void main() {
       expect(find.text('Opaque'), findsNWidgets(2));
     });
 
-    testWidgets('renders with existing digest auth data', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders with existing digest auth data',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.digest,
         digest: AuthDigestModel(
@@ -83,9 +81,8 @@ void main() {
       expect(find.text('MD5'), findsOneWidget);
     });
 
-    testWidgets('updates auth data when username changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when username changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.digest,
         digest: AuthDigestModel(
@@ -140,9 +137,8 @@ void main() {
       expect(lastUpdate?.type, APIAuthType.digest);
     });
 
-    testWidgets('updates auth data when password changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when password changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.digest,
         digest: AuthDigestModel(
@@ -197,9 +193,8 @@ void main() {
       expect(lastUpdate?.type, APIAuthType.digest);
     });
 
-    testWidgets('updates auth data when algorithm dropdown changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when algorithm dropdown changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.digest,
         digest: AuthDigestModel(
@@ -240,9 +235,8 @@ void main() {
       expect(lastUpdate?.digest?.algorithm, 'SHA-256');
     });
 
-    testWidgets('updates auth data when realm changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when realm changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.digest,
         digest: AuthDigestModel(
@@ -327,9 +321,8 @@ void main() {
       final usernameFieldFinder = find.byType(ExtendedTextField).first;
 
       // Verify the field is readOnly
-      final usernameField = tester.widget<ExtendedTextField>(
-        usernameFieldFinder,
-      );
+      final usernameField =
+          tester.widget<ExtendedTextField>(usernameFieldFinder);
       expect(usernameField.readOnly, isTrue);
 
       // Ensure updateAuth was not called
@@ -361,9 +354,8 @@ void main() {
       expect(find.text('Algorithm'), findsOneWidget);
     });
 
-    testWidgets('initializes with correct default values', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('initializes with correct default values',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(
@@ -387,9 +379,8 @@ void main() {
       expect(find.byType(EnvAuthField), findsNWidgets(6));
     });
 
-    testWidgets('creates proper AuthModel on field changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('creates proper AuthModel on field changes',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(
@@ -431,9 +422,8 @@ void main() {
       expect(lastUpdate?.digest?.algorithm, 'MD5');
     });
 
-    testWidgets('handles all algorithm options correctly', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('handles all algorithm options correctly',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(
@@ -466,9 +456,8 @@ void main() {
       }
     });
 
-    testWidgets('trims whitespace from all field inputs', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('trims whitespace from all field inputs',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(

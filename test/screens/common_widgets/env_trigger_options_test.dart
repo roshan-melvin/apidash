@@ -37,42 +37,37 @@ void main() {
     ),
   ];
   testWidgets(
-    'EnvironmentTriggerOptions shows no suggestions when suggestions are empty',
-    (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            availableEnvironmentVariablesStateProvider.overrideWith(
-              (ref) => {},
-            ),
-            activeEnvironmentIdStateProvider.overrideWith((ref) => null),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: EnvironmentTriggerOptions(
-                query: 'test',
-                onSuggestionTap: (suggestion) {},
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.byType(SizedBox), findsOneWidget);
-      expect(find.byType(ClipRRect), findsNothing);
-      expect(find.byType(ListView), findsNothing);
-    },
-  );
-
-  testWidgets('EnvironmentTriggerOptions shows suggestions when available', (
-    WidgetTester tester,
-  ) async {
+      'EnvironmentTriggerOptions shows no suggestions when suggestions are empty',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          availableEnvironmentVariablesStateProvider.overrideWith(
-            (ref) => envMap,
+          availableEnvironmentVariablesStateProvider.overrideWith((ref) => {}),
+          activeEnvironmentIdStateProvider.overrideWith((ref) => null),
+        ],
+        child: MaterialApp(
+          home: Scaffold(
+            body: EnvironmentTriggerOptions(
+              query: 'test',
+              onSuggestionTap: (suggestion) {},
+            ),
           ),
+        ),
+      ),
+    );
+
+    expect(find.byType(SizedBox), findsOneWidget);
+    expect(find.byType(ClipRRect), findsNothing);
+    expect(find.byType(ListView), findsNothing);
+  });
+
+  testWidgets('EnvironmentTriggerOptions shows suggestions when available',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          availableEnvironmentVariablesStateProvider
+              .overrideWith((ref) => envMap),
           activeEnvironmentIdStateProvider.overrideWith((ref) => 'activeEnvId'),
         ],
         child: MaterialApp(
@@ -92,38 +87,34 @@ void main() {
   });
 
   testWidgets(
-    'EnvironmentTriggerOptions calls onSuggestionTap when a suggestion is tapped',
-    (WidgetTester tester) async {
-      EnvironmentVariableSuggestion? tappedSuggestion;
+      'EnvironmentTriggerOptions calls onSuggestionTap when a suggestion is tapped',
+      (WidgetTester tester) async {
+    EnvironmentVariableSuggestion? tappedSuggestion;
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            availableEnvironmentVariablesStateProvider.overrideWith(
-              (ref) => envMap,
-            ),
-            activeEnvironmentIdStateProvider.overrideWith(
-              (ref) => 'activeEnvId',
-            ),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: EnvironmentTriggerOptions(
-                query: 'key',
-                onSuggestionTap: (suggestion) {
-                  tappedSuggestion = suggestion;
-                },
-              ),
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          availableEnvironmentVariablesStateProvider
+              .overrideWith((ref) => envMap),
+          activeEnvironmentIdStateProvider.overrideWith((ref) => 'activeEnvId'),
+        ],
+        child: MaterialApp(
+          home: Scaffold(
+            body: EnvironmentTriggerOptions(
+              query: 'key',
+              onSuggestionTap: (suggestion) {
+                tappedSuggestion = suggestion;
+              },
             ),
           ),
         ),
-      );
+      ),
+    );
 
-      await tester.tap(find.byType(ListTile).first);
-      await tester.pump();
+    await tester.tap(find.byType(ListTile).first);
+    await tester.pump();
 
-      expect(tappedSuggestion, isNotNull);
-      expect(tappedSuggestion, equals(suggestions.first));
-    },
-  );
+    expect(tappedSuggestion, isNotNull);
+    expect(tappedSuggestion, equals(suggestions.first));
+  });
 }

@@ -41,7 +41,9 @@ showImportDialog({
                   ],
                 ),
                 kVSpacer6,
-                DragAndDropArea(onFileDropped: onFileDropped),
+                DragAndDropArea(
+                  onFileDropped: onFileDropped,
+                ),
               ],
             ),
           );

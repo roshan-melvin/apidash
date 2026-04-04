@@ -28,13 +28,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 2', () {
@@ -58,13 +57,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 3', () {
@@ -88,13 +86,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 4', () {
@@ -118,13 +115,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 5', () {
@@ -151,13 +147,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 6', () {
@@ -184,13 +179,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 7', () {
@@ -213,13 +207,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 8', () {
@@ -246,13 +239,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 9', () {
@@ -276,13 +268,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 10', () {
@@ -309,13 +300,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet10,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet10,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 11', () {
@@ -342,13 +332,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet11,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet11,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 12', () {
@@ -372,13 +361,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelGet12,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelGet12,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -403,13 +391,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelHead1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelHead1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('HEAD 2', () {
@@ -432,13 +419,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelHead2,
-          SupportedUriSchemes.http,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelHead2,
+            SupportedUriSchemes.http,
+          ),
+          expectedCode);
     });
   });
 
@@ -467,13 +453,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelPost1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelPost1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 2', () {
@@ -500,13 +485,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelPost2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelPost2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 3', () {
@@ -534,13 +518,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelPost3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelPost3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 4', () {
       const expectedCode = r"""const payload = new FormData();
@@ -568,13 +551,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelPost4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelPost4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 5', () {
@@ -606,13 +588,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelPost5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelPost5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 6', () {
       const expectedCode =
@@ -642,13 +623,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelPost6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelPost6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 7', () {
       const expectedCode =
@@ -678,13 +658,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelPost7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelPost7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 8', () {
       const expectedCode = r"""const payload = new FormData();
@@ -712,13 +691,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelPost8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelPost8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 9', () {
       const expectedCode =
@@ -752,13 +730,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelPost9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelPost9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -787,13 +764,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelPut1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelPut1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -822,13 +798,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelPatch1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelPatch1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -853,13 +828,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelDelete1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelDelete1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('DELETE 2', () {
@@ -886,13 +860,12 @@ fetch(url, options)
   });
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.jsFetch,
-          requestModelDelete2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.jsFetch,
+            requestModelDelete2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 }

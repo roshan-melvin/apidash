@@ -20,14 +20,11 @@ class _HistoryDetailsState extends ConsumerState<HistoryDetails>
   @override
   Widget build(BuildContext context) {
     ref.watch(historySequenceProvider);
-    final selectedHistoryRequest = ref.watch(
-      selectedHistoryRequestModelProvider,
-    );
+    final selectedHistoryRequest =
+        ref.watch(selectedHistoryRequestModelProvider);
     final codePaneVisible = ref.watch(historyCodePaneVisibleStateProvider);
-    final TabController controller = useTabController(
-      initialLength: 3,
-      vsync: this,
-    );
+    final TabController controller =
+        useTabController(initialLength: 3, vsync: this);
 
     return selectedHistoryRequest != null
         ? LayoutBuilder(
@@ -37,11 +34,10 @@ class _HistoryDetailsState extends ConsumerState<HistoryDetails>
                 children: [
                   kVSpacer5,
                   Padding(
-                    padding: kPh4,
-                    child: HistoryURLCard(
-                      historyRequestModel: selectedHistoryRequest,
-                    ),
-                  ),
+                      padding: kPh4,
+                      child: HistoryURLCard(
+                        historyRequestModel: selectedHistoryRequest,
+                      )),
                   kVSpacer10,
                   if (isCompact) ...[
                     SegmentedTabbar(
@@ -57,22 +53,25 @@ class _HistoryDetailsState extends ConsumerState<HistoryDetails>
                       child: TabBarView(
                         controller: controller,
                         children: [
-                          HistoryRequestPane(isCompact: isCompact),
+                          HistoryRequestPane(
+                            isCompact: isCompact,
+                          ),
                           const HistoryResponsePane(),
-                          const CodePane(isHistoryRequest: true),
+                          const CodePane(
+                            isHistoryRequest: true,
+                          ),
                         ],
                       ),
                     ),
-                    const HistoryPageBottombar(),
+                    const HistoryPageBottombar()
                   ] else ...[
                     Expanded(
                       child: Padding(
                         padding: kPh4,
                         child: RequestDetailsCard(
                           child: EqualSplitView(
-                            leftWidget: HistoryRequestPane(
-                              isCompact: isCompact,
-                            ),
+                            leftWidget:
+                                HistoryRequestPane(isCompact: isCompact),
                             rightWidget: codePaneVisible
                                 ? const CodePane(isHistoryRequest: true)
                                 : const HistoryResponsePane(),
@@ -81,7 +80,7 @@ class _HistoryDetailsState extends ConsumerState<HistoryDetails>
                       ),
                     ),
                     kVSpacer8,
-                  ],
+                  ]
                 ],
               );
             },

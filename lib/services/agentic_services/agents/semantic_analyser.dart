@@ -18,6 +18,8 @@ class ResponseSemanticAnalyser extends AIAgent {
 
   @override
   Future outputFormatter(String validatedResponse) async {
-    return {'SEMANTIC_ANALYSIS': validatedResponse};
+    return {
+      'SEMANTIC_ANALYSIS': validatedResponse,
+    };
   }
 }

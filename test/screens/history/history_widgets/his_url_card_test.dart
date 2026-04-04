@@ -30,11 +30,9 @@ void main() {
       );
 
       expect(
-        find.text(
-          historyRequestModel.httpRequestModel!.method.name.toUpperCase(),
-        ),
-        findsOneWidget,
-      );
+          find.text(
+              historyRequestModel.httpRequestModel!.method.name.toUpperCase()),
+          findsOneWidget);
     });
 
     testWidgets('Testing if displays correct URL', (tester) async {
@@ -47,9 +45,7 @@ void main() {
       );
 
       expect(
-        find.text(historyRequestModel.httpRequestModel!.url),
-        findsOneWidget,
-      );
+          find.text(historyRequestModel.httpRequestModel!.url), findsOneWidget);
     });
   });
 }

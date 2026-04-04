@@ -85,7 +85,9 @@ func main() {
   fmt.Println("Response body:", string(body))
 }""";
 
-  String? getCode(HttpRequestModel requestModel) {
+  String? getCode(
+    HttpRequestModel requestModel,
+  ) {
     try {
       String result = "";
       var hasBody = false;
@@ -102,7 +104,10 @@ func main() {
       var templateUrl = jj.Template(kTemplateUrl);
       result += templateUrl.render({"url": url});
 
-      var rec = getValidRequestUri(url, requestModel.enabledParams);
+      var rec = getValidRequestUri(
+        url,
+        requestModel.enabledParams,
+      );
 
       Uri? uri = rec.$1;
 
@@ -140,13 +145,13 @@ func main() {
           var headers = requestModel.enabledHeadersMap;
           if (requestModel.hasJsonData || requestModel.hasTextData) {
             headers.putIfAbsent(
-              kHeaderContentType,
-              () => requestModel.bodyContentType.header,
-            );
+                kHeaderContentType, () => requestModel.bodyContentType.header);
           }
           if (headers.isNotEmpty) {
             var templateHeader = jj.Template(kTemplateHeader);
-            result += templateHeader.render({"headers": headers});
+            result += templateHeader.render({
+              "headers": headers,
+            });
           }
         }
         if (requestModel.hasFormData) {

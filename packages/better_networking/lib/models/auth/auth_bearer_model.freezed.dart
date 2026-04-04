@@ -60,11 +60,12 @@ class _$AuthBearerModelCopyWithImpl<$Res, $Val extends AuthBearerModel>
   $Res call({Object? token = null}) {
     return _then(
       _value.copyWith(
-        token: null == token
-            ? _value.token
-            : token // ignore: cast_nullable_to_non_nullable
-                as String,
-      ) as $Val,
+            token: null == token
+                ? _value.token
+                : token // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
     );
   }
 }
@@ -100,7 +101,7 @@ class __$$AuthBearerModelImplCopyWithImpl<$Res>
         token: null == token
             ? _value.token
             : token // ignore: cast_nullable_to_non_nullable
-                as String,
+                  as String,
       ),
     );
   }

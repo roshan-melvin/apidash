@@ -13,13 +13,9 @@ Future<void> setupInitialWindow({Size? sz}) async {
         double width, height;
         if (sz == null) {
           width = math.max(
-            (screenFrame.width / 2).roundToDouble(),
-            kMinInitialWindowWidth,
-          );
-          height = math.max(
-            (screenFrame.height / 2).roundToDouble(),
-            kMinInitialWindowHeight,
-          );
+              (screenFrame.width / 2).roundToDouble(), kMinInitialWindowWidth);
+          height = math.max((screenFrame.height / 2).roundToDouble(),
+              kMinInitialWindowHeight);
         } else {
           width = sz.width;
           height = sz.height;
@@ -49,13 +45,9 @@ Future<void> setupWindow({Size? sz, Offset? off, bool center = false}) async {
         if (screen != null) {
           final screenFrame = screen.visibleFrame;
           width = math.max(
-            (screenFrame.width / 2).roundToDouble(),
-            kMinInitialWindowWidth,
-          );
-          height = math.max(
-            (screenFrame.height / 2).roundToDouble(),
-            kMinInitialWindowHeight,
-          );
+              (screenFrame.width / 2).roundToDouble(), kMinInitialWindowWidth);
+          height = math.max((screenFrame.height / 2).roundToDouble(),
+              kMinInitialWindowHeight);
         }
       });
     } else {

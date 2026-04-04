@@ -104,9 +104,8 @@ echo \$response->getBody();
         }
 
         var templateRequestInit = jj.Template(kTemplateRequestInit);
-        result += templateRequestInit.render({
-          "method": requestModel.method.name.toUpperCase(),
-        });
+        result += templateRequestInit
+            .render({"method": requestModel.method.name.toUpperCase()});
 
         var requestBody = requestModel.body;
 
@@ -132,17 +131,15 @@ echo \$response->getBody();
           }
 
           if (requestModel.hasFileInFormData) {
-            var templateFormDataWithFiles = jj.Template(
-              kTemplateFormDataWithFiles,
-            );
+            var templateFormDataWithFiles =
+                jj.Template(kTemplateFormDataWithFiles);
             result += templateFormDataWithFiles.render({
               "formDataFields": formDataFields,
               "formDataFiles": formDataFiles,
             });
           } else {
-            var templateFormDataWithoutFiles = jj.Template(
-              kTemplateFormDataWithoutFiles,
-            );
+            var templateFormDataWithoutFiles =
+                jj.Template(kTemplateFormDataWithoutFiles);
             result += templateFormDataWithoutFiles.render({
               "formDataFields": formDataFields,
             });

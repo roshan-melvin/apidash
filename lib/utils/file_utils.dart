@@ -35,9 +35,7 @@ Future<String?> getFileDownloadpath(String? name, String? ext) async {
 }
 
 Future<String?> getApplicationSupportDirectoryFilePath(
-  String name,
-  String? ext,
-) async {
+    String name, String? ext) async {
   final Directory tempDir = await getApplicationSupportDirectory();
   name = name;
   ext = (ext != null) ? ".$ext" : "";

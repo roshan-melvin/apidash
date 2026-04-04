@@ -60,10 +60,8 @@ dispatchMain()
     try {
       String result = kTemplateStart;
 
-      var rec = getValidRequestUri(
-        requestModel.url,
-        requestModel.enabledParams,
-      );
+      var rec =
+          getValidRequestUri(requestModel.url, requestModel.enabledParams);
       Uri? uri = rec.$1;
 
       var headers = requestModel.enabledHeadersMap;
@@ -79,27 +77,28 @@ dispatchMain()
               'type': 'file',
               'name': param['name'],
               'filename': fileName,
-              'filepath': filePath,
+              'filepath': filePath
             };
           } else {
             return {
               'type': 'text',
               'name': param['name'],
-              'value': param['value'],
+              'value': param['value']
             };
           }
         }).toList();
 
         var templateFormData = jj.Template(kTemplateFormData);
-        result += templateFormData.render({"formData": formDataList});
+        result += templateFormData.render({
+          "formData": formDataList,
+        });
 
         hasBody = true;
       } else if (requestModel.hasJsonData) {
         var templateJsonData = jj.Template(kTemplateJsonData);
         result += templateJsonData.render({
-          "jsonData": requestModel.body!
-              .replaceAll('"', '\\"')
-              .replaceAll('\n', '\\n'),
+          "jsonData":
+              requestModel.body!.replaceAll('"', '\\"').replaceAll('\n', '\\n'),
         });
 
         headers.putIfAbsent("Content-Type", () => "application/json");
@@ -110,15 +109,12 @@ dispatchMain()
       else if (requestModel.hasTextData) {
         var templateTextData = jj.Template(kTemplateTextData);
         result += templateTextData.render({
-          "textData": requestModel.body!
-              .replaceAll('"', '\\"')
-              .replaceAll('\n', '\\n'),
+          "textData":
+              requestModel.body!.replaceAll('"', '\\"').replaceAll('\n', '\\n'),
         });
 
         headers.putIfAbsent(
-          kHeaderContentType,
-          () => requestModel.bodyContentType.header,
-        );
+            kHeaderContentType, () => requestModel.bodyContentType.header);
         hasBody = true;
       }
 
@@ -141,7 +137,7 @@ dispatchMain()
         "hasHeaders": hasHeaders,
         "hasFormData": requestModel.hasFormData,
         "hasBody": hasBody,
-        "hasJsonData": hasJsonData,
+        "hasJsonData": hasJsonData
       });
 
       return result;

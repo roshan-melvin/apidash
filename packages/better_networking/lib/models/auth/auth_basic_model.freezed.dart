@@ -61,15 +61,16 @@ class _$AuthBasicAuthModelCopyWithImpl<$Res, $Val extends AuthBasicAuthModel>
   $Res call({Object? username = null, Object? password = null}) {
     return _then(
       _value.copyWith(
-        username: null == username
-            ? _value.username
-            : username // ignore: cast_nullable_to_non_nullable
-                as String,
-        password: null == password
-            ? _value.password
-            : password // ignore: cast_nullable_to_non_nullable
-                as String,
-      ) as $Val,
+            username: null == username
+                ? _value.username
+                : username // ignore: cast_nullable_to_non_nullable
+                      as String,
+            password: null == password
+                ? _value.password
+                : password // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
     );
   }
 }
@@ -105,11 +106,11 @@ class __$$AuthBasicAuthModelImplCopyWithImpl<$Res>
         username: null == username
             ? _value.username
             : username // ignore: cast_nullable_to_non_nullable
-                as String,
+                  as String,
         password: null == password
             ? _value.password
             : password // ignore: cast_nullable_to_non_nullable
-                as String,
+                  as String,
       ),
     );
   }

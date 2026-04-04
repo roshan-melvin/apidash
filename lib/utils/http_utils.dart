@@ -16,8 +16,7 @@ String getRequestTitleFromUrl(String? url) {
 }
 
 (List<ResponseBodyView>, String?) getResponseBodyViewOptions(
-  MediaType? mediaType,
-) {
+    MediaType? mediaType) {
   if (mediaType == null) {
     return (kRawBodyViewOptions, null);
   }
@@ -27,7 +26,7 @@ String getRequestTitleFromUrl(String? url) {
     if (kResponseBodyViewOptions[type]!.containsKey(subtype)) {
       return (
         kResponseBodyViewOptions[type]![subtype]!,
-        kCodeHighlighterMap[subtype] ?? subtype,
+        kCodeHighlighterMap[subtype] ?? subtype
       );
     }
     if (subtype.contains(kSubTypeJson)) {
@@ -39,12 +38,12 @@ String getRequestTitleFromUrl(String? url) {
     if (kResponseBodyViewOptions[type]!.containsKey(subtype)) {
       return (
         kResponseBodyViewOptions[type]![subtype]!,
-        kCodeHighlighterMap[subtype] ?? subtype,
+        kCodeHighlighterMap[subtype] ?? subtype
       );
     }
     return (
       kResponseBodyViewOptions[type]![kSubTypeDefaultViewOptions]!,
-      subtype,
+      subtype
     );
   }
   return (kNoBodyViewOptions, null);

@@ -30,7 +30,10 @@ class SDUIWidget extends StatelessWidget {
           children: [
             Text(
               "Dog Emojis",
-              style: TextStyle(fontSize: 40, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             SizedBox(height: 20),
             Table(
@@ -54,11 +57,7 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Container(
                           color: const Color(0xFFFFFF00),
                           height: 50.0,
@@ -74,11 +73,7 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Container(
                           color: const Color(0xFFFFFF00),
                           height: 50.0,
@@ -94,11 +89,7 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Container(
                           color: const Color(0xFFFFFF00),
                           height: 50.0,
@@ -114,11 +105,7 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Container(
                           color: const Color(0xFFFFFF00),
                           height: 50.0,
@@ -138,11 +125,7 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
                           child: Text(
                             "dog face",
@@ -154,11 +137,7 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
                           child: Text(
                             "animals and nature",
@@ -170,11 +149,7 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
                           child: Text(
                             "animal mammal",
@@ -186,13 +161,12 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
-                          child: Text("🐶", style: TextStyle(fontSize: 30.576)),
+                          child: Text(
+                            "🐶",
+                            style: TextStyle(fontSize: 30.576),
+                          ),
                         ),
                       ),
                     ),
@@ -203,24 +177,19 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
-                          child: Text("dog", style: TextStyle(fontSize: 21.84)),
+                          child: Text(
+                            "dog",
+                            style: TextStyle(fontSize: 21.84),
+                          ),
                         ),
                       ),
                     ),
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
                           child: Text(
                             "animals and nature",
@@ -232,11 +201,7 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
                           child: Text(
                             "animal mammal",
@@ -248,13 +213,12 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
-                          child: Text("🐕", style: TextStyle(fontSize: 30.576)),
+                          child: Text(
+                            "🐕",
+                            style: TextStyle(fontSize: 30.576),
+                          ),
                         ),
                       ),
                     ),
@@ -265,11 +229,7 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
                           child: Text(
                             "hot dog",
@@ -281,11 +241,7 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
                           child: Text(
                             "food and drink",
@@ -297,11 +253,7 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
                           child: Text(
                             "food prepared",
@@ -313,13 +265,12 @@ class SDUIWidget extends StatelessWidget {
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                        ),
+                            top: 10, left: 10, right: 10, bottom: 10),
                         child: Center(
-                          child: Text("🌭", style: TextStyle(fontSize: 30.576)),
+                          child: Text(
+                            "🌭",
+                            style: TextStyle(fontSize: 30.576),
+                          ),
                         ),
                       ),
                     ),

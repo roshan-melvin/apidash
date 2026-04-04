@@ -23,13 +23,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 2', () {
@@ -48,13 +47,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 3', () {
@@ -73,13 +71,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 4', () {
@@ -102,13 +99,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 5', () {
@@ -127,13 +123,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 6', () {
@@ -153,13 +148,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 7', () {
@@ -177,13 +171,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 8', () {
@@ -203,13 +196,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 9', () {
@@ -229,13 +221,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 10', () {
@@ -254,13 +245,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet10,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet10,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 11', () {
@@ -281,13 +271,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet11,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet11,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 12', () {
@@ -305,13 +294,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelGet12,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelGet12,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -331,13 +319,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelHead1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelHead1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('HEAD 2', () {
@@ -355,13 +342,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelHead2,
-          SupportedUriSchemes.http,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelHead2,
+            SupportedUriSchemes.http,
+          ),
+          expectedCode);
     });
   });
 
@@ -387,13 +373,12 @@ public class Main {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelPost1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelPost1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 2', () {
@@ -422,13 +407,12 @@ public class Main {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelPost2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelPost2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 3', () {
@@ -453,13 +437,12 @@ public class Main {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelPost3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelPost3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 4', () {
       const expectedCode = r"""import kong.unirest.core.*;
@@ -479,13 +462,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelPost4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelPost4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 5', () {
@@ -507,13 +489,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelPost5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelPost5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 6', () {
       const expectedCode = r"""import kong.unirest.core.*;
@@ -534,13 +515,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelPost6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelPost6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 7', () {
       const expectedCode = r"""import kong.unirest.core.*;
@@ -561,13 +541,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelPost7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelPost7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 8', () {
       const expectedCode = r"""import kong.unirest.core.*;
@@ -589,13 +568,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelPost8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelPost8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 9', () {
       const expectedCode = r"""import kong.unirest.core.*;
@@ -620,13 +598,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelPost9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelPost9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -653,13 +630,12 @@ public class Main {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelPut1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelPut1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -686,13 +662,12 @@ public class Main {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelPatch1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelPatch1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -712,13 +687,12 @@ public class Main {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelDelete1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelDelete1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('DELETE 2', () {
@@ -743,13 +717,12 @@ public class Main {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.javaUnirest,
-          requestModelDelete2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.javaUnirest,
+            requestModelDelete2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 }

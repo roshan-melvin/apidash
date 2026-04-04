@@ -19,13 +19,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET 2', () {
       const expectedCode = r"""using HTTP
@@ -42,13 +41,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET 3', () {
       const expectedCode = r"""using HTTP
@@ -65,13 +63,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET 4', () {
       const expectedCode = r"""using HTTP
@@ -92,13 +89,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 5', () {
@@ -116,13 +112,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 6', () {
@@ -144,13 +139,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 7', () {
@@ -164,13 +158,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 8', () {
@@ -192,13 +185,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 9', () {
@@ -217,13 +209,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 10', () {
@@ -241,13 +232,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet10,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet10,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 11', () {
@@ -270,13 +260,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet11,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet11,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 12', () {
@@ -290,13 +279,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelGet12,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelGet12,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -312,13 +300,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelHead1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelHead1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('HEAD 2', () {
@@ -332,13 +319,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelHead2,
-          SupportedUriSchemes.http,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelHead2,
+            SupportedUriSchemes.http,
+          ),
+          expectedCode);
     });
   });
 
@@ -362,13 +348,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelPost1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelPost1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 2', () {
@@ -395,13 +380,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelPost2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelPost2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 3', () {
       const expectedCode = r'''using HTTP
@@ -423,13 +407,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelPost3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelPost3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 4', () {
@@ -451,13 +434,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelPost4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelPost4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 5', () {
@@ -483,13 +465,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelPost5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelPost5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 6', () {
       const expectedCode = r"""using HTTP
@@ -509,13 +490,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelPost6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelPost6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 7', () {
       const expectedCode = r"""using HTTP
@@ -535,13 +515,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelPost7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelPost7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 8', () {
       const expectedCode = r"""using HTTP
@@ -567,13 +546,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelPost8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelPost8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 9', () {
       const expectedCode = r"""using HTTP
@@ -603,13 +581,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelPost9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelPost9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
   group('PUT Request', () {
@@ -633,13 +610,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelPut1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelPut1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
   group('PATCH Request', () {
@@ -663,13 +639,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelPatch1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelPatch1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
   group('DELETE Request', () {
@@ -684,13 +659,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelDelete1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelDelete1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('DELETE 2', () {
       const expectedCode = r'''using HTTP
@@ -712,13 +686,12 @@ println("Status Code: $(response.status) $(HTTP.StatusCodes.statustext(response.
 println("Response Body: \n$(String(response.body))")
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.juliaHttp,
-          requestModelDelete2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.juliaHttp,
+            requestModelDelete2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 }

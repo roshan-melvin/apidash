@@ -16,9 +16,8 @@ class OverlayWidgetTemplate {
       _overlay = OverlayEntry(
         // replace with your own layout
         builder: (context) => ColoredBox(
-          color: kColorBlack.withValues(alpha: kOverlayBackgroundOpacity),
-          child: widget,
-        ),
+            color: kColorBlack.withValues(alpha: kOverlayBackgroundOpacity),
+            child: widget),
       );
       _overlayState!.insert(_overlay!);
     }
@@ -46,15 +45,16 @@ class SavingOverlay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Lottie.asset(
-                saveCompleted ? kAssetSavedLottie : kAssetSavingLottie,
-                width: 100,
-                height: 100,
-              ),
+                  saveCompleted ? kAssetSavedLottie : kAssetSavingLottie,
+                  width: 100,
+                  height: 100),
               kHSpacer20,
               Text(
                 saveCompleted ? kLabelSaved : kLabelSaving,
-                style: const TextStyle(fontSize: kDefaultFontSize),
-              ),
+                style: const TextStyle(
+                  fontSize: kDefaultFontSize,
+                ),
+              )
             ],
           ),
         ),

@@ -6,8 +6,16 @@ const globalEnvironment = EnvironmentModel(
   id: kGlobalEnvironmentId,
   name: 'Global',
   values: [
-    EnvironmentVariableModel(key: 'key1', value: 'value1', enabled: true),
-    EnvironmentVariableModel(key: 'key2', value: 'value2', enabled: false),
+    EnvironmentVariableModel(
+      key: 'key1',
+      value: 'value1',
+      enabled: true,
+    ),
+    EnvironmentVariableModel(
+      key: 'key2',
+      value: 'value2',
+      enabled: false,
+    ),
   ],
 );
 
@@ -84,8 +92,18 @@ const environmentModel1Json = {
   'id': 'environmentId',
   'name': 'Development',
   'values': [
-    {'key': 'key1', 'value': 'value1', 'type': 'variable', 'enabled': true},
-    {'key': 'key2', 'value': 'value2', 'type': 'variable', 'enabled': false},
+    {
+      'key': 'key1',
+      'value': 'value1',
+      'type': 'variable',
+      'enabled': true,
+    },
+    {
+      'key': 'key2',
+      'value': 'value2',
+      'type': 'variable',
+      'enabled': false,
+    },
   ],
 };
 
@@ -93,8 +111,18 @@ const environmentModel2Json = {
   'id': 'environmentId',
   'name': 'Development',
   'values': [
-    {'key': 'key', 'value': 'value1', 'type': 'secret', 'enabled': true},
-    {'key': 'key2', 'value': 'value2', 'type': 'secret', 'enabled': false},
+    {
+      'key': 'key',
+      'value': 'value1',
+      'type': 'secret',
+      'enabled': true,
+    },
+    {
+      'key': 'key2',
+      'value': 'value2',
+      'type': 'secret',
+      'enabled': false,
+    },
   ],
 };
 

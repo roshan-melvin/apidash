@@ -4,7 +4,11 @@ import 'package:share_plus/share_plus.dart';
 import '../consts.dart';
 
 class ShareButton extends StatelessWidget {
-  const ShareButton({super.key, required this.toShare, this.showLabel = true});
+  const ShareButton({
+    super.key,
+    required this.toShare,
+    this.showLabel = true,
+  });
 
   final String toShare;
   final bool showLabel;

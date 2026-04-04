@@ -24,12 +24,15 @@ class ResponseHeadersHeader extends StatelessWidget {
           Expanded(
             child: Text(
               "$name (${map.length} $kLabelItems)",
-              style: Theme.of(
-                context,
-              ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
           ),
-          if (map.isNotEmpty) CopyButton(toCopy: kJsonEncoder.convert(map)),
+          if (map.isNotEmpty)
+            CopyButton(
+              toCopy: kJsonEncoder.convert(map),
+            ),
         ],
       ),
     );

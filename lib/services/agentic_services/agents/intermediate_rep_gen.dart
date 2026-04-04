@@ -22,6 +22,8 @@ class IntermediateRepresentationGen extends AIAgent {
         .replaceAll('```yaml', '')
         .replaceAll('```yaml\n', '')
         .replaceAll('```', '');
-    return {'INTERMEDIATE_REPRESENTATION': validatedResponse};
+    return {
+      'INTERMEDIATE_REPRESENTATION': validatedResponse,
+    };
   }
 }

@@ -12,37 +12,36 @@ showOkCancelDialog(
   VoidCallback? onClickCancel,
 }) {
   showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text(dialogTitle ?? ""),
-        titleTextStyle: Theme.of(context).textTheme.titleLarge,
-        content: Container(
-          padding: kPt20,
-          width: 300,
-          child: Text(content ?? ""),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              onClickCancel?.call();
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-            },
-            child: Text(buttonLabelCancel ?? kLabelCancel),
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(dialogTitle ?? ""),
+          titleTextStyle: Theme.of(context).textTheme.titleLarge,
+          content: Container(
+            padding: kPt20,
+            width: 300,
+            child: Text(content ?? ""),
           ),
-          TextButton(
-            onPressed: () {
-              onClickOk?.call();
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-            },
-            child: Text(buttonLabelOk ?? kLabelOk),
-          ),
-        ],
-      );
-    },
-  );
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                onClickCancel?.call();
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: Text(buttonLabelCancel ?? kLabelCancel),
+            ),
+            TextButton(
+              onPressed: () {
+                onClickOk?.call();
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: Text(buttonLabelOk ?? kLabelOk),
+            ),
+          ],
+        );
+      });
 }

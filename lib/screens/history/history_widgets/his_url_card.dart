@@ -9,7 +9,10 @@ import 'package:apidash/consts.dart';
 import 'his_action_buttons.dart';
 
 class HistoryURLCard extends StatelessWidget {
-  const HistoryURLCard({super.key, required this.historyRequestModel});
+  const HistoryURLCard({
+    super.key,
+    required this.historyRequestModel,
+  });
 
   final HistoryRequestModel? historyRequestModel;
 
@@ -20,65 +23,65 @@ class HistoryURLCard extends StatelessWidget {
     final url = historyRequestModel?.metaData.url;
     final fontSize = Theme.of(context).textTheme.titleMedium?.fontSize;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isCompact = constraints.maxWidth <= kMinWindowSize.width;
-        final isExpanded = constraints.maxWidth >= WindowWidth.medium.value - 8;
-        return Card(
-          color: kColorTransparent,
-          surfaceTintColor: kColorTransparent,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            side: BorderSide(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            ),
-            borderRadius: kBorderRadius8,
+    return LayoutBuilder(builder: (context, constraints) {
+      final isCompact = constraints.maxWidth <= kMinWindowSize.width;
+      final isExpanded = constraints.maxWidth >= WindowWidth.medium.value - 8;
+      return Card(
+        color: kColorTransparent,
+        surfaceTintColor: kColorTransparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 12,
-              horizontal: isCompact ? 10 : 16,
-            ),
-            child: Row(
-              children: [
-                isCompact ? const SizedBox.shrink() : kHSpacer10,
-                if (apiType == APIType.rest) ...[
-                  Text(
-                    method!.name.toUpperCase(),
-                    style: kCodeStyle.copyWith(
-                      fontSize: fontSize,
-                      fontWeight: FontWeight.bold,
-                      color: getAPIColor(
-                        apiType!,
-                        method: method,
-                        brightness: Theme.of(context).brightness,
-                      ),
+          borderRadius: kBorderRadius8,
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: 12,
+            horizontal: isCompact ? 10 : 16,
+          ),
+          child: Row(
+            children: [
+              isCompact ? const SizedBox.shrink() : kHSpacer10,
+              if (apiType == APIType.rest) ...[
+                Text(
+                  method!.name.toUpperCase(),
+                  style: kCodeStyle.copyWith(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.bold,
+                    color: getAPIColor(
+                      apiType!,
+                      method: method,
+                      brightness: Theme.of(context).brightness,
                     ),
                   ),
-                  isCompact ? kHSpacer10 : kHSpacer20,
-                ],
-                if (apiType == APIType.ai) ...[
-                  AIModelSelector(
-                    readOnlyModel: historyRequestModel?.aiRequestModel,
-                  ),
-                  SizedBox(width: 20),
-                ],
-                Expanded(
-                  child: ReadOnlyTextField(
-                    initialValue: url,
-                    style: kCodeStyle.copyWith(fontSize: fontSize),
+                ),
+                isCompact ? kHSpacer10 : kHSpacer20,
+              ],
+              if (apiType == APIType.ai) ...[
+                AIModelSelector(
+                  readOnlyModel: historyRequestModel?.aiRequestModel,
+                ),
+                SizedBox(width: 20),
+              ],
+              Expanded(
+                child: ReadOnlyTextField(
+                  initialValue: url,
+                  style: kCodeStyle.copyWith(
+                    fontSize: fontSize,
                   ),
                 ),
-                isExpanded
-                    ? HistoryActionButtons(
-                        historyRequestModel: historyRequestModel,
-                      )
-                    : const SizedBox.shrink(),
-              ],
-            ),
+              ),
+              isExpanded
+                  ? HistoryActionButtons(
+                      historyRequestModel: historyRequestModel,
+                    )
+                  : const SizedBox.shrink()
+            ],
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }

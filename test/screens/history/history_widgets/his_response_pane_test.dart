@@ -9,16 +9,19 @@ import '../../../models/history_models.dart';
 
 void main() {
   group('HistoryResponsePane Widget Tests', () {
-    testWidgets('displays "No Request Selected" when no request is selected', (
-      tester,
-    ) async {
+    testWidgets('displays "No Request Selected" when no request is selected',
+        (tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
             selectedHistoryIdStateProvider.overrideWith((ref) => null),
             selectedHistoryRequestModelProvider.overrideWith((ref) => null),
           ],
-          child: const MaterialApp(home: Scaffold(body: HistoryResponsePane())),
+          child: const MaterialApp(
+            home: Scaffold(
+              body: HistoryResponsePane(),
+            ),
+          ),
         ),
       );
 
@@ -26,29 +29,28 @@ void main() {
     });
 
     testWidgets(
-      'displays ResponsePaneHeader and ResponseTabView when a request is selected',
-      (tester) async {
-        final historyRequestModel = historyRequestModel1;
+        'displays ResponsePaneHeader and ResponseTabView when a request is selected',
+        (tester) async {
+      final historyRequestModel = historyRequestModel1;
 
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              selectedHistoryIdStateProvider.overrideWith(
-                (ref) => historyRequestModel.historyId,
-              ),
-              selectedHistoryRequestModelProvider.overrideWith(
-                (ref) => historyRequestModel,
-              ),
-            ],
-            child: const MaterialApp(
-              home: Scaffold(body: HistoryResponsePane()),
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            selectedHistoryIdStateProvider
+                .overrideWith((ref) => historyRequestModel.historyId),
+            selectedHistoryRequestModelProvider
+                .overrideWith((ref) => historyRequestModel),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: HistoryResponsePane(),
             ),
           ),
-        );
+        ),
+      );
 
-        expect(find.byType(ResponsePaneHeader), findsOneWidget);
-        expect(find.byType(ResponseTabView), findsOneWidget);
-      },
-    );
+      expect(find.byType(ResponsePaneHeader), findsOneWidget);
+      expect(find.byType(ResponseTabView), findsOneWidget);
+    });
   });
 }

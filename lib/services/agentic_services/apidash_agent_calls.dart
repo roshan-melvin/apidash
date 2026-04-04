@@ -18,7 +18,9 @@ Future<String?> generateSDUICodeFromResponse({
     APIDashAgentCaller.instance.call(
       IntermediateRepresentationGen(),
       ref: ref,
-      input: AgentInputs(variables: {'VAR_API_RESPONSE': apiResponse}),
+      input: AgentInputs(variables: {
+        'VAR_API_RESPONSE': apiResponse,
+      }),
     ),
   ]);
   final sa = step1Res[0]?['SEMANTIC_ANALYSIS'];
@@ -34,13 +36,11 @@ Future<String?> generateSDUICodeFromResponse({
   final sduiCode = await APIDashAgentCaller.instance.call(
     StacGenBot(),
     ref: ref,
-    input: AgentInputs(
-      variables: {
-        'VAR_RAW_API_RESPONSE': apiResponse,
-        'VAR_INTERMEDIATE_REPR': ir,
-        'VAR_SEMANTIC_ANALYSIS': sa,
-      },
-    ),
+    input: AgentInputs(variables: {
+      'VAR_RAW_API_RESPONSE': apiResponse,
+      'VAR_INTERMEDIATE_REPR': ir,
+      'VAR_SEMANTIC_ANALYSIS': sa,
+    }),
   );
   final stacCode = sduiCode?['STAC']?.toString();
   if (stacCode == null) {
@@ -58,12 +58,10 @@ Future<String?> modifySDUICodeUsingPrompt({
   final res = await APIDashAgentCaller.instance.call(
     StacModifierBot(),
     ref: ref,
-    input: AgentInputs(
-      variables: {
-        'VAR_CODE': generatedSDUI,
-        'VAR_CLIENT_REQUEST': modificationRequest,
-      },
-    ),
+    input: AgentInputs(variables: {
+      'VAR_CODE': generatedSDUI,
+      'VAR_CLIENT_REQUEST': modificationRequest,
+    }),
   );
   final sdui = res?['STAC'];
   return sdui;
@@ -78,9 +76,10 @@ Future<String?> generateAPIToolUsingRequestData({
   final toolfuncRes = await APIDashAgentCaller.instance.call(
     APIToolFunctionGenerator(),
     ref: ref,
-    input: AgentInputs(
-      variables: {'REQDATA': requestData, 'TARGET_LANGUAGE': targetLanguage},
-    ),
+    input: AgentInputs(variables: {
+      'REQDATA': requestData,
+      'TARGET_LANGUAGE': targetLanguage,
+    }),
   );
   if (toolfuncRes == null) {
     return null;
@@ -91,14 +90,11 @@ Future<String?> generateAPIToolUsingRequestData({
   final toolres = await APIDashAgentCaller.instance.call(
     ApiToolBodyGen(),
     ref: ref,
-    input: AgentInputs(
-      variables: {
-        'TEMPLATE': APIToolGenTemplateSelector.getTemplate(
-          targetLanguage,
-          selectedAgent,
-        ).substitutePromptVariable('FUNC', toolCode),
-      },
-    ),
+    input: AgentInputs(variables: {
+      'TEMPLATE':
+          APIToolGenTemplateSelector.getTemplate(targetLanguage, selectedAgent)
+              .substitutePromptVariable('FUNC', toolCode),
+    }),
   );
   if (toolres == null) {
     return null;

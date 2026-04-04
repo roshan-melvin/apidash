@@ -22,7 +22,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: kThemeDataLight,
-          home: Scaffold(body: DashbotGeneratedCodeBlock(action: action)),
+          home: Scaffold(
+            body: DashbotGeneratedCodeBlock(action: action),
+          ),
         ),
       );
 
@@ -40,7 +42,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: kThemeDataLight,
-          home: Scaffold(body: DashbotGeneratedCodeBlock(action: action)),
+          home: Scaffold(
+            body: DashbotGeneratedCodeBlock(action: action),
+          ),
         ),
       );
 

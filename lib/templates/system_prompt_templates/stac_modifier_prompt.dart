@@ -1,7 +1,6 @@
 import '../rulesets/stac_ruleset.dart';
 
-const String kPromptStacModifier =
-    """
+const String kPromptStacModifier = """
 You are an expert agent whose sole JOB is to accept FLutter-SDUI (json-like) representation 
 and modify it to match the requests of the client.
 

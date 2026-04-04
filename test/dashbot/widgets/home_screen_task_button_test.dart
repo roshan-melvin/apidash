@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('HomeScreenTaskButton renders label and invokes callback', (
-    tester,
-  ) async {
+  testWidgets('HomeScreenTaskButton renders label and invokes callback',
+      (tester) async {
     var tapped = false;
     await tester.pumpWidget(
       MaterialApp(

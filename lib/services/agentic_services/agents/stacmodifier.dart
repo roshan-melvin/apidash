@@ -35,6 +35,8 @@ class StacModifierBot extends AIAgent {
     //Stac Specific Changes
     validatedResponse = validatedResponse.replaceAll('bold', 'w700');
 
-    return {'STAC': validatedResponse};
+    return {
+      'STAC': validatedResponse,
+    };
   }
 }

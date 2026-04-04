@@ -34,7 +34,9 @@ void main() {
           ],
           child: MaterialApp(
             theme: kThemeDataLight,
-            home: Scaffold(body: DashbotAutoFixButton(action: action)),
+            home: Scaffold(
+              body: DashbotAutoFixButton(action: action),
+            ),
           ),
         ),
       );

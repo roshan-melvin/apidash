@@ -10,14 +10,18 @@ const httpRequestModelGet1 = HttpRequestModel(
 const httpRequestModelGet2 = HttpRequestModel(
   method: HTTPVerb.get,
   url: 'https://api.apidash.dev/country/data',
-  params: [NameValueModel(name: 'code', value: 'US')],
+  params: [
+    NameValueModel(name: 'code', value: 'US'),
+  ],
 );
 
 /// GET request model with override query params
 const httpRequestModelGet3 = HttpRequestModel(
   url: 'https://api.apidash.dev/country/data?code=US',
   method: HTTPVerb.get,
-  params: [NameValueModel(name: 'code', value: 'IND')],
+  params: [
+    NameValueModel(name: 'code', value: 'IND'),
+  ],
 );
 
 /// GET request model with different types of query params
@@ -37,15 +41,21 @@ const httpRequestModelGet4 = HttpRequestModel(
 const httpRequestModelGet5 = HttpRequestModel(
   method: HTTPVerb.get,
   url: 'https://api.github.com/repos/foss42/apidash',
-  headers: [NameValueModel(name: 'User-Agent', value: 'Test Agent')],
+  headers: [
+    NameValueModel(name: 'User-Agent', value: 'Test Agent'),
+  ],
 );
 
 /// GET request model with headers & query params
 const httpRequestModelGet6 = HttpRequestModel(
   method: HTTPVerb.get,
   url: 'https://api.github.com/repos/foss42/apidash',
-  headers: [NameValueModel(name: 'User-Agent', value: 'Test Agent')],
-  params: [NameValueModel(name: 'raw', value: 'true')],
+  headers: [
+    NameValueModel(name: 'User-Agent', value: 'Test Agent'),
+  ],
+  params: [
+    NameValueModel(name: 'raw', value: 'true'),
+  ],
 );
 
 /// GET request model with body
@@ -80,7 +90,12 @@ const httpRequestModelGet9 = HttpRequestModel(
     NameValueModel(name: 'system', value: 'SS'),
     NameValueModel(name: 'add_space', value: 'true'),
   ],
-  isParamEnabledList: [true, false, false, true],
+  isParamEnabledList: [
+    true,
+    false,
+    false,
+    true,
+  ],
 );
 
 /// GET Request model with some headers enabled
@@ -91,7 +106,10 @@ const httpRequestModelGet10 = HttpRequestModel(
     NameValueModel(name: 'User-Agent', value: 'Test Agent'),
     NameValueModel(name: 'Content-Type', value: 'application/json'),
   ],
-  isHeaderEnabledList: [true, false],
+  isHeaderEnabledList: [
+    true,
+    false,
+  ],
 );
 
 /// GET Request model with some headers & URL parameters enabled
@@ -108,8 +126,16 @@ const httpRequestModelGet11 = HttpRequestModel(
     NameValueModel(name: 'User-Agent', value: 'Test Agent'),
     NameValueModel(name: 'Content-Type', value: 'application/json'),
   ],
-  isParamEnabledList: [true, true, false, false],
-  isHeaderEnabledList: [true, false],
+  isParamEnabledList: [
+    true,
+    true,
+    false,
+    false,
+  ],
+  isHeaderEnabledList: [
+    true,
+    false,
+  ],
 );
 
 /// Request model with all headers & URL parameters disabled
@@ -126,8 +152,16 @@ const httpRequestModelGet12 = HttpRequestModel(
     NameValueModel(name: 'User-Agent', value: 'Test Agent'),
     NameValueModel(name: 'Content-Type', value: 'application/json'),
   ],
-  isParamEnabledList: [false, false, false, false],
-  isHeaderEnabledList: [false, false],
+  isParamEnabledList: [
+    false,
+    false,
+    false,
+    false,
+  ],
+  isHeaderEnabledList: [
+    false,
+    false,
+  ],
 );
 
 /// Basic HEAD request model
@@ -174,7 +208,9 @@ const httpRequestModelPost3 = HttpRequestModel(
 "text": "I LOVE Flutter"
 }""",
   bodyContentType: ContentType.json,
-  headers: [NameValueModel(name: 'User-Agent', value: 'Test Agent')],
+  headers: [
+    NameValueModel(name: 'User-Agent', value: 'Test Agent'),
+  ],
 );
 
 /// POST request model with multipart body(text)
@@ -193,7 +229,9 @@ const httpRequestModelPost4 = HttpRequestModel(
 const httpRequestModelPost5 = HttpRequestModel(
   method: HTTPVerb.post,
   url: 'https://api.apidash.dev/io/form',
-  headers: [NameValueModel(name: 'User-Agent', value: 'Test Agent')],
+  headers: [
+    NameValueModel(name: 'User-Agent', value: 'Test Agent'),
+  ],
   bodyContentType: ContentType.formdata,
   formData: [
     FormDataModel(name: "text", value: "API", type: FormDataType.text),
@@ -210,10 +248,7 @@ const httpRequestModelPost6 = HttpRequestModel(
   formData: [
     FormDataModel(name: "token", value: "xyz", type: FormDataType.text),
     FormDataModel(
-      name: "imfile",
-      value: "/Documents/up/1.png",
-      type: FormDataType.file,
-    ),
+        name: "imfile", value: "/Documents/up/1.png", type: FormDataType.file),
   ],
 );
 
@@ -228,10 +263,7 @@ const httpRequestModelPost7 = HttpRequestModel(
   formData: [
     FormDataModel(name: "token", value: "xyz", type: FormDataType.text),
     FormDataModel(
-      name: "imfile",
-      value: "/Documents/up/1.png",
-      type: FormDataType.file,
-    ),
+        name: "imfile", value: "/Documents/up/1.png", type: FormDataType.file),
   ],
 );
 
@@ -270,10 +302,7 @@ const httpRequestModelPost9 = HttpRequestModel(
   formData: [
     FormDataModel(name: "token", value: "xyz", type: FormDataType.text),
     FormDataModel(
-      name: "imfile",
-      value: "/Documents/up/1.png",
-      type: FormDataType.file,
-    ),
+        name: "imfile", value: "/Documents/up/1.png", type: FormDataType.file),
   ],
 );
 
@@ -284,9 +313,7 @@ const httpRequestModelPost10 = HttpRequestModel(
   headers: [
     NameValueModel(name: 'User-Agent', value: 'Test Agent'),
     NameValueModel(
-      name: 'Content-Type',
-      value: 'application/json; charset=utf-8',
-    ),
+        name: 'Content-Type', value: 'application/json; charset=utf-8'),
   ],
   params: [
     NameValueModel(name: 'size', value: '2'),
@@ -301,10 +328,7 @@ const httpRequestModelPost10 = HttpRequestModel(
   formData: [
     FormDataModel(name: "token", value: "xyz", type: FormDataType.text),
     FormDataModel(
-      name: "imfile",
-      value: "/Documents/up/1.png",
-      type: FormDataType.file,
-    ),
+        name: "imfile", value: "/Documents/up/1.png", type: FormDataType.file),
   ],
 );
 
@@ -358,7 +382,7 @@ const httpRequestModelGet4Json = <String, dynamic>{
     {'name': 'digits', 'value': '3'},
     {'name': 'system', 'value': 'SS'},
     {'name': 'add_space', 'value': 'true'},
-    {'name': 'trailing_zeros', 'value': 'true'},
+    {'name': 'trailing_zeros', 'value': 'true'}
   ],
   'authModel': {
     'type': 'none',
@@ -368,14 +392,14 @@ const httpRequestModelGet4Json = <String, dynamic>{
     'jwt': null,
     'digest': null,
     'oauth1': null,
-    'oauth2': null,
+    'oauth2': null
   },
   "isHeaderEnabledList": null,
   "isParamEnabledList": null,
   "bodyContentType": "json",
   "body": null,
   "query": null,
-  "formData": null,
+  "formData": null
 };
 
 const httpRequestModelPost10Json = <String, dynamic>{
@@ -383,11 +407,11 @@ const httpRequestModelPost10Json = <String, dynamic>{
   "url": 'https://api.apidash.dev/case/lower',
   "headers": [
     {'name': 'User-Agent', 'value': 'Test Agent'},
-    {'name': 'Content-Type', 'value': 'application/json; charset=utf-8'},
+    {'name': 'Content-Type', 'value': 'application/json; charset=utf-8'}
   ],
   'params': [
     {'name': 'size', 'value': '2'},
-    {'name': 'len', 'value': '3'},
+    {'name': 'len', 'value': '3'}
   ],
   'authModel': {
     'type': 'none',
@@ -397,7 +421,7 @@ const httpRequestModelPost10Json = <String, dynamic>{
     'jwt': null,
     'digest': null,
     'oauth1': null,
-    'oauth2': null,
+    'oauth2': null
   },
   'isHeaderEnabledList': [false, true],
   'isParamEnabledList': null,
@@ -408,7 +432,7 @@ const httpRequestModelPost10Json = <String, dynamic>{
   "query": null,
   'formData': [
     {'name': 'token', 'value': 'xyz', 'type': 'text'},
-    {'name': 'imfile', 'value': '/Documents/up/1.png', 'type': 'file'},
+    {'name': 'imfile', 'value': '/Documents/up/1.png', 'type': 'file'}
   ],
 };
 
@@ -428,7 +452,9 @@ const httpRequestModelGetBadSSL = HttpRequestModel(
 const httpRequestModelPost11 = HttpRequestModel(
   method: HTTPVerb.post,
   url: 'https://api.apidash.dev/case/lower',
-  headers: [NameValueModel(name: 'Content-Type', value: 'application/json')],
+  headers: [
+    NameValueModel(name: 'Content-Type', value: 'application/json'),
+  ],
   isHeaderEnabledList: [true],
   bodyContentType: ContentType.json,
   body: r"""{
@@ -452,9 +478,7 @@ const httpRequestModelPost13 = HttpRequestModel(
   url: 'https://api.apidash.dev/case/lower',
   headers: [
     NameValueModel(
-      name: 'Content-Type',
-      value: 'application/json; charset=latin1',
-    ),
+        name: 'Content-Type', value: 'application/json; charset=latin1'),
   ],
   isHeaderEnabledList: [true],
   bodyContentType: ContentType.json,

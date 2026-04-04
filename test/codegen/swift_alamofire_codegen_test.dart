@@ -8,9 +8,11 @@ import '../models/request_models.dart';
 void main() {
   final codeGen = Codegen();
 
-  group('HTTPVerb.get', () {
-    test('GET 1', () {
-      const expectedCode = r"""
+  group(
+    'HTTPVerb.get',
+    () {
+      test('GET 1', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.apidash.dev"
@@ -32,18 +34,17 @@ AF.request(url, method: .get)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet1,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('GET 2', () {
-      const expectedCode = r"""
+      test('GET 2', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.apidash.dev/country/data?code=US"
@@ -65,18 +66,17 @@ AF.request(url, method: .get)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet2,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('GET 3', () {
-      const expectedCode = r"""
+      test('GET 3', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.apidash.dev/country/data?code=IND"
@@ -98,18 +98,17 @@ AF.request(url, method: .get)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet3,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('GET 4', () {
-      const expectedCode = r"""
+      test('GET 4', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.apidash.dev/humanize/social?num=8700000&digits=3&system=SS&add_space=true&trailing_zeros=true"
@@ -131,18 +130,17 @@ AF.request(url, method: .get)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet4,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('GET 5', () {
-      const expectedCode = r"""
+      test('GET 5', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.github.com/repos/foss42/apidash"
@@ -164,18 +162,17 @@ AF.request(url, method: .get, headers: ["User-Agent": "Test Agent"])
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet5,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('GET 6', () {
-      const expectedCode = r"""
+      test('GET 6', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.github.com/repos/foss42/apidash?raw=true"
@@ -197,18 +194,17 @@ AF.request(url, method: .get, headers: ["User-Agent": "Test Agent"])
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet6,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('GET 7', () {
-      const expectedCode = r"""
+      test('GET 7', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.apidash.dev"
@@ -230,18 +226,17 @@ AF.request(url, method: .get)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet7,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('GET 8', () {
-      const expectedCode = r"""
+      test('GET 8', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.github.com/repos/foss42/apidash?raw=true"
@@ -263,18 +258,17 @@ AF.request(url, method: .get, headers: ["User-Agent": "Test Agent"])
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet8,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('GET 9', () {
-      const expectedCode = r"""
+      test('GET 9', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.apidash.dev/humanize/social?num=8700000&add_space=true"
@@ -296,18 +290,17 @@ AF.request(url, method: .get)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet9,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('GET 10', () {
-      const expectedCode = r"""
+      test('GET 10', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.apidash.dev/humanize/social"
@@ -329,18 +322,17 @@ AF.request(url, method: .get, headers: ["User-Agent": "Test Agent"])
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet10,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet10,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('GET 11', () {
-      const expectedCode = r"""
+      test('GET 11', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.apidash.dev/humanize/social?num=8700000&digits=3"
@@ -362,18 +354,17 @@ AF.request(url, method: .get, headers: ["User-Agent": "Test Agent"])
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet11,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet11,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('GET 12', () {
-      const expectedCode = r"""
+      test('GET 12', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.apidash.dev/humanize/social"
@@ -395,20 +386,23 @@ AF.request(url, method: .get)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelGet12,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
-  });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelGet12,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
+    },
+     
+  );
 
-  group('HTTPVerb.head', () {
-    test('HEAD 1', () {
-      const expectedCode = r"""
+  group(
+    'HTTPVerb.head',
+    () {
+      test('HEAD 1', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.apidash.dev"
@@ -430,18 +424,17 @@ AF.request(url, method: .head)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelHead1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelHead1,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('HEAD 2', () {
-      const expectedCode = r"""
+      test('HEAD 2', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://api.apidash.dev"
@@ -463,20 +456,23 @@ AF.request(url, method: .head)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelHead2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
-  });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelHead2,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
+    },
+     
+  );
 
-  group("HTTPVerb.post", () {
-    test('POST 1', () {
-      const expectedCode = r'''
+  group(
+    "HTTPVerb.post",
+    () {
+      test('POST 1', () {
+        const expectedCode = r'''
 import Foundation
 import Alamofire
 let textString = """
@@ -502,17 +498,16 @@ AF.upload(textData!, to: url, method: .post, headers: ["Content-Type": "text/pla
 
 dispatchMain()''';
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPost1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
-    test('POST 2', () {
-      const expectedCode = r'''
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPost1,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
+      test('POST 2', () {
+        const expectedCode = r'''
 import Foundation
 import Alamofire
 let jsonString = """
@@ -538,18 +533,17 @@ AF.upload(jsonData!, to: url, method: .post, headers: ["Content-Type": "applicat
 
 dispatchMain()''';
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPost2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPost2,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('POST 3', () {
-      const expectedCode = r'''
+      test('POST 3', () {
+        const expectedCode = r'''
 import Foundation
 import Alamofire
 let jsonString = """
@@ -575,18 +569,17 @@ AF.upload(jsonData!, to: url, method: .post, headers: ["User-Agent": "Test Agent
 
 dispatchMain()''';
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPost3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPost3,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('POST 4', () {
-      const expectedCode = r"""
+      test('POST 4', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let multipartFormData = MultipartFormData()
@@ -612,18 +605,17 @@ AF.upload(multipartFormData: multipartFormData, to: url, method: .post)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPost4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPost4,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('POST 5', () {
-      const expectedCode = r"""
+      test('POST 5', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let multipartFormData = MultipartFormData()
@@ -649,18 +641,18 @@ AF.upload(multipartFormData: multipartFormData, to: url, method: .post, headers:
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPost5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPost5,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('POST 6', () {
-      const expectedCode = r"""
+
+      test('POST 6', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let multipartFormData = MultipartFormData()
@@ -688,18 +680,20 @@ AF.upload(multipartFormData: multipartFormData, to: url, method: .post)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPost6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPost6,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('POST 7', () {
-      const expectedCode = r"""
+
+
+
+      test('POST 7', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let multipartFormData = MultipartFormData()
@@ -727,17 +721,16 @@ AF.upload(multipartFormData: multipartFormData, to: url, method: .post)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPost7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
-    test('POST 8', () {
-      const expectedCode = r"""
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPost7,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
+      test('POST 8', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let multipartFormData = MultipartFormData()
@@ -763,17 +756,16 @@ AF.upload(multipartFormData: multipartFormData, to: url, method: .post)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPost8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
-    test('POST 9', () {
-      const expectedCode = r"""
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPost8,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
+      test('POST 9', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let multipartFormData = MultipartFormData()
@@ -801,17 +793,16 @@ AF.upload(multipartFormData: multipartFormData, to: url, method: .post, headers:
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPost9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
-    test('POST 10', () {
-      const expectedCode = r'''
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPost9,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+     });
+      test('POST 10', () {
+        const expectedCode = r'''
 import Foundation
 import Alamofire
 let jsonString = """
@@ -837,20 +828,23 @@ AF.upload(jsonData!, to: url, method: .post, headers: ["Content-Type": "applicat
 
 dispatchMain()''';
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPost10,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
-  });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPost10,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
+    },
+   
+  );
 
-  group('HTTPVerb.put', () {
-    test('PUT 1', () {
-      const expectedCode = r'''
+  group(
+    'HTTPVerb.put',
+    () {
+      test('PUT 1', () {
+        const expectedCode = r'''
 import Foundation
 import Alamofire
 let jsonString = """
@@ -876,20 +870,23 @@ AF.upload(jsonData!, to: url, method: .put, headers: ["Content-Type": "applicati
 
 dispatchMain()''';
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPut1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
-  });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPut1,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
+    },
+     
+  );
 
-  group('HTTPVerb.patch', () {
-    test('PATCH 1', () {
-      const expectedCode = r'''
+  group(
+    'HTTPVerb.patch',
+    () {
+      test('PATCH 1', () {
+        const expectedCode = r'''
 import Foundation
 import Alamofire
 let jsonString = """
@@ -915,20 +912,23 @@ AF.upload(jsonData!, to: url, method: .patch, headers: ["Content-Type": "applica
 
 dispatchMain()''';
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelPatch1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
-  });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelPatch1,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
+    },
+     
+  );
 
-  group('HTTPVerb.delete', () {
-    test('DELETE 1', () {
-      const expectedCode = r"""
+  group(
+    'HTTPVerb.delete',
+    () {
+      test('DELETE 1', () {
+        const expectedCode = r"""
 import Foundation
 import Alamofire
 let url = "https://reqres.in/api/users/2"
@@ -950,18 +950,17 @@ AF.request(url, method: .delete)
 
 dispatchMain()""";
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelDelete1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelDelete1,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
 
-    test('DELETE 2', () {
-      const expectedCode = r'''
+      test('DELETE 2', () {
+        const expectedCode = r'''
 import Foundation
 import Alamofire
 let jsonString = """
@@ -987,14 +986,15 @@ AF.upload(jsonData!, to: url, method: .delete, headers: ["Content-Type": "applic
 
 dispatchMain()''';
 
-      expect(
-        codeGen.getCode(
-          CodegenLanguage.swiftAlamofire,
-          requestModelDelete2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
-    });
-  });
+        expect(
+            codeGen.getCode(
+              CodegenLanguage.swiftAlamofire,
+              requestModelDelete2,
+              SupportedUriSchemes.https,
+            ),
+            expectedCode);
+      });
+    },
+     
+  );
 }

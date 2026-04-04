@@ -50,9 +50,8 @@ void main() {
     expect(changedValue, ItemMenuOption.duplicate);
   });
 
-  testWidgets('showItemCardMenu shows the menu at the right position', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('showItemCardMenu shows the menu at the right position',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -61,10 +60,7 @@ void main() {
               return GestureDetector(
                 onTapUp: (details) {
                   showItemCardMenu(
-                    context,
-                    details,
-                    (ItemMenuOption option) {},
-                  );
+                      context, details, (ItemMenuOption option) {});
                 },
                 child: const Text('Show Menu'),
               );

@@ -4,9 +4,8 @@ import 'package:file_selector/file_selector.dart';
 import 'package:apidash/widgets/drag_and_drop_area.dart';
 
 void main() {
-  testWidgets('DragAndDropArea responds to file drop', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('DragAndDropArea responds to file drop',
+      (WidgetTester tester) async {
     bool fileDropped = false;
     XFile? droppedFile;
 
@@ -28,9 +27,8 @@ void main() {
 
     // Simulate dropping a file
     final testFile = XFile('test.curl');
-    final dragAndDropArea = tester.widget<DragAndDropArea>(
-      find.byType(DragAndDropArea),
-    );
+    final dragAndDropArea =
+        tester.widget<DragAndDropArea>(find.byType(DragAndDropArea));
 
     // Since we can't actually perform drag-and-drop in a unit test,
     // we'll call the onDragDone callback directly

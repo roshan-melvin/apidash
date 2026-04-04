@@ -33,13 +33,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET2', () {
       const expectedCode = r"""
@@ -66,13 +65,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET3', () {
       const expectedCode = r"""
@@ -99,13 +97,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET4', () {
       const expectedCode = r"""
@@ -132,13 +129,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET5', () {
       const expectedCode = r"""
@@ -170,13 +166,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET6', () {
       const expectedCode = r"""
@@ -208,13 +203,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET7', () {
       const expectedCode = r"""
@@ -241,13 +235,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET8', () {
       const expectedCode = r"""
@@ -279,13 +272,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET9', () {
       const expectedCode = r"""
@@ -312,13 +304,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET10', () {
       const expectedCode = r"""
@@ -350,13 +341,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet10,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet10,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET11', () {
       const expectedCode = r"""
@@ -388,13 +378,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet11,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet11,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET12', () {
       const expectedCode = r"""
@@ -421,13 +410,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelGet12,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelGet12,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -457,13 +445,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelHead1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelHead1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('HEAD2', () {
       const expectedCode = r"""
@@ -490,13 +477,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelHead2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelHead2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -535,13 +521,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelPost1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelPost1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST2', () {
       const expectedCode = r"""
@@ -583,13 +568,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelPost2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelPost2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST3', () {
       const expectedCode = r"""
@@ -627,13 +611,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelPost3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelPost3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST4', () {
       const expectedCode = r"""
@@ -675,13 +658,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelPost4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelPost4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST5', () {
       const expectedCode = r"""
@@ -728,13 +710,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelPost5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelPost5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST6', () {
       const expectedCode = r"""
@@ -772,13 +753,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelPost6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelPost6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST7', () {
       const expectedCode = r"""
@@ -816,13 +796,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelPost7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelPost7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST8', () {
       const expectedCode = r"""
@@ -864,13 +843,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelPost8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelPost8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST9', () {
       const expectedCode = r"""
@@ -914,13 +892,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelPost9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelPost9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -961,13 +938,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelPut1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelPut1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -1008,13 +984,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelPatch1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelPatch1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -1044,13 +1019,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelDelete1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelDelete1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('DELETE2', () {
       const expectedCode = r"""
@@ -1088,13 +1062,12 @@ fn main() {
   println!("Response code: {}", easy.response_code().unwrap());
 }""";
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rustCurl,
-          requestModelDelete2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rustCurl,
+            requestModelDelete2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 }

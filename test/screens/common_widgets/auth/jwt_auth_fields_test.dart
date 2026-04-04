@@ -19,9 +19,8 @@ void main() {
       };
     });
 
-    testWidgets('renders with default values when authData is null', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders with default values when authData is null',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(
@@ -45,9 +44,8 @@ void main() {
       expect(find.text('HS256'), findsOneWidget);
     });
 
-    testWidgets('renders with existing JWT auth data', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders with existing JWT auth data',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.jwt,
         jwt: AuthJwtModel(
@@ -82,9 +80,8 @@ void main() {
       expect(find.text('HS256'), findsOneWidget);
     });
 
-    testWidgets('shows secret field for HMAC algorithms', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('shows secret field for HMAC algorithms',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.jwt,
         jwt: AuthJwtModel(
@@ -119,9 +116,8 @@ void main() {
       expect(find.byType(CheckboxListTile), findsOneWidget);
     });
 
-    testWidgets('shows private key field for RSA algorithms', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('shows private key field for RSA algorithms',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.jwt,
         jwt: AuthJwtModel(
@@ -155,9 +151,8 @@ void main() {
       expect(find.byType(TextField), findsNWidgets(2)); // Private key + payload
     });
 
-    testWidgets('updates auth data when add token to dropdown changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when add token to dropdown changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.jwt,
         jwt: AuthJwtModel(
@@ -200,9 +195,8 @@ void main() {
       expect(lastUpdate?.jwt?.addTokenTo, 'query');
     });
 
-    testWidgets('updates auth data when algorithm dropdown changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when algorithm dropdown changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.jwt,
         jwt: AuthJwtModel(
@@ -245,9 +239,8 @@ void main() {
       expect(lastUpdate?.jwt?.algorithm, 'RS256');
     });
 
-    testWidgets('updates auth data when secret changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when secret changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.jwt,
         jwt: AuthJwtModel(
@@ -297,9 +290,8 @@ void main() {
       expect(lastUpdate?.jwt?.secret, 'new-secret');
     });
 
-    testWidgets('updates auth data when payload changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when payload changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.jwt,
         jwt: AuthJwtModel(
@@ -340,9 +332,8 @@ void main() {
       expect(lastUpdate?.jwt?.payload, '{"sub": "1234567890"}');
     });
 
-    testWidgets('updates auth data when Base64 checkbox changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when Base64 checkbox changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.jwt,
         jwt: AuthJwtModel(
@@ -381,9 +372,8 @@ void main() {
       expect(lastUpdate?.jwt?.isSecretBase64Encoded, true);
     });
 
-    testWidgets('initializes with correct default values', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('initializes with correct default values',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(

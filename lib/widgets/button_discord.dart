@@ -4,7 +4,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:apidash/consts.dart';
 
 class DiscordButton extends StatelessWidget {
-  const DiscordButton({super.key, this.text});
+  const DiscordButton({
+    super.key,
+    this.text,
+  });
 
   final String? text;
 

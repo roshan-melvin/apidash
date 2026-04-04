@@ -10,7 +10,11 @@ void main() {
       MaterialApp(
         title: 'Repo button',
         theme: kThemeDataLight,
-        home: const Scaffold(body: RepoButton(icon: Icons.code)),
+        home: const Scaffold(
+          body: RepoButton(
+            icon: Icons.code,
+          ),
+        ),
       ),
     );
 
@@ -23,7 +27,9 @@ void main() {
       MaterialApp(
         title: 'Repo button',
         theme: kThemeDataLight,
-        home: const Scaffold(body: RepoButton()),
+        home: const Scaffold(
+          body: RepoButton(),
+        ),
       ),
     );
 

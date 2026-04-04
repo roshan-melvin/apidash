@@ -110,7 +110,9 @@ public class Main {
 }
 ''';
 
-  String? getCode(HttpRequestModel requestModel) {
+  String? getCode(
+    HttpRequestModel requestModel,
+  ) {
     try {
       String result = '';
       bool hasBody = false;
@@ -128,9 +130,8 @@ public class Main {
       result += kStringStart;
       if (requestModel.hasFormData) {
         var templateMultipartImport = jj.Template(kTemplateMultipartImport);
-        result += templateMultipartImport.render({
-          "hasFileInFormData": requestModel.hasFileInFormData,
-        });
+        result += templateMultipartImport
+            .render({"hasFileInFormData": requestModel.hasFileInFormData});
       }
       result += kStringMainClassMainMethodStart;
       result += kStringAsyncHttpClientTryBlockStart;
@@ -190,9 +191,8 @@ public class Main {
         }
 
         if (textFieldMap.isNotEmpty) {
-          var templateRequestFormData = jj.Template(
-            kTemplateMultipartTextFormData,
-          );
+          var templateRequestFormData =
+              jj.Template(kTemplateMultipartTextFormData);
 
           result += templateRequestFormData.render({
             "textFields": textFieldMap,
@@ -200,10 +200,11 @@ public class Main {
         }
 
         if (requestModel.hasFileInFormData) {
-          var templateFileHandling = jj.Template(
-            kTemplateMultipartFileHandling,
-          );
-          result += templateFileHandling.render({"fileFields": fileFieldMap});
+          var templateFileHandling =
+              jj.Template(kTemplateMultipartFileHandling);
+          result += templateFileHandling.render({
+            "fileFields": fileFieldMap,
+          });
         }
       }
 

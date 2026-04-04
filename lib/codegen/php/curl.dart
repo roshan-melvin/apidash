@@ -125,9 +125,8 @@ echo $response . "\n";
         if (uri.hasQuery) {
           if (requestModel.enabledParamsMap.isNotEmpty) {
             var templateParams = jj.Template(kTemplateParams);
-            result += templateParams.render({
-              "params": requestModel.enabledParamsMap,
-            });
+            result += templateParams
+                .render({"params": requestModel.enabledParamsMap});
           }
         }
 
@@ -148,9 +147,8 @@ echo $response . "\n";
 
         //renders the request template
         var templateRequestOptsInit = jj.Template(kTemplateRequestOptsInit);
-        result += templateRequestOptsInit.render({
-          'method': requestModel.method.name,
-        });
+        result += templateRequestOptsInit
+            .render({'method': requestModel.method.name});
         if (headers.isNotEmpty) {
           result += kStringHeaderOpt;
         }

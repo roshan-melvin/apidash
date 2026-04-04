@@ -6,9 +6,8 @@ import '../test_consts.dart';
 
 void main() {
   group('SendButton', () {
-    testWidgets('renders send state correctly when not working', (
-      tester,
-    ) async {
+    testWidgets('renders send state correctly when not working',
+        (tester) async {
       bool sendPressed = false;
       bool cancelPressed = false;
 

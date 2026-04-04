@@ -115,7 +115,10 @@ class _OAuth1FieldsState extends ConsumerState<OAuth1Fields> {
         const SizedBox(height: 16),
         Text(
           kLabelOAuth1SignatureMethod,
-          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 14,
+          ),
         ),
         const SizedBox(height: 4),
         ADPopupMenu<OAuth1SignatureMethod>(

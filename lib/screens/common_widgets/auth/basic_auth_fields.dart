@@ -64,9 +64,13 @@ class _BasicAuthFieldsState extends State<BasicAuthFields> {
       username: _username.trim(),
       password: _password.trim(),
     );
-    widget.updateAuth?.call(
-      widget.authData?.copyWith(type: APIAuthType.basic, basic: basicAuth) ??
-          AuthModel(type: APIAuthType.basic, basic: basicAuth),
-    );
+    widget.updateAuth?.call(widget.authData?.copyWith(
+          type: APIAuthType.basic,
+          basic: basicAuth,
+        ) ??
+        AuthModel(
+          type: APIAuthType.basic,
+          basic: basicAuth,
+        ));
   }
 }

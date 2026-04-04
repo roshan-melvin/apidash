@@ -20,9 +20,7 @@ class DashbotDefaultPage extends StatelessWidget {
         Text(
           'Hello there!',
           style: kTextStyleXXLarge.copyWith(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-          ),
+              fontSize: 22, fontWeight: FontWeight.w600),
         ),
         kVSpacer10,
         Text(
@@ -41,7 +39,9 @@ class DashbotDefaultPage extends StatelessWidget {
             HomeScreenTaskButton(
               label: "🤖 Open Chat",
               onPressed: () {
-                Navigator.of(context).pushNamed(DashbotRoutes.dashbotChat);
+                Navigator.of(context).pushNamed(
+                  DashbotRoutes.dashbotChat,
+                );
               },
             ),
             HomeScreenTaskButton(

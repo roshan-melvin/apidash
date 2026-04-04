@@ -26,13 +26,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET2', () {
       const expectedCode = r'''
@@ -56,13 +55,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET3', () {
       const expectedCode = r'''
@@ -86,13 +84,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET4', () {
       const expectedCode = r'''
@@ -120,13 +117,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET5', () {
       const expectedCode = r'''
@@ -152,13 +148,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET6', () {
       const expectedCode = r'''
@@ -188,13 +183,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET7', () {
       const expectedCode = r'''
@@ -214,13 +208,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET8', () {
       const expectedCode = r'''
@@ -250,13 +243,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET9', () {
       const expectedCode = r'''
@@ -281,13 +273,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET10', () {
       const expectedCode = r'''
@@ -313,13 +304,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet10,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet10,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET11', () {
       const expectedCode = r'''
@@ -350,13 +340,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet11,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet11,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('GET12', () {
       const expectedCode = r'''
@@ -376,13 +365,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelGet12,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelGet12,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -405,13 +393,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelHead1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelHead1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('HEAD2', () {
       const expectedCode = r'''
@@ -431,13 +418,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelHead2,
-          SupportedUriSchemes.http,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelHead2,
+            SupportedUriSchemes.http,
+          ),
+          expectedCode);
     });
   });
 
@@ -473,13 +459,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelPost1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelPost1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST2', () {
       const expectedCode = r'''
@@ -517,13 +502,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelPost2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelPost2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST3', () {
       const expectedCode = r'''
@@ -557,13 +541,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelPost3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelPost3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST4', () {
       const expectedCode = r'''
@@ -595,13 +578,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelPost4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelPost4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST5', () {
       const expectedCode = r'''
@@ -634,13 +616,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelPost5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelPost5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST6', () {
       const expectedCode = r'''
@@ -672,13 +653,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelPost6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelPost6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST7', () {
       const expectedCode = r'''
@@ -710,13 +690,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelPost7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelPost7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST8', () {
       const expectedCode = r'''
@@ -753,13 +732,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelPost8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelPost8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST9', () {
       const expectedCode = r'''
@@ -798,13 +776,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelPost9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelPost9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -841,13 +818,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelPut1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelPut1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -884,13 +860,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelPatch1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelPatch1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -913,13 +888,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelDelete1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelDelete1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('DELETE2', () {
       const expectedCode = r'''
@@ -953,13 +927,12 @@ echo $response->getBody();
 
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.phpHttpPlug,
-          requestModelDelete2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.phpHttpPlug,
+            requestModelDelete2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 }

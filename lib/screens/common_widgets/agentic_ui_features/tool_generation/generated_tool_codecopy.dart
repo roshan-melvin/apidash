@@ -7,11 +7,8 @@ import 'package:flutter/material.dart';
 class GeneratedToolCodeCopyPage extends StatelessWidget {
   final String? toolCode;
   final String language;
-  const GeneratedToolCodeCopyPage({
-    super.key,
-    required this.toolCode,
-    required this.language,
-  });
+  const GeneratedToolCodeCopyPage(
+      {super.key, required this.toolCode, required this.language});
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +41,10 @@ class GeneratedToolCodeCopyPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          CopyButton(toCopy: toolCode!, showLabel: true),
+          CopyButton(
+            toCopy: toolCode!,
+            showLabel: true,
+          ),
           Expanded(
             child: SingleChildScrollView(
               child: SizedBox(

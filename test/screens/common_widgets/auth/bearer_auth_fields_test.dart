@@ -18,9 +18,8 @@ void main() {
       };
     });
 
-    testWidgets('renders with default values when authData is null', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders with default values when authData is null',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(
@@ -40,12 +39,13 @@ void main() {
       expect(find.text('Token'), findsNWidgets(2));
     });
 
-    testWidgets('renders with existing bearer auth data', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders with existing bearer auth data',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.bearer,
-        bearer: AuthBearerModel(token: 'test-bearer-token'),
+        bearer: AuthBearerModel(
+          token: 'test-bearer-token',
+        ),
       );
 
       await tester.pumpWidget(
@@ -65,12 +65,13 @@ void main() {
       expect(find.text('Token'), findsNWidgets(2));
     });
 
-    testWidgets('updates auth data when token changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when token changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.bearer,
-        bearer: AuthBearerModel(token: 'old-token'),
+        bearer: AuthBearerModel(
+          token: 'old-token',
+        ),
       );
 
       await tester.pumpWidget(
@@ -114,7 +115,9 @@ void main() {
     testWidgets('respects readOnly property', (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.bearer,
-        bearer: AuthBearerModel(token: 'test-token'),
+        bearer: AuthBearerModel(
+          token: 'test-token',
+        ),
       );
 
       await tester.pumpWidget(
@@ -157,12 +160,13 @@ void main() {
       expect(find.byType(EnvAuthField), findsOneWidget);
     });
 
-    testWidgets('handles empty auth data gracefully', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('handles empty auth data gracefully',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.bearer,
-        bearer: AuthBearerModel(token: ''),
+        bearer: AuthBearerModel(
+          token: '',
+        ),
       );
 
       await tester.pumpWidget(
@@ -181,9 +185,8 @@ void main() {
       expect(find.byType(EnvAuthField), findsOneWidget);
     });
 
-    testWidgets('creates proper AuthModel on token change', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('creates proper AuthModel on token change',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(
@@ -224,9 +227,8 @@ void main() {
       expect(lastUpdate?.bearer?.token, 'test-bearer-token');
     });
 
-    testWidgets('initializes with correct default token value', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('initializes with correct default token value',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(
@@ -246,9 +248,8 @@ void main() {
       expect(find.byType(EnvAuthField), findsOneWidget);
     });
 
-    testWidgets('trims whitespace from token input', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('trims whitespace from token input',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(

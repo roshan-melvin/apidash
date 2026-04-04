@@ -32,7 +32,9 @@ void main() {
           ],
           child: MaterialApp(
             theme: kThemeDataLight,
-            home: Scaffold(body: DashbotApplyOpenApiButton(action: action)),
+            home: Scaffold(
+              body: DashbotApplyOpenApiButton(action: action),
+            ),
           ),
         ),
       );
@@ -45,9 +47,8 @@ void main() {
       expect(notifier.applyAutoFixCalls.single, same(action));
     });
 
-    testWidgets('shows Create New Request label when requested', (
-      tester,
-    ) async {
+    testWidgets('shows Create New Request label when requested',
+        (tester) async {
       const action = ChatAction(
         action: 'apply_openapi',
         target: 'httpRequestModel',
@@ -63,7 +64,9 @@ void main() {
           ],
           child: MaterialApp(
             theme: kThemeDataLight,
-            home: Scaffold(body: DashbotApplyOpenApiButton(action: action)),
+            home: Scaffold(
+              body: DashbotApplyOpenApiButton(action: action),
+            ),
           ),
         ),
       );
@@ -71,9 +74,8 @@ void main() {
       expect(find.text('Create New Request'), findsOneWidget);
     });
 
-    testWidgets('shows Apply to Selected label when field=apply_to_selected', (
-      tester,
-    ) async {
+    testWidgets('shows Apply to Selected label when field=apply_to_selected',
+        (tester) async {
       const action = ChatAction(
         action: 'apply_openapi',
         target: 'httpRequestModel',
@@ -89,7 +91,9 @@ void main() {
           ],
           child: MaterialApp(
             theme: kThemeDataLight,
-            home: Scaffold(body: DashbotApplyOpenApiButton(action: action)),
+            home: Scaffold(
+              body: DashbotApplyOpenApiButton(action: action),
+            ),
           ),
         ),
       );

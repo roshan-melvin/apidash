@@ -17,10 +17,18 @@ class HomeScreenTaskButton extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
-        side: BorderSide(color: Theme.of(context).colorScheme.primary),
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        padding: const EdgeInsets.symmetric(
+          vertical: 0,
+          horizontal: 16,
+        ),
       ),
-      child: Text(label, textAlign: textAlign),
+      child: Text(
+        label,
+        textAlign: textAlign,
+      ),
     );
   }
 }

@@ -25,13 +25,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 2', () {
@@ -54,13 +53,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 3', () {
@@ -83,13 +81,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 4', () {
@@ -116,13 +113,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 5', () {
@@ -145,13 +141,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 6', () {
@@ -177,13 +172,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 7', () {
@@ -203,13 +197,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 8', () {
@@ -235,13 +228,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 9', () {
@@ -265,13 +257,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 10', () {
@@ -294,13 +285,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet10,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet10,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 11', () {
@@ -327,13 +317,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet11,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet11,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 12', () {
@@ -353,13 +342,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelGet12,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelGet12,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -381,13 +369,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelHead1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelHead1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('HEAD 2', () {
@@ -407,13 +394,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelHead2,
-          SupportedUriSchemes.http,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelHead2,
+            SupportedUriSchemes.http,
+          ),
+          expectedCode);
     });
   });
 
@@ -444,13 +430,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelPost1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelPost1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 2', () {
@@ -484,13 +469,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelPost2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelPost2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 3', () {
@@ -520,13 +504,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelPost3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelPost3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 4', () {
@@ -552,13 +535,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelPost4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelPost4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 5', () {
       const expectedCode = r"""require 'uri'
@@ -586,13 +568,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelPost5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelPost5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 6', () {
       const expectedCode = r"""require 'uri'
@@ -618,13 +599,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelPost6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelPost6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 7', () {
       const expectedCode = r"""require 'uri'
@@ -650,13 +630,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelPost7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelPost7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 8', () {
       const expectedCode = r"""require 'uri'
@@ -685,13 +664,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelPost8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelPost8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 9', () {
       const expectedCode = r"""require 'uri'
@@ -725,13 +703,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelPost9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelPost9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -763,13 +740,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelPut1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelPut1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -801,13 +777,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelPatch1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelPatch1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -829,13 +804,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelDelete1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelDelete1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('DELETE 2', () {
@@ -866,13 +840,12 @@ puts "Status Code: #{response.status}"
 puts "Response Body: #{response.body}"
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.rubyFaraday,
-          requestModelDelete2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.rubyFaraday,
+            requestModelDelete2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 }

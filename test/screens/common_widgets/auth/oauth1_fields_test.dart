@@ -26,21 +26,18 @@ void main() {
 
     // Helper function to wrap OAuth1Fields widget with proper layout constraints
 
-    testWidgets('renders with default values when authData is null', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders with default values when authData is null',
+        (WidgetTester tester) async {
       mockAuthData = null;
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            settingsProvider.overrideWith(
-              (ref) => ThemeStateNotifier(
-                settingsModel: const SettingsModel(
-                  workspaceFolderPath: '/test/workspace',
-                ),
-              ),
-            ),
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
+                  settingsModel: const SettingsModel(
+                    workspaceFolderPath: '/test/workspace',
+                  ),
+                )),
             selectedRequestModelProvider.overrideWith((ref) => null),
           ],
           child: Portal(
@@ -63,9 +60,8 @@ void main() {
       expect(find.text('Signature Method'), findsOneWidget);
     });
 
-    testWidgets('renders with existing OAuth1 auth data', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders with existing OAuth1 auth data',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.oauth1,
         oauth1: AuthOAuth1Model(
@@ -87,13 +83,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            settingsProvider.overrideWith(
-              (ref) => ThemeStateNotifier(
-                settingsModel: const SettingsModel(
-                  workspaceFolderPath: '/test/workspace',
-                ),
-              ),
-            ),
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
+                  settingsModel: const SettingsModel(
+                    workspaceFolderPath: '/test/workspace',
+                  ),
+                )),
             selectedRequestModelProvider.overrideWith((ref) => null),
           ],
           child: Portal(
@@ -115,9 +109,8 @@ void main() {
       expect(find.byType(ADPopupMenu<OAuth1SignatureMethod>), findsOneWidget);
     });
 
-    testWidgets('updates auth data when consumer key changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when consumer key changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.oauth1,
         oauth1: AuthOAuth1Model(
@@ -132,13 +125,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            settingsProvider.overrideWith(
-              (ref) => ThemeStateNotifier(
-                settingsModel: const SettingsModel(
-                  workspaceFolderPath: '/test/workspace',
-                ),
-              ),
-            ),
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
+                  settingsModel: const SettingsModel(
+                    workspaceFolderPath: '/test/workspace',
+                  ),
+                )),
             selectedRequestModelProvider.overrideWith((ref) => null),
           ],
           child: Portal(
@@ -177,9 +168,8 @@ void main() {
       expect(lastUpdate?.type, APIAuthType.oauth1);
     });
 
-    testWidgets('updates auth data when consumer secret changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when consumer secret changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.oauth1,
         oauth1: AuthOAuth1Model(
@@ -194,13 +184,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            settingsProvider.overrideWith(
-              (ref) => ThemeStateNotifier(
-                settingsModel: const SettingsModel(
-                  workspaceFolderPath: '/test/workspace',
-                ),
-              ),
-            ),
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
+                  settingsModel: const SettingsModel(
+                    workspaceFolderPath: '/test/workspace',
+                  ),
+                )),
             selectedRequestModelProvider.overrideWith((ref) => null),
           ],
           child: Portal(
@@ -239,9 +227,8 @@ void main() {
       expect(lastUpdate?.type, APIAuthType.oauth1);
     });
 
-    testWidgets('updates auth data when signature method changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when signature method changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.oauth1,
         oauth1: AuthOAuth1Model(
@@ -256,13 +243,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            settingsProvider.overrideWith(
-              (ref) => ThemeStateNotifier(
-                settingsModel: const SettingsModel(
-                  workspaceFolderPath: '/test/workspace',
-                ),
-              ),
-            ),
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
+                  settingsModel: const SettingsModel(
+                    workspaceFolderPath: '/test/workspace',
+                  ),
+                )),
             selectedRequestModelProvider.overrideWith((ref) => null),
           ],
           child: Portal(
@@ -281,9 +266,8 @@ void main() {
       );
 
       // Find and tap the signature method dropdown
-      final signatureMethodDropdown = find.byType(
-        ADPopupMenu<OAuth1SignatureMethod>,
-      );
+      final signatureMethodDropdown =
+          find.byType(ADPopupMenu<OAuth1SignatureMethod>);
       await tester.tap(signatureMethodDropdown);
       await tester.pumpAndSettle();
 
@@ -295,15 +279,12 @@ void main() {
       expect(capturedAuthUpdates.length, greaterThan(0));
       final lastUpdate = capturedAuthUpdates.last;
       expect(
-        lastUpdate?.oauth1?.signatureMethod,
-        OAuth1SignatureMethod.plaintext,
-      );
+          lastUpdate?.oauth1?.signatureMethod, OAuth1SignatureMethod.plaintext);
       expect(lastUpdate?.type, APIAuthType.oauth1);
     });
 
-    testWidgets('updates auth data when access token changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when access token changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.oauth1,
         oauth1: AuthOAuth1Model(
@@ -319,13 +300,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            settingsProvider.overrideWith(
-              (ref) => ThemeStateNotifier(
-                settingsModel: const SettingsModel(
-                  workspaceFolderPath: '/test/workspace',
-                ),
-              ),
-            ),
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
+                  settingsModel: const SettingsModel(
+                    workspaceFolderPath: '/test/workspace',
+                  ),
+                )),
             selectedRequestModelProvider.overrideWith((ref) => null),
           ],
           child: Portal(
@@ -379,13 +358,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            settingsProvider.overrideWith(
-              (ref) => ThemeStateNotifier(
-                settingsModel: const SettingsModel(
-                  workspaceFolderPath: '/test/workspace',
-                ),
-              ),
-            ),
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
+                  settingsModel: const SettingsModel(
+                    workspaceFolderPath: '/test/workspace',
+                  ),
+                )),
             selectedRequestModelProvider.overrideWith((ref) => null),
           ],
           child: Portal(
@@ -412,9 +389,8 @@ void main() {
       // This is verified by the widget structure itself
     });
 
-    testWidgets('handles empty auth data gracefully', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('handles empty auth data gracefully',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.oauth1,
         oauth1: AuthOAuth1Model(
@@ -431,13 +407,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            settingsProvider.overrideWith(
-              (ref) => ThemeStateNotifier(
-                settingsModel: const SettingsModel(
-                  workspaceFolderPath: '/test/workspace',
-                ),
-              ),
-            ),
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
+                  settingsModel: const SettingsModel(
+                    workspaceFolderPath: '/test/workspace',
+                  ),
+                )),
             selectedRequestModelProvider.overrideWith((ref) => null),
           ],
           child: Portal(
@@ -460,58 +434,55 @@ void main() {
     });
 
     testWidgets(
-      'creates proper AuthModel on field changes when authData is null',
-      (WidgetTester tester) async {
-        mockAuthData = null;
+        'creates proper AuthModel on field changes when authData is null',
+        (WidgetTester tester) async {
+      mockAuthData = null;
 
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              settingsProvider.overrideWith(
-                (ref) => ThemeStateNotifier(
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
                   settingsModel: const SettingsModel(
                     workspaceFolderPath: '/test/workspace',
                   ),
-                ),
-              ),
-              selectedRequestModelProvider.overrideWith((ref) => null),
-            ],
-            child: Portal(
-              child: MaterialApp(
-                home: Scaffold(
-                  body: SingleChildScrollView(
-                    child: OAuth1Fields(
-                      authData: mockAuthData,
-                      updateAuth: mockUpdateAuth,
-                    ),
+                )),
+            selectedRequestModelProvider.overrideWith((ref) => null),
+          ],
+          child: Portal(
+            child: MaterialApp(
+              home: Scaffold(
+                body: SingleChildScrollView(
+                  child: OAuth1Fields(
+                    authData: mockAuthData,
+                    updateAuth: mockUpdateAuth,
                   ),
                 ),
               ),
             ),
           ),
-        );
+        ),
+      );
 
-        // Enter consumer key using find.descendant
-        expect(find.byType(EnvAuthField), findsNWidgets(9));
+      // Enter consumer key using find.descendant
+      expect(find.byType(EnvAuthField), findsNWidgets(9));
 
-        final consumerKeyField = find.descendant(
-          of: find.byType(EnvAuthField).first,
-          matching: find.byType(ExtendedTextField),
-        );
-        await tester.tap(consumerKeyField);
-        await tester.pumpAndSettle();
+      final consumerKeyField = find.descendant(
+        of: find.byType(EnvAuthField).first,
+        matching: find.byType(ExtendedTextField),
+      );
+      await tester.tap(consumerKeyField);
+      await tester.pumpAndSettle();
 
-        // Use tester.testTextInput to enter text directly
-        tester.testTextInput.enterText('test_consumer_key');
-        await tester.pumpAndSettle();
+      // Use tester.testTextInput to enter text directly
+      tester.testTextInput.enterText('test_consumer_key');
+      await tester.pumpAndSettle();
 
-        // Verify that updateAuth was called with correct structure
-        expect(capturedAuthUpdates.length, greaterThan(0));
-        final lastUpdate = capturedAuthUpdates.last;
-        expect(lastUpdate?.type, APIAuthType.oauth1);
-        expect(lastUpdate?.oauth1?.consumerKey, 'test_consumer_key');
-      },
-    );
+      // Verify that updateAuth was called with correct structure
+      expect(capturedAuthUpdates.length, greaterThan(0));
+      final lastUpdate = capturedAuthUpdates.last;
+      expect(lastUpdate?.type, APIAuthType.oauth1);
+      expect(lastUpdate?.oauth1?.consumerKey, 'test_consumer_key');
+    });
 
     testWidgets('displays correct hint texts', (WidgetTester tester) async {
       mockAuthData = null;
@@ -519,13 +490,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            settingsProvider.overrideWith(
-              (ref) => ThemeStateNotifier(
-                settingsModel: const SettingsModel(
-                  workspaceFolderPath: '/test/workspace',
-                ),
-              ),
-            ),
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
+                  settingsModel: const SettingsModel(
+                    workspaceFolderPath: '/test/workspace',
+                  ),
+                )),
             selectedRequestModelProvider.overrideWith((ref) => null),
           ],
           child: Portal(
@@ -547,9 +516,8 @@ void main() {
       expect(find.text('Signature Method'), findsOneWidget);
     });
 
-    testWidgets('updates auth data when token secret changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when token secret changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.oauth1,
         oauth1: AuthOAuth1Model(
@@ -566,13 +534,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            settingsProvider.overrideWith(
-              (ref) => ThemeStateNotifier(
-                settingsModel: const SettingsModel(
-                  workspaceFolderPath: '/test/workspace',
-                ),
-              ),
-            ),
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
+                  settingsModel: const SettingsModel(
+                    workspaceFolderPath: '/test/workspace',
+                  ),
+                )),
             selectedRequestModelProvider.overrideWith((ref) => null),
           ],
           child: Portal(
@@ -611,9 +577,8 @@ void main() {
       expect(lastUpdate?.type, APIAuthType.oauth1);
     });
 
-    testWidgets('updates auth data when callback URL changes', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('updates auth data when callback URL changes',
+        (WidgetTester tester) async {
       mockAuthData = const AuthModel(
         type: APIAuthType.oauth1,
         oauth1: AuthOAuth1Model(
@@ -629,13 +594,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            settingsProvider.overrideWith(
-              (ref) => ThemeStateNotifier(
-                settingsModel: const SettingsModel(
-                  workspaceFolderPath: '/test/workspace',
-                ),
-              ),
-            ),
+            settingsProvider.overrideWith((ref) => ThemeStateNotifier(
+                  settingsModel: const SettingsModel(
+                    workspaceFolderPath: '/test/workspace',
+                  ),
+                )),
             selectedRequestModelProvider.overrideWith((ref) => null),
           ],
           child: Portal(
@@ -671,9 +634,7 @@ void main() {
       expect(capturedAuthUpdates.length, greaterThan(0));
       final lastUpdate = capturedAuthUpdates.last;
       expect(
-        lastUpdate?.oauth1?.callbackUrl,
-        'http://api.apidash.dev/callback',
-      );
+          lastUpdate?.oauth1?.callbackUrl, 'http://api.apidash.dev/callback');
       expect(lastUpdate?.type, APIAuthType.oauth1);
     });
   });

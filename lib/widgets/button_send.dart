@@ -31,9 +31,15 @@ class SendButton extends StatelessWidget {
               kHSpacer6,
             ]
           : const [
-              Text(kLabelSend, style: kTextStyleButton),
+              Text(
+                kLabelSend,
+                style: kTextStyleButton,
+              ),
               kHSpacer10,
-              Icon(size: 16, Icons.send),
+              Icon(
+                size: 16,
+                Icons.send,
+              ),
             ],
     );
   }

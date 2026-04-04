@@ -21,16 +21,17 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(body: FilledButtonGroup(buttons: buttons)),
+        home: Scaffold(
+          body: FilledButtonGroup(buttons: buttons),
+        ),
       ),
     );
 
     expect(find.byType(FilledButtonWidget), findsNWidgets(2));
   });
 
-  testWidgets('Testing FilledButtonWidget with label', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('Testing FilledButtonWidget with label',
+      (WidgetTester tester) async {
     final buttonData = ButtonData(
       icon: Icons.add,
       label: 'Add',
@@ -50,9 +51,8 @@ void main() {
     expect(find.text('Add'), findsOneWidget);
   });
 
-  testWidgets('Testing FilledButtonWidget without label', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('Testing FilledButtonWidget without label',
+      (WidgetTester tester) async {
     final buttonData = ButtonData(
       icon: Icons.add,
       label: 'Add',
@@ -72,9 +72,8 @@ void main() {
     expect(find.text('Add'), findsNothing);
   });
 
-  testWidgets('Testing FilledButtonWidget with onPressed callback', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('Testing FilledButtonWidget with onPressed callback',
+      (WidgetTester tester) async {
     bool pressed = false;
 
     final buttonData = ButtonData(

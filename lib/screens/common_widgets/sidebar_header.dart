@@ -7,7 +7,11 @@ import 'package:apidash/consts.dart';
 import 'sidebar_save_button.dart';
 
 class SidebarHeader extends ConsumerWidget {
-  const SidebarHeader({super.key, this.onAddNew, this.onImport});
+  const SidebarHeader({
+    super.key,
+    this.onAddNew,
+    this.onImport,
+  });
   final VoidCallback? onAddNew;
   final VoidCallback? onImport;
 
@@ -24,7 +28,10 @@ class SidebarHeader extends ConsumerWidget {
           ElevatedButton(
             onPressed: onAddNew,
             style: kButtonSidebarStyle,
-            child: const Text(kLabelPlusNew, style: kTextStyleButton),
+            child: const Text(
+              kLabelPlusNew,
+              style: kTextStyleButton,
+            ),
           ),
           kHSpacer4,
           SizedBox(

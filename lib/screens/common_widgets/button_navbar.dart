@@ -26,9 +26,8 @@ class NavbarButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mobileScaffoldKeyNotifier = ref.watch(
-      mobileScaffoldKeyStateProvider.notifier,
-    );
+    final mobileScaffoldKeyNotifier =
+        ref.watch(mobileScaffoldKeyStateProvider.notifier);
     final bool isSelected = railIdx == buttonIdx;
     var onPress = isSelected
         ? null
@@ -70,11 +69,13 @@ class NavbarButton extends ConsumerWidget {
                 ? Text(
                     label,
                     style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: isSelected
-                          ? Theme.of(context).colorScheme.onSecondaryContainer
-                          : Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                          fontWeight: FontWeight.w600,
+                          color: isSelected
+                              ? Theme.of(context)
+                                  .colorScheme
+                                  .onSecondaryContainer
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                   )
                 : const SizedBox.shrink(),
           ],

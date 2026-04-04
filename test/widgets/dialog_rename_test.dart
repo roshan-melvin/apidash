@@ -35,9 +35,8 @@ void main() {
       expect(find.text('Old Name'), findsOneWidget);
     });
 
-    testWidgets('calls onRename with new name when Ok is pressed', (
-      tester,
-    ) async {
+    testWidgets('calls onRename with new name when Ok is pressed',
+        (tester) async {
       String? renamedValue;
 
       await tester.pumpWidget(
@@ -46,11 +45,14 @@ void main() {
             builder: (context) {
               return ElevatedButton(
                 onPressed: () {
-                  showRenameDialog(context, 'Rename Item', 'Old Name', (
-                    newName,
-                  ) {
-                    renamedValue = newName;
-                  });
+                  showRenameDialog(
+                    context,
+                    'Rename Item',
+                    'Old Name',
+                    (newName) {
+                      renamedValue = newName;
+                    },
+                  );
                 },
                 child: const Text('Show Dialog'),
               );
@@ -69,9 +71,8 @@ void main() {
       expect(renamedValue, 'New Name');
     });
 
-    testWidgets('does not call onRename when Cancel is pressed', (
-      tester,
-    ) async {
+    testWidgets('does not call onRename when Cancel is pressed',
+        (tester) async {
       String? renamedValue;
 
       await tester.pumpWidget(
@@ -80,11 +81,14 @@ void main() {
             builder: (context) {
               return ElevatedButton(
                 onPressed: () {
-                  showRenameDialog(context, 'Rename Item', 'Old Name', (
-                    newName,
-                  ) {
-                    renamedValue = newName;
-                  });
+                  showRenameDialog(
+                    context,
+                    'Rename Item',
+                    'Old Name',
+                    (newName) {
+                      renamedValue = newName;
+                    },
+                  );
                 },
                 child: const Text('Show Dialog'),
               );
@@ -103,9 +107,8 @@ void main() {
       expect(renamedValue, isNull);
     });
 
-    testWidgets('disposes TextEditingController after dialog is closed', (
-      tester,
-    ) async {
+    testWidgets('disposes TextEditingController after dialog is closed',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

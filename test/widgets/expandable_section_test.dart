@@ -41,9 +41,8 @@ void main() {
     expect(find.byIcon(Icons.keyboard_arrow_up), findsOneWidget);
   });
 
-  testWidgets('ExpandableSection respects initiallyOpen parameter', (
-    tester,
-  ) async {
+  testWidgets('ExpandableSection respects initiallyOpen parameter',
+      (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -86,9 +85,8 @@ void main() {
     expect(find.byIcon(Icons.keyboard_arrow_up), findsOneWidget);
   });
 
-  testWidgets('ExpandableSection highlights title when highlightQuery matches', (
-    tester,
-  ) async {
+  testWidgets('ExpandableSection highlights title when highlightQuery matches',
+      (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -110,9 +108,8 @@ void main() {
     expect(titleRichText.text.toPlainText(), 'Network Settings');
   });
 
-  testWidgets('ExpandableSection updates when forceOpen changes', (
-    tester,
-  ) async {
+  testWidgets('ExpandableSection updates when forceOpen changes',
+      (tester) async {
     bool forceOpen = false;
 
     await tester.pumpWidget(

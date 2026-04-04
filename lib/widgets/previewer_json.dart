@@ -19,51 +19,39 @@ class JsonPreviewerColor {
   static const Color lightKeySearchHighlightText = Colors.black;
   static const Color lightKeySearchHighlightBackground = Color(0xFFFFEDAD);
   static const Color lightFocusedKeySearchHighlightText = Colors.black;
-  static const Color lightFocusedKeySearchHighlightBackground = Color(
-    0xFFF29D0B,
-  );
+  static const Color lightFocusedKeySearchHighlightBackground =
+      Color(0xFFF29D0B);
   static const Color lightValueText = Color(0xffc41a16);
   static const Color lightValueSearchHighlightText = Color(0xffc41a16);
   static const Color lightValueNum = Color(0xff3F6E74);
   static const Color lightValueBool = Color(0xff1c00cf);
   static const Color lightValueSearchHighlightBackground = Color(0xFFFFEDAD);
   static const Color lightFocusedValueSearchHighlightText = Colors.black;
-  static const Color lightFocusedValueSearchHighlightBackground = Color(
-    0xFFF29D0B,
-  );
-  static const Color lightIndentationLineColor = Color.fromARGB(
-    255,
-    213,
-    213,
-    213,
-  );
+  static const Color lightFocusedValueSearchHighlightBackground =
+      Color(0xFFF29D0B);
+  static const Color lightIndentationLineColor =
+      Color.fromARGB(255, 213, 213, 213);
   static const Color lightHighlightColor = Color(0xFFF1F1F1);
 
-  // Dark colors
+// Dark colors
   static const Color darkRootInfoBox = Color.fromARGB(255, 83, 13, 19);
   static const Color darkRootKeyText = Color(0xffd6deeb);
   static const Color darkPropertyKeyText = Color(0xffd6deeb);
   static const Color darkKeySearchHighlightText = Color(0xffd6deeb);
   static const Color darkKeySearchHighlightBackground = Color(0xff9b703f);
   static const Color darkFocusedKeySearchHighlightText = Color(0xffd6deeb);
-  static const Color darkFocusedKeySearchHighlightBackground = Color(
-    0xffc41a16,
-  );
+  static const Color darkFocusedKeySearchHighlightBackground =
+      Color(0xffc41a16);
   static const Color darkValueText = Color(0xffecc48d);
   static const Color darkValueSearchHighlightText = Color(0xffecc48d);
   static const Color darkValueNum = Color(0xffaddb67);
   static const Color darkValueBool = Color(0xff82aaff);
   static const Color darkValueSearchHighlightBackground = Color(0xff9b703f);
   static const Color darkFocusedValueSearchHighlightText = Color(0xffd6deeb);
-  static const Color darkFocusedValueSearchHighlightBackground = Color(
-    0xffc41a16,
-  );
-  static const Color darkIndentationLineColor = Color.fromARGB(
-    255,
-    119,
-    119,
-    119,
-  );
+  static const Color darkFocusedValueSearchHighlightBackground =
+      Color(0xffc41a16);
+  static const Color darkIndentationLineColor =
+      Color.fromARGB(255, 119, 119, 119);
   static const Color darkHighlightColor = Color.fromARGB(255, 55, 55, 55);
 }
 
@@ -87,7 +75,9 @@ final jsonExplorerThemeLight = JsonExplorerTheme(
         JsonPreviewerColor.lightFocusedKeySearchHighlightBackground,
     fontWeight: FontWeight.bold,
   ),
-  valueTextStyle: kCodeStyle.copyWith(color: JsonPreviewerColor.lightValueText),
+  valueTextStyle: kCodeStyle.copyWith(
+    color: JsonPreviewerColor.lightValueText,
+  ),
   valueSearchHighlightTextStyle: kCodeStyle.copyWith(
     color: JsonPreviewerColor.lightValueSearchHighlightText,
     backgroundColor: JsonPreviewerColor.lightValueSearchHighlightBackground,
@@ -122,7 +112,9 @@ final jsonExplorerThemeDark = JsonExplorerTheme(
     backgroundColor: JsonPreviewerColor.darkFocusedKeySearchHighlightBackground,
     fontWeight: FontWeight.bold,
   ),
-  valueTextStyle: kCodeStyle.copyWith(color: JsonPreviewerColor.darkValueText),
+  valueTextStyle: kCodeStyle.copyWith(
+    color: JsonPreviewerColor.darkValueText,
+  ),
   valueSearchHighlightTextStyle: kCodeStyle.copyWith(
     color: JsonPreviewerColor.darkValueSearchHighlightText,
     backgroundColor: JsonPreviewerColor.darkValueSearchHighlightBackground,
@@ -139,7 +131,10 @@ final jsonExplorerThemeDark = JsonExplorerTheme(
 );
 
 class JsonPreviewer extends StatefulWidget {
-  const JsonPreviewer({super.key, required this.code});
+  const JsonPreviewer({
+    super.key,
+    required this.code,
+  });
   final dynamic code;
 
   @override
@@ -176,9 +171,8 @@ class _JsonPreviewerState extends State<JsonPreviewer> {
         builder: (context, state, child) {
           return LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              var maxRootNodeWidth = getJsonPreviewerMaxRootNodeWidth(
-                constraints.maxWidth,
-              );
+              var maxRootNodeWidth =
+                  getJsonPreviewerMaxRootNodeWidth(constraints.maxWidth);
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -190,17 +184,19 @@ class _JsonPreviewerState extends State<JsonPreviewer> {
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
                             border: Border.all(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHighest,
-                            ),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest),
                             borderRadius: kBorderRadius8,
                           ),
                           child: Row(
                             children: [
                               const Padding(
                                 padding: kPh4,
-                                child: Icon(Icons.search, size: 16),
+                                child: Icon(
+                                  Icons.search,
+                                  size: 16,
+                                ),
                               ),
                               Expanded(
                                 child: JsonSearchField(
@@ -208,12 +204,13 @@ class _JsonPreviewerState extends State<JsonPreviewer> {
                                   onChanged: (term) => state.search(term),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(
+                                width: 8,
+                              ),
                               if (state.searchResults.isNotEmpty)
-                                Text(
-                                  _searchFocusText(),
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
+                                Text(_searchFocusText(),
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall),
                               if (state.searchResults.isNotEmpty)
                                 IconButton(
                                   visualDensity: VisualDensity.compact,
@@ -240,23 +237,21 @@ class _JsonPreviewerState extends State<JsonPreviewer> {
                         icon: Icons.unfold_more,
                         showLabel:
                             (constraints.minWidth > kMinWindowSize.width) &&
-                            !kIsMobile,
+                                !kIsMobile,
                         label: 'Expand All',
                         labelTextStyle: kTextStyleButtonSmall,
-                        onPressed: state.areAllExpanded()
-                            ? null
-                            : state.expandAll,
+                        onPressed:
+                            state.areAllExpanded() ? null : state.expandAll,
                       ),
                       ADTextButton(
                         icon: Icons.unfold_less,
                         showLabel:
                             (constraints.minWidth > kMinWindowSize.width) &&
-                            !kIsMobile,
+                                !kIsMobile,
                         label: 'Collapse All',
                         labelTextStyle: kTextStyleButtonSmall,
-                        onPressed: state.areAllCollapsed()
-                            ? null
-                            : state.collapseAll,
+                        onPressed:
+                            state.areAllCollapsed() ? null : state.collapseAll,
                       ),
                     ],
                   ),
@@ -270,19 +265,21 @@ class _JsonPreviewerState extends State<JsonPreviewer> {
                           rootInfoBox(context, node),
                       collapsableToggleBuilder: (context, node) =>
                           AnimatedRotation(
-                            turns: node.isCollapsed ? -0.25 : 0,
-                            duration: const Duration(milliseconds: 300),
-                            child: const Icon(Icons.arrow_drop_down),
-                          ),
+                        turns: node.isCollapsed ? -0.25 : 0,
+                        duration: const Duration(milliseconds: 300),
+                        child: const Icon(Icons.arrow_drop_down),
+                      ),
                       trailingBuilder: (context, node) => node.isFocused
                           ? Padding(
                               padding: const EdgeInsets.only(right: 12),
                               child: IconButton(
                                 padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(
-                                  maxHeight: 18,
+                                constraints:
+                                    const BoxConstraints(maxHeight: 18),
+                                icon: const Icon(
+                                  Icons.copy,
+                                  size: 18,
                                 ),
-                                icon: const Icon(Icons.copy, size: 18),
                                 onPressed: () async {
                                   final val = toJson(node);
                                   String toCopy = '';
@@ -291,7 +288,8 @@ class _JsonPreviewerState extends State<JsonPreviewer> {
                                       node.isRoot) {
                                     toCopy = kJsonEncoder.convert(val);
                                   } else {
-                                    toCopy = (val.values as Iterable).first
+                                    toCopy = (val.values as Iterable)
+                                        .first
                                         .toString();
                                   }
                                   await _copy(toCopy, sm);
@@ -376,7 +374,10 @@ class _JsonPreviewerState extends State<JsonPreviewer> {
         borderRadius: const BorderRadius.all(Radius.circular(2)),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 4,
+          vertical: 2,
+        ),
         child: SelectableText(
           node.isClass ? '{${node.childrenCount}}' : '[${node.childrenCount}]',
           style: kCodeStyle,
@@ -417,7 +418,9 @@ class _JsonPreviewerState extends State<JsonPreviewer> {
   }
 }
 
-dynamic toJson(NodeViewModelState node) {
+dynamic toJson(
+  NodeViewModelState node,
+) {
   dynamic res;
   if (node.isRoot) {
     if (node.isClass) {

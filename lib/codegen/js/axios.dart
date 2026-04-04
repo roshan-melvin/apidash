@@ -44,7 +44,9 @@ axios(config)
     console.log(err);
   });
 """;
-  String? getCode(HttpRequestModel requestModel) {
+  String? getCode(
+    HttpRequestModel requestModel,
+  ) {
     try {
       jj.Template kNodejsImportTemplate = jj.Template(kStringImportNode);
       String importsData = kNodejsImportTemplate.render({
@@ -54,8 +56,8 @@ axios(config)
       String result = isNodeJs
           ? importsData
           : requestModel.hasFileInFormData
-          ? "// refer https://github.com/foss42/apidash/issues/293#issuecomment-1997568083 for details regarding integration\n\n"
-          : "";
+              ? "// refer https://github.com/foss42/apidash/issues/293#issuecomment-1997568083 for details regarding integration\n\n"
+              : "";
       var harJson = requestModelToHARJsonRequest(
         requestModel,
         useEnabled: true,
@@ -74,9 +76,8 @@ axios(config)
         for (var i in params) {
           m[i["name"]] = i["value"];
         }
-        result += templateParams.render({
-          "params": padMultilineString(kJsonEncoder.convert(m), 2),
-        });
+        result += templateParams
+            .render({"params": padMultilineString(kJsonEncoder.convert(m), 2)});
       }
 
       var headers = harJson["headers"];
@@ -89,9 +90,8 @@ axios(config)
         if (requestModel.hasFormData) {
           m[kHeaderContentType] = ContentType.formdata.header;
         }
-        result += templateHeader.render({
-          "headers": padMultilineString(kJsonEncoder.convert(m), 2),
-        });
+        result += templateHeader.render(
+            {"headers": padMultilineString(kJsonEncoder.convert(m), 2)});
       }
       var templateBody = jj.Template(kTemplateBody);
       if (requestModel.hasFormData && requestModel.formDataMapList.isNotEmpty) {
@@ -102,20 +102,17 @@ axios(config)
           formParams["${element["name"]}"] = element["type"] == "text"
               ? "${element["value"]}"
               : isNodeJs
-              ? "fs.createReadStream(${element["value"]})"
-              : "fileInput$formFileCounter.files[0]";
+                  ? "fs.createReadStream(${element["value"]})"
+                  : "fileInput$formFileCounter.files[0]";
           if (element["type"] == "file") formFileCounter++;
         }
-        var sanitizedJSObject = sanitzeJSObject(
-          kJsonEncoder.convert(formParams),
-        );
-        result += templateBody.render({
-          "body": padMultilineString(sanitizedJSObject, 2),
-        });
+        var sanitizedJSObject =
+            sanitzeJSObject(kJsonEncoder.convert(formParams));
+        result += templateBody
+            .render({"body": padMultilineString(sanitizedJSObject, 2)});
       } else if (harJson["postData"]?["text"] != null) {
-        result += templateBody.render({
-          "body": kJsonEncoder.convert(harJson["postData"]["text"]),
-        });
+        result += templateBody.render(
+            {"body": kJsonEncoder.convert(harJson["postData"]["text"])});
       }
       result += kStringRequest;
       return result;

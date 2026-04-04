@@ -10,7 +10,9 @@ void main() {
       MaterialApp(
         title: 'ClearResponseButton',
         theme: kThemeDataLight,
-        home: const Scaffold(body: ClearResponseButton()),
+        home: const Scaffold(
+          body: ClearResponseButton(),
+        ),
       ),
     );
 

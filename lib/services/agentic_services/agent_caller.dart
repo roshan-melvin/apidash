@@ -10,9 +10,8 @@ class APIDashAgentCaller {
     required WidgetRef ref,
     required AgentInputs input,
   }) async {
-    final defaultAIModel = ref.read(
-      settingsProvider.select((e) => e.defaultAIModel),
-    );
+    final defaultAIModel =
+        ref.read(settingsProvider.select((e) => e.defaultAIModel));
     if (defaultAIModel == null) {
       throw Exception('NO_DEFAULT_LLM');
     }

@@ -24,13 +24,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 2', () {
@@ -49,13 +48,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 3', () {
@@ -74,13 +72,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 4', () {
@@ -99,13 +96,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 5', () {
@@ -126,13 +122,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 6', () {
@@ -153,13 +148,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 7', () {
@@ -178,13 +172,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 8', () {
@@ -205,13 +198,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 9', () {
@@ -230,13 +222,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 10', () {
@@ -257,13 +248,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet10,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet10,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 11', () {
@@ -284,13 +274,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet11,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet11,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 12', () {
@@ -309,13 +298,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelGet12,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelGet12,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -336,13 +324,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Head, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelHead1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelHead1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('HEAD 2', () {
@@ -361,13 +348,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Head, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelHead2,
-          SupportedUriSchemes.http,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelHead2,
+            SupportedUriSchemes.http,
+          ),
+          expectedCode);
     });
   });
 
@@ -396,13 +382,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelPost1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelPost1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 2', () {
@@ -434,13 +419,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelPost2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelPost2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 3', () {
@@ -469,13 +453,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelPost3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelPost3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 4', () {
@@ -503,13 +486,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelPost4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelPost4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 5', () {
@@ -539,13 +521,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelPost5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelPost5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 6', () {
@@ -576,13 +557,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelPost6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelPost6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 7', () {
@@ -613,13 +593,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelPost7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelPost7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 8', () {
@@ -647,13 +626,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelPost8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelPost8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 9', () {
@@ -687,13 +665,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelPost9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelPost9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -723,13 +700,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Put, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelPut1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelPut1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -759,13 +735,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Patch, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelPatch1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelPatch1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -786,13 +761,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Delete, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelDelete1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelDelete1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('DELETE 2', () {
@@ -820,13 +794,12 @@ using (var request = new HttpRequestMessage(HttpMethod.Delete, uri))
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.cSharpHttpClient,
-          requestModelDelete2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.cSharpHttpClient,
+            requestModelDelete2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 }

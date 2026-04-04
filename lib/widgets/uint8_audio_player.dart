@@ -4,8 +4,11 @@ import 'package:apidash_design_system/apidash_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-typedef AudioErrorWidgetBuilder =
-    Widget Function(BuildContext context, Object error, StackTrace? stackTrace);
+typedef AudioErrorWidgetBuilder = Widget Function(
+  BuildContext context,
+  Object error,
+  StackTrace? stackTrace,
+);
 
 // Uint8List AudioSource for just_audio
 class Uint8AudioSource extends StreamAudioSource {
@@ -52,12 +55,10 @@ class _Uint8AudioPlayerState extends State<Uint8AudioPlayer> {
 
   @override
   void initState() {
-    player.setAudioSource(
-      Uint8AudioSource(
-        widget.bytes,
-        contentType: '${widget.type}/${widget.subtype}',
-      ),
-    );
+    player.setAudioSource(Uint8AudioSource(
+      widget.bytes,
+      contentType: '${widget.type}/${widget.subtype}',
+    ));
     super.initState();
   }
 
@@ -74,10 +75,7 @@ class _Uint8AudioPlayerState extends State<Uint8AudioPlayer> {
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return widget.errorBuilder(
-            context,
-            snapshot.error!,
-            snapshot.stackTrace,
-          );
+              context, snapshot.error!, snapshot.stackTrace);
         } else {
           final playerState = snapshot.data;
           final processingState = playerState?.processingState;
@@ -172,9 +170,15 @@ class _Uint8AudioPlayerState extends State<Uint8AudioPlayer> {
             onPressed: play,
           );
         } else if (completed) {
-          return IconButton(icon: const Icon(Icons.replay), onPressed: restart);
+          return IconButton(
+            icon: const Icon(Icons.replay),
+            onPressed: restart,
+          );
         } else {
-          return IconButton(icon: const Icon(Icons.pause), onPressed: pause);
+          return IconButton(
+            icon: const Icon(Icons.pause),
+            onPressed: pause,
+          );
         }
       },
     );
@@ -222,11 +226,8 @@ class _Uint8AudioPlayerState extends State<Uint8AudioPlayer> {
     );
   }
 
-  StreamBuilder<double> _buildVolumeButton(
-    Stream<double> stream, {
-    VoidCallback? mute,
-    VoidCallback? unmute,
-  }) {
+  StreamBuilder<double> _buildVolumeButton(Stream<double> stream,
+      {VoidCallback? mute, VoidCallback? unmute}) {
     return StreamBuilder<double>(
       stream: stream,
       builder: (context, snapshot) {

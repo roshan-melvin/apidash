@@ -136,10 +136,8 @@ class JsLogTile extends StatelessWidget {
           if (showTimestamp) ...[
             Padding(
               padding: const EdgeInsets.only(top: 2, right: 8),
-              child: Text(
-                _formatTs(entry.ts),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              child: Text(_formatTs(entry.ts),
+                  style: Theme.of(context).textTheme.bodySmall),
             ),
           ] else if (icon != null) ...[
             Padding(
@@ -198,11 +196,9 @@ class _NetworkLogTileState extends State<NetworkLogTile> {
     final lowerQ = q.toLowerCase();
     bool inMap(Map<String, String>? m) =>
         m != null &&
-        m.entries.any(
-          (e) =>
-              e.key.toLowerCase().contains(lowerQ) ||
-              e.value.toLowerCase().contains(lowerQ),
-        );
+        m.entries.any((e) =>
+            e.key.toLowerCase().contains(lowerQ) ||
+            e.value.toLowerCase().contains(lowerQ));
     bool inText(String? t) =>
         t != null && t.toLowerCase().contains(lowerQ) && t.isNotEmpty;
     return inMap(n.requestHeaders) ||
@@ -216,9 +212,8 @@ class _NetworkLogTileState extends State<NetworkLogTile> {
   Widget build(BuildContext context) {
     final n = widget.entry.network!;
     final status = n.responseStatus != null ? '${n.responseStatus}' : null;
-    final duration = n.duration != null
-        ? '${n.duration!.inMilliseconds} ms'
-        : null;
+    final duration =
+        n.duration != null ? '${n.duration!.inMilliseconds} ms' : null;
     final bodyStyle = Theme.of(context).textTheme.bodyMedium;
     final methodStyle = kCodeStyle.copyWith(
       fontWeight: FontWeight.bold,
@@ -284,11 +279,9 @@ class _NetworkLogTileState extends State<NetworkLogTile> {
                 if (status != null && duration != null) const Text('  |  '),
                 if (duration != null) Text(duration),
                 const SizedBox(width: 6),
-                Icon(
-                  _expanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                ),
+                Icon(_expanded
+                    ? Icons.keyboard_arrow_up
+                    : Icons.keyboard_arrow_down),
               ],
             ),
           ),
@@ -315,11 +308,9 @@ class NetworkDetails extends StatelessWidget {
         q != null &&
         q.isNotEmpty &&
         m != null &&
-        m.entries.any(
-          (e) =>
-              e.key.toLowerCase().contains(q.toLowerCase()) ||
-              e.value.toLowerCase().contains(q.toLowerCase()),
-        );
+        m.entries.any((e) =>
+            e.key.toLowerCase().contains(q.toLowerCase()) ||
+            e.value.toLowerCase().contains(q.toLowerCase()));
 
     final networkBodyMap = {
       'API Type': n.apiType.name,
@@ -333,14 +324,11 @@ class NetworkDetails extends StatelessWidget {
       if (n.responseStatus != null) 'Status': '${n.responseStatus}',
       if (n.errorMessage != null) 'Error': n.errorMessage!,
     };
-    final networkSectionHasMatch =
-        q != null &&
+    final networkSectionHasMatch = q != null &&
         q.isNotEmpty &&
-        networkBodyMap.entries.any(
-          (e) =>
-              e.key.toLowerCase().contains(q.toLowerCase()) ||
-              e.value.toLowerCase().contains(q.toLowerCase()),
-        );
+        networkBodyMap.entries.any((e) =>
+            e.key.toLowerCase().contains(q.toLowerCase()) ||
+            e.value.toLowerCase().contains(q.toLowerCase()));
 
     final tiles = <Widget>[
       ExpandableSection(

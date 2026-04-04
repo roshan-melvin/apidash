@@ -31,8 +31,10 @@ class ItemCardMenu extends StatelessWidget {
       shape: shape,
       itemBuilder: (BuildContext context) => ItemMenuOption.values
           .map<PopupMenuEntry<ItemMenuOption>>(
-            (e) =>
-                PopupMenuItem<ItemMenuOption>(value: e, child: Text(e.label)),
+            (e) => PopupMenuItem<ItemMenuOption>(
+              value: e,
+              child: Text(e.label),
+            ),
           )
           .toList(),
       child: child,

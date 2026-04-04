@@ -3,9 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:apidash/widgets/splitview_drawer.dart';
 
 void main() {
-  testWidgets('Testing DrawerSplitView displays main components', (
-    tester,
-  ) async {
+  testWidgets('Testing DrawerSplitView displays main components',
+      (tester) async {
     final scaffoldKey = GlobalKey<ScaffoldState>();
 
     await tester.pumpWidget(
@@ -79,7 +78,7 @@ void main() {
           mainContent: const Text('Main Content'),
           title: const Text('Title'),
           actions: [
-            IconButton(icon: const Icon(Icons.search), onPressed: () {}),
+            IconButton(icon: const Icon(Icons.search), onPressed: () {})
           ],
         ),
       ),

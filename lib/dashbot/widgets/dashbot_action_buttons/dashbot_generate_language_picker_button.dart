@@ -34,9 +34,7 @@ class DashbotGenerateLanguagePicker extends ConsumerWidget
         for (final l in langs)
           OutlinedButton(
             onPressed: () {
-              ref
-                  .read(chatViewmodelProvider.notifier)
-                  .sendMessage(
+              ref.read(chatViewmodelProvider.notifier).sendMessage(
                     text: 'Please generate code in $l',
                     type: ChatMessageType.generateCode,
                   );

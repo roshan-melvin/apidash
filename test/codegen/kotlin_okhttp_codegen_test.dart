@@ -29,13 +29,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 2', () {
@@ -62,13 +61,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 3', () {
@@ -95,13 +93,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 4', () {
@@ -132,13 +129,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 5', () {
@@ -163,13 +159,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 6', () {
@@ -197,13 +192,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 7', () {
@@ -227,13 +221,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 8', () {
@@ -261,13 +254,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 9', () {
@@ -295,13 +287,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 10', () {
@@ -326,13 +317,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet10,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet10,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 11', () {
@@ -361,13 +351,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet11,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet11,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('GET 12', () {
@@ -391,13 +380,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelGet12,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelGet12,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -423,13 +411,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelHead1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelHead1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('HEAD 2', () {
@@ -453,13 +440,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelHead2,
-          SupportedUriSchemes.http,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelHead2,
+            SupportedUriSchemes.http,
+          ),
+          expectedCode);
     });
   });
 
@@ -493,13 +479,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelPost1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelPost1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 2', () {
@@ -536,13 +521,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelPost2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelPost2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 3', () {
@@ -575,13 +559,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelPost3,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelPost3,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 4', () {
       const expectedCode = r'''import okhttp3.OkHttpClient
@@ -608,13 +591,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelPost4,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelPost4,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('POST 5', () {
@@ -643,13 +625,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelPost5,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelPost5,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 6', () {
       const expectedCode = r'''import okhttp3.OkHttpClient
@@ -679,13 +660,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelPost6,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelPost6,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 7', () {
       const expectedCode = r'''import okhttp3.OkHttpClient
@@ -715,13 +695,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelPost7,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelPost7,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 8', () {
       const expectedCode = r'''import okhttp3.OkHttpClient
@@ -752,13 +731,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelPost8,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelPost8,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
     test('POST 9', () {
       const expectedCode = r'''import okhttp3.OkHttpClient
@@ -794,13 +772,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelPost9,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelPost9,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -835,13 +812,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelPut1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelPut1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -876,13 +852,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelPatch1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelPatch1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 
@@ -908,13 +883,12 @@ fun main() {
 }
 """;
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelDelete1,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelDelete1,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
 
     test('DELETE 2', () {
@@ -947,13 +921,12 @@ fun main() {
 }
 ''';
       expect(
-        codeGen.getCode(
-          CodegenLanguage.kotlinOkHttp,
-          requestModelDelete2,
-          SupportedUriSchemes.https,
-        ),
-        expectedCode,
-      );
+          codeGen.getCode(
+            CodegenLanguage.kotlinOkHttp,
+            requestModelDelete2,
+            SupportedUriSchemes.https,
+          ),
+          expectedCode);
     });
   });
 }

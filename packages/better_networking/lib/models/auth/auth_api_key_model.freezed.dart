@@ -67,19 +67,20 @@ class _$AuthApiKeyModelCopyWithImpl<$Res, $Val extends AuthApiKeyModel>
   }) {
     return _then(
       _value.copyWith(
-        key: null == key
-            ? _value.key
-            : key // ignore: cast_nullable_to_non_nullable
-                as String,
-        location: null == location
-            ? _value.location
-            : location // ignore: cast_nullable_to_non_nullable
-                as String,
-        name: null == name
-            ? _value.name
-            : name // ignore: cast_nullable_to_non_nullable
-                as String,
-      ) as $Val,
+            key: null == key
+                ? _value.key
+                : key // ignore: cast_nullable_to_non_nullable
+                      as String,
+            location: null == location
+                ? _value.location
+                : location // ignore: cast_nullable_to_non_nullable
+                      as String,
+            name: null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
     );
   }
 }
@@ -119,15 +120,15 @@ class __$$AuthApiKeyModelImplCopyWithImpl<$Res>
         key: null == key
             ? _value.key
             : key // ignore: cast_nullable_to_non_nullable
-                as String,
+                  as String,
         location: null == location
             ? _value.location
             : location // ignore: cast_nullable_to_non_nullable
-                as String,
+                  as String,
         name: null == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
-                as String,
+                  as String,
       ),
     );
   }
