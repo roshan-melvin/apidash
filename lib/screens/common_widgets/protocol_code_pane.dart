@@ -5,6 +5,10 @@ import 'package:apidash/models/mqtt_request_model.dart';
 import 'package:apidash/models/websocket_request_model.dart';
 import 'package:apidash/models/grpc_request_model.dart';
 import 'package:apidash/widgets/previewer_codegen.dart';
+import 'package:apidash/widgets/button_copy.dart';
+import 'package:apidash/widgets/button_save_download.dart';
+import 'package:apidash/widgets/button_share.dart';
+import 'package:apidash/utils/utils.dart';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // WebSocket Code Generator
@@ -469,19 +473,24 @@ class _WebSocketCodePaneState extends State<WebSocketCodePane> {
     return _ProtocolCodeView(
       code: code,
       highlightLang: _lang == WSLang.python ? 'python' : 'javascript',
-      langSelector: DropdownButton<WSLang>(
-        value: _lang,
-        isDense: true,
-        underline: const SizedBox(),
-        items: const [
-          DropdownMenuItem(value: WSLang.javascript, child: Text('JavaScript (Browser)')),
-          DropdownMenuItem(value: WSLang.nodejs, child: Text('Node.js (ws)')),
-          DropdownMenuItem(value: WSLang.python, child: Text('Python (websockets)')),
-          DropdownMenuItem(value: WSLang.dart, child: Text('Dart')),
-        ],
-        onChanged: (v) {
-          if (v != null) setState(() => _lang = v);
-        },
+      ext: _lang == WSLang.python
+          ? 'py'
+          : (_lang == WSLang.dart ? 'dart' : 'js'),
+      langSelector: Expanded(
+        child: ADDropdownButton<WSLang>(
+          value: _lang,
+          values: const [
+            (WSLang.javascript, 'JavaScript (Browser)'),
+            (WSLang.nodejs, 'Node.js (ws)'),
+            (WSLang.python, 'Python (websockets)'),
+            (WSLang.dart, 'Dart'),
+          ],
+          onChanged: (v) {
+            if (v != null) setState(() => _lang = v);
+          },
+          iconSize: 16,
+          isExpanded: true,
+        ),
       ),
     );
   }
@@ -507,19 +516,26 @@ class _MQTTCodePaneState extends State<MQTTCodePane> {
     final code = generateMQTTCode(widget.model, _lang);
     return _ProtocolCodeView(
       code: code,
-      highlightLang: _lang == MQTTLang.dart ? 'dart' : (_lang == MQTTLang.python ? 'python' : 'javascript'),
-      langSelector: DropdownButton<MQTTLang>(
-        value: _lang,
-        isDense: true,
-        underline: const SizedBox(),
-        items: const [
-          DropdownMenuItem(value: MQTTLang.python, child: Text('Python (paho-mqtt)')),
-          DropdownMenuItem(value: MQTTLang.javascript, child: Text('JavaScript (mqtt.js)')),
-          DropdownMenuItem(value: MQTTLang.dart, child: Text('Dart (mqtt_client)')),
-        ],
-        onChanged: (v) {
-          if (v != null) setState(() => _lang = v);
-        },
+      highlightLang: _lang == MQTTLang.dart
+          ? 'dart'
+          : (_lang == MQTTLang.python ? 'python' : 'javascript'),
+      ext: _lang == MQTTLang.python
+          ? 'py'
+          : (_lang == MQTTLang.dart ? 'dart' : 'js'),
+      langSelector: Expanded(
+        child: ADDropdownButton<MQTTLang>(
+          value: _lang,
+          values: const [
+            (MQTTLang.python, 'Python (paho-mqtt)'),
+            (MQTTLang.javascript, 'JavaScript (mqtt.js)'),
+            (MQTTLang.dart, 'Dart (mqtt_client)'),
+          ],
+          onChanged: (v) {
+            if (v != null) setState(() => _lang = v);
+          },
+          iconSize: 16,
+          isExpanded: true,
+        ),
       ),
     );
   }
@@ -545,19 +561,26 @@ class _GrpcCodePaneState extends State<GrpcCodePane> {
     final code = generateGrpcCode(widget.model, _lang);
     return _ProtocolCodeView(
       code: code,
-      highlightLang: _lang == GrpcLang.dart ? 'dart' : (_lang == GrpcLang.python ? 'python' : 'javascript'),
-      langSelector: DropdownButton<GrpcLang>(
-        value: _lang,
-        isDense: true,
-        underline: const SizedBox(),
-        items: const [
-          DropdownMenuItem(value: GrpcLang.python, child: Text('Python (grpcio)')),
-          DropdownMenuItem(value: GrpcLang.javascript, child: Text('JavaScript (@grpc/grpc-js)')),
-          DropdownMenuItem(value: GrpcLang.dart, child: Text('Dart (grpc)')),
-        ],
-        onChanged: (v) {
-          if (v != null) setState(() => _lang = v);
-        },
+      highlightLang: _lang == GrpcLang.dart
+          ? 'dart'
+          : (_lang == GrpcLang.python ? 'python' : 'javascript'),
+      ext: _lang == GrpcLang.python
+          ? 'py'
+          : (_lang == GrpcLang.dart ? 'dart' : 'js'),
+      langSelector: Expanded(
+        child: ADDropdownButton<GrpcLang>(
+          value: _lang,
+          values: const [
+            (GrpcLang.python, 'Python (grpcio)'),
+            (GrpcLang.javascript, 'JavaScript (@grpc/grpc-js)'),
+            (GrpcLang.dart, 'Dart (grpc)'),
+          ],
+          onChanged: (v) {
+            if (v != null) setState(() => _lang = v);
+          },
+          iconSize: 16,
+          isExpanded: true,
+        ),
       ),
     );
   }
@@ -571,11 +594,13 @@ class _ProtocolCodeView extends StatelessWidget {
   const _ProtocolCodeView({
     required this.code,
     required this.highlightLang,
+    required this.ext,
     required this.langSelector,
   });
 
   final String code;
   final String highlightLang;
+  final String ext;
   final Widget langSelector;
 
   @override
@@ -583,43 +608,62 @@ class _ProtocolCodeView extends StatelessWidget {
     final codeTheme = Theme.of(context).brightness == Brightness.light
         ? kLightCodeTheme
         : kDarkCodeTheme;
+    final textContainerdecoration = BoxDecoration(
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      border: Border.all(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest),
+      borderRadius: kBorderRadius8,
+    );
 
-    return Padding(
-      padding: kP10,
-      child: Column(
-        children: [
-          SizedBox(
-            height: kHeaderHeight,
-            child: Row(
-              children: [
-                langSelector,
-                const Spacer(),
-                // Copy button is built-in via SelectionArea
-              ],
-            ),
-          ),
-          kVSpacer10,
-          Expanded(
-            child: Container(
-              width: double.maxFinite,
-              padding: kP8,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerLow,
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        var showLabel = showButtonLabelsInViewCodePane(
+          constraints.maxWidth,
+        );
+        return Padding(
+          padding: kP10,
+          child: Column(
+            children: [
+              SizedBox(
+                height: kHeaderHeight,
+                child: Row(
+                  children: [
+                    langSelector,
+                    CopyButton(
+                      toCopy: code,
+                      showLabel: showLabel,
+                    ),
+                    kIsMobile
+                        ? ShareButton(
+                            toShare: code,
+                            showLabel: showLabel,
+                          )
+                        : SaveInDownloadsButton(
+                            content: stringToBytes(code),
+                            ext: ext,
+                            showLabel: showLabel,
+                          ),
+                  ],
                 ),
-                borderRadius: kBorderRadius8,
               ),
-              child: CodeGenPreviewer(
-                code: code,
-                theme: codeTheme,
-                language: highlightLang,
-                textStyle: kCodeStyle,
+              kVSpacer10,
+              Expanded(
+                child: Container(
+                  width: double.maxFinite,
+                  padding: kP8,
+                  decoration: textContainerdecoration,
+                  child: CodeGenPreviewer(
+                    code: code,
+                    theme: codeTheme,
+                    language: highlightLang,
+                    textStyle: kCodeStyle,
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
