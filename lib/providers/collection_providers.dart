@@ -8,6 +8,7 @@ import 'package:apidash/terminal/terminal.dart';
 import 'providers.dart';
 import '../models/models.dart';
 import '../services/services.dart';
+import '../services/mcp_sync_service.dart';
 import '../utils/utils.dart';
 
 final selectedIdStateProvider = StateProvider<String?>((ref) => null);
@@ -641,6 +642,9 @@ class CollectionStateNotifier
     await hiveHandler.removeUnused();
     ref.read(saveDataStateProvider.notifier).state = false;
     ref.read(hasUnsavedChangesProvider.notifier).state = false;
+
+    // Bridge with MCP Agent
+    McpSyncService.syncWorkspaceToMcp(state?.values.toList(), null);
   }
 
   Future<Map<String, dynamic>> exportDataToHAR() async {
