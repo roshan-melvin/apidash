@@ -65,92 +65,8 @@ The overarching system relies on a **Decoupled File-Sync Architecture** bridging
 
 ## Flowchart 1 — High-Level System Topology
 
-```mermaid
-graph TD
-    classDef client fill:#e6f3ff,stroke:#4a90e2,stroke-width:2px,color:#000;
-    classDef flutter fill:#e0f2f1,stroke:#26a69a,stroke-width:2px,color:#000;
-    classDef transport fill:#f3e5f5,stroke:#ab47bc,stroke-width:2px,color:#000;
-    classDef server fill:#e3f2fd,stroke:#64b5f6,stroke-width:3px,color:#000;
-    classDef core fill:#fff3e0,stroke:#ffb347,stroke-width:2px,color:#000;
-    classDef cli fill:#f0f0f0,stroke:#666,stroke-width:2px,stroke-dasharray: 5 5,color:#000;
-    classDef datalayer fill:#cfd8dc,stroke:#607d8b,stroke-width:3px,color:#000;
-    classDef security fill:#ffebee,stroke:#ef5350,stroke-width:2px,color:#000;
+<img width="1354" height="699" alt="Gemini_Generated_Image_j2ts0kj2ts0kj2ts" src="https://github.com/user-attachments/assets/3b08d91f-391d-4714-bd2e-7c990264f517" />
 
-    subgraph ExternalClients["External AI & Extension Clients"]
-        Claude["Claude Desktop (stdio)"]:::client
-        VSCode["VS Code / Copilot (stdio)"]:::client
-        Browser["Browser / ChatFlow (HTTP)"]:::client
-    end
-
-    subgraph TerminalLayer["Standalone Terminal Execution"]
-        CLI["$ apidash-cli\nlist · run · request · graphql\nai · save · env · set · codegen"]:::cli
-    end
-
-    subgraph TransportLayer["MCP Transport Layer"]
-        STDIO["stdio transport\n(--stdio flag)"]:::transport
-        HTTP["Streamable HTTP\nPOST /mcp"]:::transport
-        SSE["SSE /mcp/sse\n(streaming)"]:::transport
-    end
-
-    ExternalClients -- "JSON-RPC 2.0" --> TransportLayer
-
-    subgraph ServerCore["Node.js MCP Backend (apidash_mcp)"]
-        HashGate["ToolHashRegistry\nSHA-256 Boot Signature"]:::security
-        Router["McpServer\nRequest Router"]:::server
-        subgraph Tools14["14 Registered Tools"]
-            T1["request-builder"]:::server
-            T2["http-send-request"]:::server
-            T3["view-response"]:::server
-            T4["explore-collections"]:::server
-            T5["graphql-explorer"]:::server
-            T6["graphql-execute-query"]:::server
-            T7["codegen-ui"]:::server
-            T8["generate-code-snippet"]:::server
-            T9["manage-environment"]:::server
-            T10["update-environment-variables"]:::server
-            T11["get-api-request-template"]:::server
-            T12["ai-llm-request"]:::server
-            T13["save-request"]:::server
-            T14["_get-last-response"]:::server
-        end
-        subgraph UIResources["7 SEP-1865 UI Resources"]
-            R1["ui://apidash-mcp/request-builder"]:::transport
-            R2["ui://apidash-mcp/response-viewer"]:::transport
-            R3["ui://apidash-mcp/collections-explorer"]:::transport
-            R4["ui://apidash-mcp/graphql-explorer"]:::transport
-            R5["ui://apidash-mcp/code-generator"]:::transport
-            R6["ui://apidash-mcp/env-manager"]:::transport
-            R7["ui://apidash-mcp/code-viewer"]:::transport
-        end
-        TransportLayer --> HashGate
-        HashGate --> Router
-        Router --> Tools14
-        Router --> UIResources
-    end
-
-    subgraph CoreLib["@apidash/mcp-core (apidash_mcp_core)"]
-        executor["executor.ts\n(executeHttpRequest)"]:::core
-        graphql["graphql.ts\n(executeGraphQLRequest)"]:::core
-        ai["ai.ts\n(executeAIRequest + AI_PROVIDERS)"]:::core
-        codegen["codegen.ts\n(generateCode × 12 langs)"]:::core
-        workspace["workspace.ts\n(getMcpWorkspaceData / updateMcpWorkspaceData)"]:::core
-    end
-
-    subgraph FlutterApp["APIDash Flutter GUI"]
-        Riverpod["Riverpod Providers\n(RequestModel, EnvModel)"]:::flutter
-        SyncSvc["McpSyncService\n(Dart file watcher + serialiser)"]:::flutter
-        HiveDB["Hive LocalDB\n(binary persistence)"]:::flutter
-        Riverpod <--> SyncSvc
-        Riverpod <--> HiveDB
-    end
-
-    WorkspaceJSON[/"apidash_mcp_workspace.json\n(Cross-platform shared source of truth)"/]:::datalayer
-
-    Tools14 -. "delegates logic to" .-> CoreLib
-    TerminalLayer == "delegates all logic to" ==> CoreLib
-    CoreLib == "reads & writes" ==> WorkspaceJSON
-    SyncSvc == "writes state / reads changes" ==> WorkspaceJSON
-```
 
 ---
 
@@ -158,37 +74,8 @@ graph TD
 
 This diagram traces a single AI-agent tool call from JSON-RPC arrival to response, showing exactly how the SHA-256 Hash Gate operates at every step.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Agent as AI Agent (Claude / Copilot)
-    participant Transport as MCP Transport (stdio / HTTP)
-    participant HashGate as ToolHashRegistry (SHA-256)
-    participant Router as McpServer Router
-    participant Tool as Tool Handler (e.g. http-send-request)
-    participant Core as @apidash/mcp-core
-    participant FS as apidash_mcp_workspace.json
-    participant Flutter as McpSyncService (Dart)
+<img width="1392" height="752" alt="4006c45b-08d6-42dc-b1e2-765f16b9d8ff-u2_b8599359-a2c8-41ab-9b4a-1253fb142d28" src="https://github.com/user-attachments/assets/b7e1affe-bbd3-4477-bfd8-7ac1b38f9211" />
 
-    Agent->>Transport: JSON-RPC 2.0 tools/call\n{name: "http-send-request", params: {...}}
-    Transport->>HashGate: verifyAndThrow(name, description, schema)
-    alt Signature mismatch (prompt injection attempt)
-        HashGate-->>Transport: throw {code: -32600, message: "Invalid tool signature"}
-        Transport-->>Agent: Error response — request rejected
-    else Signature valid (normal invocation)
-        HashGate->>Router: pass through
-        Router->>Tool: invoke handler(input)
-        Tool->>Core: executeHttpRequest({method, url, headers, body, timeoutMs})
-        Core->>Core: axios({method, url, ...})\ntimeout: 30 000ms, validateStatus: ()=>true
-        Core-->>Tool: {success, data: {status, body, headers, duration}}
-        Tool->>FS: updateMcpWorkspaceData() — if save-request tool
-        FS-->>Flutter: fs.watch() event fires
-        Flutter-->>Flutter: McpSyncService hydrates Riverpod state
-        Tool-->>Router: MCP ToolResult {content, structuredContent}
-        Router-->>Transport: JSON-RPC 2.0 response
-        Transport-->>Agent: Tool result rendered in chat
-    end
-```
 
 ---
 
@@ -196,41 +83,8 @@ sequenceDiagram
 
 This diagram shows the full path for every CLI command, from `process.argv` parsing to final output.
 
-```mermaid
-flowchart TD
-    START(["$ apidash-cli ‹command› ‹args›"]) --> PARSE["parseFlags\nExtract --flags & positional args"]
-    PARSE --> SWITCH{"command?"}
+<img width="1408" height="768" alt="Gemini_Generated_Image_8y9pbp8y9pbp8y9p" src="https://github.com/user-attachments/assets/0daa9165-4cfb-4ec9-abc4-654dbe1d77dd" />
 
-    SWITCH -- list --> LIST["cmdList\ngetMcpWorkspaceData\nrender indexed table"]
-    SWITCH -- "run ‹id|index›" --> RUN["cmdRun\nresolve by int index or string ID\nexecuteHttpRequest via @apidash/mcp-core"]
-    SWITCH -- "request ‹METHOD› ‹URL›" --> ADHOC["cmdRequest\ncollectRepeated headers\nexecuteHttpRequest"]
-    SWITCH -- "graphql ‹URL›" --> GQL["cmdGraphQL\ncollectRepeated variables\nexecuteGraphQLRequest"]
-    SWITCH -- "ai ‹provider|url›" --> AI["cmdAI\nresolve AI_PROVIDERS[]\nexecuteAIRequest"]
-    SWITCH -- "save ‹METHOD› ‹URL›" --> SAVE["cmdSave\nsaveRequestToWorkspace\nupdateMcpWorkspaceData"]
-    SWITCH -- "codegen ‹id› ‹lang›" --> CG["cmdCodegen\ngenerateCode via @apidash/mcp-core\nprint syntax-highlighted snippet"]
-    SWITCH -- "env [scope]" --> ENV["cmdEnv\ngetMcpWorkspaceData\nfilter by scope, mask secrets"]
-    SWITCH -- "set ‹scope› ‹key› ‹val›" --> SET["cmdSet\nupdateMcpWorkspaceData\nflush environments array"]
-    SWITCH -- langs --> LANGS["cmdLangs\nprint SUPPORTED_GENERATORS"]
-    SWITCH -- info --> INFO["cmdInfo\ngetSyncFilePath → existsSync\nprint platform + Node.js version"]
-    SWITCH -- providers --> PROV["cmdProviders\nprint AI_PROVIDERS map"]
-    SWITCH -- "help / -h / --help" --> HELP["printHelp\nrender ASCII banner"]
-    SWITCH -- unknown --> ERR["print 'Unknown command'\nprocess.exit 1"]
-
-    RUN --> CORE_HTTP["executeHttpRequest\n@apidash/mcp-core/executor.ts"]
-    ADHOC --> CORE_HTTP
-    ADHOC -- "--codegen flag" --> CORE_CG["generateCode\n@apidash/mcp-core/codegen.ts"]
-    ADHOC -- "--save flag" --> CORE_WS["updateMcpWorkspaceData\n@apidash/mcp-core/workspace.ts"]
-    GQL --> CORE_GQL["executeGraphQLRequest\n@apidash/mcp-core/graphql.ts"]
-    AI --> CORE_AI["executeAIRequest\n@apidash/mcp-core/ai.ts"]
-    SAVE --> CORE_WS
-    CG --> CORE_CG
-    SET --> CORE_WS
-    CORE_WS -- "writes JSON" --> JSON_FILE[/"apidash_mcp_workspace.json"/]
-    JSON_FILE -- "fs.watch() event" --> FLUTTER_SYNC["McpSyncService\nhydrates Riverpod"]
-
-    CORE_HTTP --> DISP["dispatchHttpResult\nstatusBadge + methodBadge\nprintBody JSON/text"]
-    DISP --> STDOUT(["stdout — coloured terminal output"])
-```
 
 ---
 
@@ -238,84 +92,15 @@ flowchart TD
 
 This diagram shows the internal Dart logic bridging Riverpod ↔ the JSON file ↔ the Node.js tools.
 
-```mermaid
-stateDiagram-v2
-    [*] --> Idle : App launched
+<img width="1328" height="800" alt="image" src="https://github.com/user-attachments/assets/e65d05e7-9d7e-4086-a0f2-65bc5ab7eeda" />
 
-    Idle --> ExportingJSON : Riverpod state changes\n(user adds/edits a request or env)
-    ExportingJSON --> Idle : writeFileSync(\napidash_mcp_workspace.json\n)\n→ debounced 200 ms
-
-    Idle --> WatcherTriggered : fs.watch() event\n(external write detected)
-    WatcherTriggered --> Parsing : readFileSync + JSON.parse
-    Parsing --> ValidationOK : schema valid\n(requests[], environments[])
-    Parsing --> ValidationFail : parse error / schema mismatch
-    ValidationOK --> HydrationOK : Riverpod.update()\nRequestModelNotifier.set()\nEnvModelNotifier.set()
-    HydrationOK --> Idle : UI reflects new state
-    ValidationFail --> Idle : log warning, skip hydration
-
-    note right of ExportingJSON
-        Triggered by:
-        • User saves a request
-        • User edits env variable
-        • App starts (initial export)
-    end note
-
-    note right of WatcherTriggered
-        Triggered by:
-        • MCP tool: save-request
-        • MCP tool: update-environment-variables
-        • CLI: apidash-cli save / set
-    end note
-```
 
 ---
 
 ## Flowchart 5 — Monorepo Package Dependency Graph
 
-```mermaid
-graph LR
-    classDef npm fill:#cb3837,color:#fff,stroke:#900,stroke-width:2px;
-    classDef local fill:#fff3e0,stroke:#ffb347,stroke-width:2px,color:#000;
-    classDef dart fill:#0175C2,color:#fff,stroke:#014;
+<img width="1392" height="752" alt="eb80151b-5df3-49f3-989b-a5c4d928f537-u2_3a6b8a86-5ef6-4996-b353-4644d7003e9e" src="https://github.com/user-attachments/assets/4e2064f7-47f6-493e-b7c8-d9a5b4ce85f8" />
 
-    subgraph NPM_Registry["npm registry (external)"]
-        axios["axios ^1.7.9"]:::npm
-        mcp_sdk["@modelcontextprotocol/sdk ^1.25.2"]:::npm
-        express["express ^5.2.1"]:::npm
-        zod["zod ^4.3.5"]:::npm
-        graphql_pkg["graphql ^16.10.0"]:::npm
-        tsx["tsx ^4.21.0"]:::npm
-    end
-
-    subgraph Monorepo["APIDash TypeScript Monorepo (packages/)"]
-        MCP_CORE["@apidash/mcp-core\n(apidash_mcp_core)\n━━━━━━━━━━━━━━━\nexecutor.ts\ngraphql.ts\nai.ts\ncodegen.ts\nworkspace.ts\nindex.ts"]:::local
-        MCP_SERVER["apidash-mcp\n(apidash_mcp)\n━━━━━━━━━━━━━━━\nindex.ts  (13 tools)\nui/ (6 SEP-1865 UIs)\nstyles.ts"]:::local
-        CLI["apidash-cli\n(apidash_cli)\n━━━━━━━━━━━━━━━\nindex.ts (17 commands)\ntest_cli.sh"]:::local
-    end
-
-    subgraph FlutterCode["APIDash Flutter / Dart"]
-        DART_SYNC["McpSyncService.dart\n(Riverpod ↔ JSON bridge)"]:::dart
-        HIVE["Hive LocalDB\n(binary boxes)"]:::dart
-    end
-
-    MCP_SERVER --> MCP_CORE
-    MCP_SERVER --> mcp_sdk
-    MCP_SERVER --> express
-    MCP_SERVER --> zod
-    MCP_SERVER --> axios
-    MCP_SERVER --> graphql_pkg
-
-    CLI --> MCP_CORE
-    CLI --> axios
-
-    MCP_CORE --> axios
-
-    MCP_SERVER -.->|"file: ../apidash_mcp_core"| MCP_CORE
-    CLI -.->|"file: ../apidash_mcp_core"| MCP_CORE
-
-    DART_SYNC <-->|"apidash_mcp_workspace.json\n(shared filesystem IPC)"| MCP_CORE
-    DART_SYNC <--> HIVE
-```
 
 ---
 
@@ -461,30 +246,8 @@ To secure the MCP Server, APIDash implements a 3-Tier authentication architectur
 #### Flowchart 6 — OAuth 2.1 Dynamic Client Registration & PKCE Flow
 The following sequence demonstrates how headless agents (like VS Code Copilot) dynamically establish trust and acquire Bearer tokens via the APIDash MCP Server's `.well-known` endpoints without relying on hardcoded keys.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Copilot as VS Code Agent
-    participant Auth as APIDash Auth Middleware
-    participant WellKnown as .well-known Endpoints
-    participant Store as OAuth Token Store
+<img width="1392" height="752" alt="02efa50e-7c6e-4977-a8db-9f033e2586d4-u1_9a2eff9a-b3a0-49d2-ad62-8b416c66a760 (1)" src="https://github.com/user-attachments/assets/0b7bad8a-dd5e-4571-8d2b-1bfc095993d4" />
 
-    Copilot->>Auth: POST /mcp/sse (No token)
-    Auth-->>Copilot: 401 Unauthorized<br>WWW-Authenticate: Bearer resource_metadata="..."
-    Copilot->>WellKnown: GET /.well-known/oauth-protected-resource
-    WellKnown-->>Copilot: 200 OK (authorization_servers: [URL])
-    Copilot->>WellKnown: GET /.well-known/oauth-authorization-server
-    WellKnown-->>Copilot: 200 OK (OAuth endpoints & capabilities)
-    Copilot->>Store: POST /register (Dynamic Client Registration)
-    Store-->>Copilot: 201 Created (client_id)
-    Copilot->>Copilot: User clicks "Sign In" (Browser Opens)
-    Copilot->>Store: GET /authorize?response_type=code&client_id=...&code_challenge=...
-    Store-->>Copilot: 302 Redirect (auth_code)
-    Copilot->>Store: POST /token (grant_type=authorization_code&code_verifier=...)
-    Store-->>Copilot: 200 OK (access_token)
-    Copilot->>Auth: POST /mcp/sse (Authorization: Bearer <token>)
-    Auth-->>Copilot: 200 OK (SSE Stream Established)
-```
 
 #### Step 1 — Configure the Server Auth Mode
 
