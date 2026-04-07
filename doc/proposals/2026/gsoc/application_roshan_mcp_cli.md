@@ -198,38 +198,38 @@ This diagram shows the full path for every CLI command, from `process.argv` pars
 
 ```mermaid
 flowchart TD
-    START([$ apidash-cli ‹command› ‹args›]) --> PARSE[parseFlags\nExtract --flags & positional args]
-    PARSE --> SWITCH{command?}
+    START(["$ apidash-cli ‹command› ‹args›"]) --> PARSE["parseFlags\nExtract --flags & positional args"]
+    PARSE --> SWITCH{"command?"}
 
-    SWITCH -- list --> LIST[cmdList\ngetMcpWorkspaceData\nrender indexed table]
-    SWITCH -- "run ‹id|index›" --> RUN[cmdRun\nresolve by int index or string ID\nexecuteHttpRequest via @apidash/mcp-core]
-    SWITCH -- "request ‹METHOD› ‹URL›" --> ADHOC[cmdRequest\ncollectRepeated headers\nexecuteHttpRequest]
-    SWITCH -- "graphql ‹URL›" --> GQL[cmdGraphQL\ncollectRepeated variables\nexecuteGraphQLRequest]
-    SWITCH -- "ai ‹provider|url›" --> AI[cmdAI\nresolve AI_PROVIDERS[]\nexecuteAIRequest]
-    SWITCH -- "save ‹METHOD› ‹URL›" --> SAVE[cmdSave\nsaveRequestToWorkspace\nupdateMcpWorkspaceData]
-    SWITCH -- "codegen ‹id› ‹lang›" --> CG[cmdCodegen\ngenerateCode via @apidash/mcp-core\nprint syntax-highlighted snippet]
-    SWITCH -- "env [scope]" --> ENV[cmdEnv\ngetMcpWorkspaceData\nfilter by scope, mask secrets]
-    SWITCH -- "set ‹scope› ‹key› ‹val›" --> SET[cmdSet\nupdateMcpWorkspaceData\nflush environments array]
-    SWITCH -- langs --> LANGS[cmdLangs\nprint SUPPORTED_GENERATORS]
-    SWITCH -- info --> INFO[cmdInfo\ngetSyncFilePath → existsSync\nprint platform + Node.js version]
-    SWITCH -- providers --> PROV[cmdProviders\nprint AI_PROVIDERS map]
-    SWITCH -- "help / -h / --help" --> HELP[printHelp\nrender ASCII banner]
-    SWITCH -- unknown --> ERR[print 'Unknown command'\nprocess.exit 1]
+    SWITCH -- list --> LIST["cmdList\ngetMcpWorkspaceData\nrender indexed table"]
+    SWITCH -- "run ‹id|index›" --> RUN["cmdRun\nresolve by int index or string ID\nexecuteHttpRequest via @apidash/mcp-core"]
+    SWITCH -- "request ‹METHOD› ‹URL›" --> ADHOC["cmdRequest\ncollectRepeated headers\nexecuteHttpRequest"]
+    SWITCH -- "graphql ‹URL›" --> GQL["cmdGraphQL\ncollectRepeated variables\nexecuteGraphQLRequest"]
+    SWITCH -- "ai ‹provider|url›" --> AI["cmdAI\nresolve AI_PROVIDERS[]\nexecuteAIRequest"]
+    SWITCH -- "save ‹METHOD› ‹URL›" --> SAVE["cmdSave\nsaveRequestToWorkspace\nupdateMcpWorkspaceData"]
+    SWITCH -- "codegen ‹id› ‹lang›" --> CG["cmdCodegen\ngenerateCode via @apidash/mcp-core\nprint syntax-highlighted snippet"]
+    SWITCH -- "env [scope]" --> ENV["cmdEnv\ngetMcpWorkspaceData\nfilter by scope, mask secrets"]
+    SWITCH -- "set ‹scope› ‹key› ‹val›" --> SET["cmdSet\nupdateMcpWorkspaceData\nflush environments array"]
+    SWITCH -- langs --> LANGS["cmdLangs\nprint SUPPORTED_GENERATORS"]
+    SWITCH -- info --> INFO["cmdInfo\ngetSyncFilePath → existsSync\nprint platform + Node.js version"]
+    SWITCH -- providers --> PROV["cmdProviders\nprint AI_PROVIDERS map"]
+    SWITCH -- "help / -h / --help" --> HELP["printHelp\nrender ASCII banner"]
+    SWITCH -- unknown --> ERR["print 'Unknown command'\nprocess.exit 1"]
 
-    RUN --> CORE_HTTP[executeHttpRequest\n@apidash/mcp-core/executor.ts]
+    RUN --> CORE_HTTP["executeHttpRequest\n@apidash/mcp-core/executor.ts"]
     ADHOC --> CORE_HTTP
-    ADHOC -- "--codegen flag" --> CORE_CG[generateCode\n@apidash/mcp-core/codegen.ts]
-    ADHOC -- "--save flag" --> CORE_WS[updateMcpWorkspaceData\n@apidash/mcp-core/workspace.ts]
-    GQL --> CORE_GQL[executeGraphQLRequest\n@apidash/mcp-core/graphql.ts]
-    AI --> CORE_AI[executeAIRequest\n@apidash/mcp-core/ai.ts]
+    ADHOC -- "--codegen flag" --> CORE_CG["generateCode\n@apidash/mcp-core/codegen.ts"]
+    ADHOC -- "--save flag" --> CORE_WS["updateMcpWorkspaceData\n@apidash/mcp-core/workspace.ts"]
+    GQL --> CORE_GQL["executeGraphQLRequest\n@apidash/mcp-core/graphql.ts"]
+    AI --> CORE_AI["executeAIRequest\n@apidash/mcp-core/ai.ts"]
     SAVE --> CORE_WS
     CG --> CORE_CG
     SET --> CORE_WS
     CORE_WS -- "writes JSON" --> JSON_FILE[/"apidash_mcp_workspace.json"/]
-    JSON_FILE -- "fs.watch() event" --> FLUTTER_SYNC[McpSyncService\nhydrates Riverpod]
+    JSON_FILE -- "fs.watch() event" --> FLUTTER_SYNC["McpSyncService\nhydrates Riverpod"]
 
-    CORE_HTTP --> DISP[dispatchHttpResult\nstatusBadge + methodBadge\nprintBody JSON/text]
-    DISP --> STDOUT([stdout — coloured terminal output])
+    CORE_HTTP --> DISP["dispatchHttpResult\nstatusBadge + methodBadge\nprintBody JSON/text"]
+    DISP --> STDOUT(["stdout — coloured terminal output"])
 ```
 
 ---
