@@ -3,10 +3,21 @@ import { STATUS_REASONS } from "./data/api-data.js";
 export async function executeHttpRequest({ method, url, headers, body, timeoutMs }) {
     const startTime = Date.now();
     try {
+        const finalHeaders = { ...(headers ?? {}) };
+        // LLM Forgiveness: Auto-add application/json Content-Type if missing and body looks like JSON
+        if (body && !Object.keys(finalHeaders).some(k => k.toLowerCase() === 'content-type')) {
+            const trimmed = body.trim();
+            if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+                finalHeaders['Content-Type'] = 'application/json';
+            }
+            else {
+                finalHeaders['Content-Type'] = 'text/plain';
+            }
+        }
         const response = await axios({
             method: method.toLowerCase(),
             url,
-            headers: (headers ?? {}),
+            headers: finalHeaders,
             data: body,
             timeout: timeoutMs ?? 30000,
             validateStatus: () => true, // don't throw on non-2xx

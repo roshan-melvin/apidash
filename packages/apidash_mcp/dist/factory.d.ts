@@ -10,4 +10,6 @@
  * from the centralised src/tools/ modules.
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+export declare let globalLastResponse: any;
+export declare let globalLastCodeState: any;
 export declare function createMcpServer(): McpServer;

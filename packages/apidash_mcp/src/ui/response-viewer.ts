@@ -68,6 +68,8 @@ export function RESPONSE_VIEWER_UI(): string {
     }
     .loading-icon { font-size: 36px; opacity: 0.5; }
     .loading-text { font-size: 12px; }
+    .poll-dot { display: inline-block; animation: blink 1.2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
     .view-toggle { display: flex; gap: 6px; margin-left: auto; }
   </style>
 </head>
@@ -79,7 +81,7 @@ export function RESPONSE_VIEWER_UI(): string {
 
   <div id="loadingState" class="loading-state">
     <div class="loading-icon">📭</div>
-    <div class="loading-text">Waiting for response data…</div>
+    <div class="loading-text">Waiting for response data… <span class="poll-dot">●</span></div>
     <div style="font-size:10px; color:var(--muted);">Use the HTTP Send Request tool to populate this viewer</div>
   </div>
 
@@ -163,6 +165,32 @@ export function RESPONSE_VIEWER_UI(): string {
         document.body.className = theme; 
       }
     });
+
+    // ─── Fetch latest response dynamically via MCP ───────────
+    let lastRenderedTime = 0;
+    async function fetchLatest() {
+      try {
+        const result = await request('tools/call', {
+          name: '_get-last-response',
+          arguments: {}
+        });
+        const sc = result?.structuredContent;
+        if (sc && sc.status && sc.timestamp !== lastRenderedTime) {
+          lastRenderedTime = sc.timestamp;
+          currentData = sc;
+          renderResponse(sc);
+        } else if (!sc) {
+           document.querySelector('.loading-text').innerHTML = "No structuredContent returned from tool.<br><small>" + JSON.stringify(result) + "</small>";
+        }
+      } catch (e) {
+        document.querySelector('.loading-text').innerHTML = "MCP Error: " + (e.message || String(e)) + "<br>If polling failed natively, make sure tools/call is supported by your client!";
+      }
+    }
+
+    // Poll every 1s for updates
+    setInterval(fetchLatest, 1000);
+    // Fetch immediately on load
+    setTimeout(fetchLatest, 100);
 
     function switchView(btn, name) {
       document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));

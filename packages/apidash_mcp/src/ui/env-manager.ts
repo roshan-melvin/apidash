@@ -203,7 +203,7 @@ export function ENV_MANAGER_UI(): string {
               oninput="vars[currentEnv][\${i}].key=this.value; updatePreview();" />
           </td>
           <td>
-            <input class="env-input" type="\${v.secret && !showSecret[\${i}] ? 'password' : 'text'}"
+            <input class="env-input" type="\${v.secret && !showSecret[i] ? 'password' : 'text'}"
               value="\${esc(v.value)}"
               oninput="vars[currentEnv][\${i}].value=this.value; updatePreview();" />
           </td>
@@ -253,7 +253,7 @@ export function ENV_MANAGER_UI(): string {
       const currentVars = (vars[currentEnv] || []).filter(v => v.enabled);
       let result = input;
       currentVars.forEach(v => {
-        const safeKey = v.key.replace(/[-[\]{}()*+?.,\\\\^$|#\s]/g, '\\\\$&');
+        const safeKey = v.key.replace(/[-[\\]{}()*+?.,\\\\^$|#\\s]/g, '\\\\$&');
         const regex = new RegExp('{{' + safeKey + '}}', 'g');
         result = result.replace(regex, v.secret ? '••••••' : v.value);
       });

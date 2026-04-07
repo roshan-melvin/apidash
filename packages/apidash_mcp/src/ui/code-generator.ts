@@ -85,16 +85,8 @@ export function CODE_GENERATOR_UI(): string {
       </div>
     </div>
 
-    <!-- Code Output -->
-    <div class="code-output" id="codeOutput" style="display:none;">
-      <div class="code-toolbar">
-        <span id="codeLangLabel" style="font-size:11px; font-weight:600; color:var(--muted);"></span>
-        <div style="display:flex; gap:6px;">
-          <button class="btn-secondary" style="font-size:9px; padding:3px 8px;" onclick="copyCode()">📋 Copy</button>
-          <button class="btn-secondary" style="font-size:9px; padding:3px 8px;" onclick="downloadCode()">⬇️ Download</button>
         </div>
       </div>
-      <pre id="codeContent" class="code-content"></pre>
     </div>
   </div>
 
@@ -110,7 +102,6 @@ export function CODE_GENERATOR_UI(): string {
     const pending = new Map();
     let nextId = 1;
     let currentLang = 'curl';
-    let lastCode = '';
     let lastInput = null;
 
     function request(method, params) {
@@ -174,42 +165,38 @@ export function CODE_GENERATOR_UI(): string {
       const body = document.getElementById('codeBody').value.trim() || undefined;
       lastInput = { method, url, headers, body };
 
-      setFoot('Generating…', '');
+      setFoot('Generating & Syncing…', '');
 
       try {
-        const result = await request('tools/call', {
+        await request('tools/call', {
           name: 'generate-code-snippet',
           arguments: { method, url, headers, body, generator: currentLang }
         });
 
-        const sc = result?.structuredContent;
-        lastCode = sc?.code || result?.content?.[0]?.text || '';
-        const gen = getGenerator();
+        const poll = await request('tools/call', { name: '_get-last-response', arguments: {} });
+        const code = poll?.structuredContent?.lastCodeState?.code || "Code unavailable";
 
-        document.getElementById('codeOutput').style.display = '';
-        document.getElementById('codeLangLabel').textContent = (gen?.name || currentLang) + ' (' + (gen?.lang || '') + ')';
-        document.getElementById('codeContent').textContent = lastCode;
-        document.getElementById('addChatBtn').disabled = false;
-        setFoot('✅ Code generated', 'success');
+        await request('ui/update-model-context', {
+          content: [{
+            type: "text",
+            text: "Please display this generated code snippet using the apidash_mcp_server 'generate-code-snippet' tool so I can view it."
+          }],
+          structuredContent: {
+            language: currentLang,
+            request: { method, url, headers, body },
+            code: code,
+          }
+        });
+        
+        setFoot('✅ Added snippet to chat context!', 'success');
+        document.getElementById('addChatBtn').disabled = true;
       } catch (e) {
         setFoot('❌ ' + (e?.message || 'Generation failed'), 'error');
       }
     }
 
-    function copyCode() {
-      if (!lastCode) return;
-      navigator.clipboard?.writeText(lastCode).then(() => setFoot('📋 Copied!', ''));
-    }
-
-    function downloadCode() {
-      if (!lastCode) return;
-      const gen = getGenerator();
-      const ext = gen?.lang === 'javascript' ? 'js' : gen?.lang === 'python' ? 'py' : gen?.lang === 'bash' ? 'sh' : gen?.lang || 'txt';
-      const blob = new Blob([lastCode], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'api-request.' + ext;
-      a.click();
+    async function addToChat() {
+      await generateCode();
     }
 
     async function loadFromBuilder() {

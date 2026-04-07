@@ -7,6 +7,8 @@ export const TOOL_OUTPUT_SCHEMAS = {
         duration: z.number().optional(),
         body: z.string().optional(),
         headers: z.record(z.string(), z.string()).optional(),
+        method: z.string().optional(),
+        url: z.string().optional(),
     }),
     "view-response": z.object({
         response: z.any(),

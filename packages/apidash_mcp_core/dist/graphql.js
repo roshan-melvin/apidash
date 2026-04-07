@@ -23,7 +23,7 @@ export async function executeGraphQLRequest(ctx) {
             method: "POST",
             url,
             headers: mergedHeaders,
-            data: JSON.stringify(payload),
+            data: payload,
             timeout: timeoutMs,
             validateStatus: () => true,
         });

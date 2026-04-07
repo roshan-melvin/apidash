@@ -56,7 +56,7 @@ The overarching system relies on a **Decoupled File-Sync Architecture** bridging
 |---|---|---|
 | **APIDash Flutter GUI** | Flutter / Dart / Riverpod | Primary UI; persists requests in Hive; writes & watches `apidash_mcp_workspace.json` |
 | **McpSyncService** | Dart | Bi-directional file bridge; serialises Riverpod state → JSON; watches for external writes |
-| **apidash_mcp** (MCP Server) | Node.js / TypeScript | Registers 13 MCP tools + 6 SEP-1865 UI resources over `streamable-HTTP` or `stdio` |
+| **apidash_mcp** (MCP Server) | Node.js / TypeScript | Registers 14 MCP tools + 7 SEP-1865 UI resources over `streamable-HTTP` or `stdio` |
 | **apidash_mcp_core** | TypeScript (ESM) | Shared zero-duplication library: executor, graphql, ai, codegen, workspace I/O |
 | **apidash_cli** | Node.js / TypeScript | Terminal-first headless executor; delegates all logic to `@apidash/mcp-core` |
 | **Agent Client** | Any MCP-compatible host | Claude Desktop, VS Code Copilot, or custom chatflow connecting via JSON-RPC 2.0 |
@@ -97,7 +97,7 @@ graph TD
     subgraph ServerCore["Node.js MCP Backend (apidash_mcp)"]
         HashGate["ToolHashRegistry\nSHA-256 Boot Signature"]:::security
         Router["McpServer\nRequest Router"]:::server
-        subgraph Tools13["13 Registered Tools"]
+        subgraph Tools14["14 Registered Tools"]
             T1["request-builder"]:::server
             T2["http-send-request"]:::server
             T3["view-response"]:::server
@@ -111,18 +111,20 @@ graph TD
             T11["get-api-request-template"]:::server
             T12["ai-llm-request"]:::server
             T13["save-request"]:::server
+            T14["_get-last-response"]:::server
         end
-        subgraph UIResources["6 SEP-1865 UI Resources"]
+        subgraph UIResources["7 SEP-1865 UI Resources"]
             R1["ui://apidash-mcp/request-builder"]:::transport
             R2["ui://apidash-mcp/response-viewer"]:::transport
             R3["ui://apidash-mcp/collections-explorer"]:::transport
             R4["ui://apidash-mcp/graphql-explorer"]:::transport
             R5["ui://apidash-mcp/code-generator"]:::transport
             R6["ui://apidash-mcp/env-manager"]:::transport
+            R7["ui://apidash-mcp/code-viewer"]:::transport
         end
         TransportLayer --> HashGate
         HashGate --> Router
-        Router --> Tools13
+        Router --> Tools14
         Router --> UIResources
     end
 
@@ -144,7 +146,7 @@ graph TD
 
     WorkspaceJSON[/"apidash_mcp_workspace.json\n(Cross-platform shared source of truth)"/]:::datalayer
 
-    Tools13 -. "delegates logic to" .-> CoreLib
+    Tools14 -. "delegates logic to" .-> CoreLib
     TerminalLayer == "delegates all logic to" ==> CoreLib
     CoreLib == "reads & writes" ==> WorkspaceJSON
     SyncSvc == "writes state / reads changes" ==> WorkspaceJSON
@@ -620,9 +622,13 @@ During the development and testing of the Model Context Protocol (MCP) server, w
 * **Issue:** When executing tools like `http-send-request`, the LLM agent threw an abrupt output validation error: `Invalid input: expected record, received AxiosHeaders`. This crash occurred because our MCP payload builder was passing raw Axios responses downstream. In Axios v1.0+, `response.headers` is an instance of the `AxiosHeaders` class—not a plain JSON object. The MCP Protocol strictly enforces its schema, and `z.record()` validation crashed because the object prototype didn't cleanly match a standard JS Dictionary.
 * **Fix:** We updated `@apidash/mcp-core/executor.ts` to rigidly serialize the response headers via `JSON.parse(JSON.stringify(response.headers))` before dropping them into the `structuredContent` MCP block. This aggressively flattens the `AxiosHeaders` class instance back into a strict dictionary of string key-value pairs, resolving the Zod structural parse crash.
 
+### 8. Cross-Process Webview UI State Synchronization (Stalled Iframes)
+* **Issue:** Tools designed to render standalone UX panels (like the API Response Viewer) were stalling indefinitely on "Waiting for response data..." when invoked autonomously by an AI agent over standard `stdio`. The VS Code/Cursor Webview API pushes the LLM's raw intent (`ui/notifications/tool-input`) into the iframe lifecycle, but drops the vast underlying JSON *Output Result*, severely restricting how the UI syncs dynamic backend data in proxy environments that lack an accessible localhost HTTP origin. 
+* **Fix:** We completely bypassed traditional network polling architectures by injecting native JSON-RPC loops directly into the iframe's lifecycle. By maintaining a single `globalLastResponse` shared memory pool in the Node backend and spinning up an invisible `_get-last-response` internal tool, the UI iframe actively executes downstream polling *through* the client's own IPC socket. The agent tunnels the request perfectly down its `stdio` stream back to our Node instance and safely returns the backend memory structure entirely over the standard tool bridge.
+
 ---
 
-## MCP Tool Manifest (13 Tools)
+## MCP Tool Manifest (14 Tools)
 
 | # | Tool Name | Visibility | Description |
 |---|---|---|---|
@@ -639,8 +645,9 @@ During the development and testing of the Model Context Protocol (MCP) server, w
 | 11 | `get-api-request-template` | model + app | Fetches a saved request by ID from workspace JSON for inspection or execution |
 | 12 | `ai-llm-request` | model | Chat-completion proxy to any OpenAI-compatible LLM (7 built-in provider shortcuts) |
 | 13 | `save-request` | model | Persists a new HTTP/GraphQL request to `apidash_mcp_workspace.json` via `updateMcpWorkspaceData` |
+| 14 | `_get-last-response` | app only | Internal polling endpoint used by Webview UIs to bypass `-32602` JSON-RPC payload limits |
 
-**SEP-1865 UI Resources (6 panels):**
+**SEP-1865 UI Resources (7 panels):**
 
 | Resource URI | Rendered by |
 |---|---|
@@ -650,12 +657,13 @@ During the development and testing of the Model Context Protocol (MCP) server, w
 | `ui://apidash-mcp/graphql-explorer` | `GRAPHQL_EXPLORER_UI()` |
 | `ui://apidash-mcp/code-generator` | `CODE_GENERATOR_UI()` |
 | `ui://apidash-mcp/env-manager` | `ENV_MANAGER_UI()` |
+| `ui://apidash-mcp/code-viewer` | `CODE_VIEWER_UI()` |
 
 ---
 
 ## Extended MCP Agent Triggering Prompts
 
-The following is a complete prompt reference for all 13 tools exposed by the APIDash MCP server. These prompts are designed to trigger each tool naturally inside Claude Desktop, VS Code Copilot, or any MCP-compatible agent.
+The following is a complete prompt reference for all 13 external tools exposed by the APIDash MCP server. These prompts are designed to trigger each tool naturally inside Claude Desktop, VS Code Copilot, or any MCP-compatible agent.
 
 ---
 

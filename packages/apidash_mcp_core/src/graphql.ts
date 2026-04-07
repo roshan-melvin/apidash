@@ -60,7 +60,7 @@ export async function executeGraphQLRequest(ctx: GraphQLRequestContext): Promise
       method: "POST",
       url,
       headers: mergedHeaders,
-      data: JSON.stringify(payload),
+      data: payload,
       timeout: timeoutMs,
       validateStatus: () => true,
     });

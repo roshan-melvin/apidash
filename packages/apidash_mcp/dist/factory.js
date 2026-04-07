@@ -17,10 +17,14 @@ import { RESPONSE_VIEWER_UI } from "./ui/response-viewer.js";
 import { COLLECTIONS_EXPLORER_UI } from "./ui/collections-explorer.js";
 import { GRAPHQL_EXPLORER_UI } from "./ui/graphql-explorer.js";
 import { CODE_GENERATOR_UI } from "./ui/code-generator.js";
+import { CODE_VIEWER_UI } from "./ui/code-viewer.js";
 import { ENV_MANAGER_UI } from "./ui/env-manager.js";
 import { STATUS_REASONS } from "./data/api-data.js";
 import { TOOL_ANNOTATIONS } from "./tools/annotations.js";
 import { TOOL_OUTPUT_SCHEMAS } from "./tools/schemas.js";
+// Global in-memory store for the last response, used by the Response Viewer UI via JSON-RPC
+export let globalLastResponse = null;
+export let globalLastCodeState = null;
 // ─────────────────────────────────────────────────────────────
 // Constants (shared with index.ts via re-export is not needed —
 // index.ts keeps its own copy for the startup console output)
@@ -38,6 +42,25 @@ function toolOpts(name, opts) {
         annotations: TOOL_ANNOTATIONS[name],
         outputSchema: TOOL_OUTPUT_SCHEMAS[name],
     };
+}
+// ─────────────────────────────────────────────────────────────
+// Helper: Interpolate variables before executing HTTP calls
+// ─────────────────────────────────────────────────────────────
+function interpolateVars(str) {
+    if (!str)
+        return "";
+    let result = str;
+    const workspace = getMcpWorkspaceData();
+    const globalEnv = workspace.environments?.find((e) => e.name === 'global');
+    const vars = globalEnv?.values || [];
+    vars.forEach((v) => {
+        if (!v.enabled || !v.key)
+            return;
+        const safeKey = v.key.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&');
+        const regex = new RegExp('{{' + safeKey + '}}', 'g');
+        result = result.replace(regex, v.value);
+    });
+    return result;
 }
 // ─────────────────────────────────────────────────────────────
 // Factory
@@ -124,6 +147,20 @@ export function createMcpServer() {
                 }],
         };
     });
+    // 5.5. Code Viewer UI
+    server.registerResource("code-viewer-ui", `${URI}/code-viewer`, {
+        mimeType: MIME,
+        description: "Read-only view for outputting generated API code snippets.",
+    }, async (uri) => {
+        console.log(`📱 resources/read: ${uri.href}`);
+        return {
+            contents: [{
+                    uri: uri.href,
+                    mimeType: MIME,
+                    text: CODE_VIEWER_UI(),
+                }],
+        };
+    });
     // 6. Environment Variables Manager UI
     server.registerResource("env-manager-ui", `${URI}/env-manager`, {
         mimeType: MIME,
@@ -178,11 +215,30 @@ export function createMcpServer() {
             },
         },
     }), async ({ method, url, headers, body, timeoutMs }) => {
-        console.log(`🔧 [http-send-request] ${method} ${url}`);
-        const res = await executeHttpRequest({ method, url, headers: headers, body, timeoutMs });
+        const iUrl = interpolateVars(url);
+        const iBody = interpolateVars(body);
+        const iHeaders = {};
+        if (headers) {
+            Object.entries(headers).forEach(([k, v]) => {
+                iHeaders[k] = interpolateVars(v);
+            });
+        }
+        console.log(`🔧 [http-send-request] ${method} ${iUrl}`);
+        const res = await executeHttpRequest({ method, url: iUrl, headers: iHeaders, body: iBody, timeoutMs });
         if (res.success && res.data) {
             const responseBody = res.data.body || "";
             const duration = res.data.duration;
+            globalLastResponse = {
+                type: "http",
+                status: res.data.status,
+                statusText: res.data.statusText,
+                duration,
+                method,
+                url: iUrl,
+                body: responseBody,
+                headers: res.data.headers,
+                timestamp: Date.now()
+            };
             return {
                 content: [{
                         type: "text",
@@ -309,6 +365,17 @@ export function createMcpServer() {
         }
         const { status, duration, body, errors, data } = result.data;
         const hasErrors = errors && Array.isArray(errors) && errors.length > 0;
+        globalLastResponse = {
+            type: "graphql",
+            status,
+            statusText: result.data.statusText || "OK",
+            duration,
+            method: "POST",
+            url,
+            body,
+            headers: result.data.headers,
+            timestamp: Date.now()
+        };
         return {
             content: [{
                     type: "text",
@@ -349,7 +416,7 @@ export function createMcpServer() {
                 }],
             structuredContent: method && url
                 ? { request: { method, url, headers: headers ?? {}, body } }
-                : undefined,
+                : {},
         };
     });
     // ── Tool 8: Generate Code Snippet (app-only) ──────────────
@@ -368,20 +435,35 @@ export function createMcpServer() {
         },
         _meta: {
             ui: {
-                resourceUri: `${URI}/code-generator`,
-                visibility: ["app"],
+                resourceUri: `${URI}/code-viewer`,
+                visibility: ["model", "app"],
             },
         },
     }), async ({ method, url, headers, body, generator }) => {
-        console.log(`🔧 [generate-code-snippet] generator=${generator}, ${method} ${url}`);
+        const iUrl = interpolateVars(url);
+        const iBody = interpolateVars(body);
+        const iHeaders = {};
+        if (headers) {
+            Object.entries(headers).forEach(([k, v]) => {
+                iHeaders[k] = interpolateVars(v);
+            });
+        }
+        console.log(`🔧 [generate-code-snippet] generator=${generator}, ${method} ${iUrl}`);
         const code = generateCode(generator, {
             method,
-            url,
-            headers: (headers ?? {}),
-            body,
+            url: iUrl,
+            headers: iHeaders,
+            body: iBody,
         });
+        globalLastCodeState = {
+            generator,
+            language: generator,
+            code,
+            request: { method, url: iUrl, headers: iHeaders, body: iBody },
+            timestamp: Date.now()
+        };
         return {
-            content: [{ type: "text", text: `Generated ${generator} code:\n\n\`\`\`\n${code}\n\`\`\`` }],
+            content: [{ type: "text", text: `Successfully generated ${generator} snippet. It is now mounted in the APIDash Code Viewer UI above.` }],
             structuredContent: {
                 generator,
                 language: generator,
@@ -405,7 +487,8 @@ export function createMcpServer() {
             content: [{
                     type: "text",
                     text: "🌱 APIDash Environment Variables Manager opened.\n\nScopes: Global, Development, Staging, Production\n\nUse {{VARIABLE_NAME}} in URLs, headers, and body to reference variables.\n\nExamples:\n• https://{{BASE_URL}}/api/{{VERSION}}/users\n• Authorization: Bearer {{TOKEN}}\n• {\"api_key\": \"{{API_KEY}}\"}"
-                }]
+                }],
+            structuredContent: {},
         };
     });
     // ── Tool 10: Update Environment Variables (app-only) ──────
@@ -587,6 +670,19 @@ export function createMcpServer() {
                     text: `✅ Request saved!\n\n**Name:** ${name}\n**ID:** \`${id}\`\n**Method:** ${method}\n**URL:** ${url}\n\nRun it with: \`apidash-cli run ${id}\``,
                 }],
             structuredContent: { success: true, id, name, method, url },
+        };
+    });
+    // ── Tool 14: Internal Get Last Response ───────────────────
+    // Called by Response Viewer UI via JSON-RPC since it can't fetch() due to stdio architecture
+    server.registerTool("_get-last-response", {
+        description: "Internal tool to retrieve the last HTTP/GraphQL response.",
+    }, async () => {
+        return {
+            content: [{ type: "text", text: "OK" }],
+            structuredContent: {
+                lastResponse: globalLastResponse || {},
+                lastCodeState: globalLastCodeState || {}
+            },
         };
     });
     return server;
