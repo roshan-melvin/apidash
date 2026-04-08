@@ -1030,22 +1030,32 @@ src/
 
 ### After — MCP 2025–2026 Compliant Modular Structure
 
-```
+```text
 src/
 ├── index.ts                  ← ~110 lines: thin composition root (wiring only)
 ├── factory.ts                ← createMcpServer(): all 14 tools + 7 resources
 ├── middleware/
-│   └── auth.ts               ← OAuth 2.1 bearer token gate
+│   └── auth.ts               ← Bearer token config gate
+├── oauth/                    ← Added: Full OAuth2.1 Authorization Code Flow
+│   ├── routes.ts             ← /oauth/authorize, /oauth/callback, /oauth/token
+│   └── store.ts              ← In-memory Token/State PKCE store
 ├── routes/
 │   ├── health.ts             ← GET /health
 │   └── wellKnown.ts          ← GET /.well-known/mcp (server card, March 2026)
 ├── tools/
-│   ├── annotations.ts        ← ToolAnnotations for all 14 tools
-│   └── schemas.ts            ← outputSchema for all 14 tools
-├── styles.ts                 ← (unchanged)
+│   ├── annotations.ts        ← ToolAnnotations for all tools
+│   └── schemas.ts            ← outputSchema for all tools
+├── styles.ts                 
 ├── data/
-│   └── api-data.ts           ← (unchanged)
-└── ui/                       ← (unchanged)
+│   └── api-data.ts           
+└── ui/                       
+    ├── code-generator.ts
+    ├── code-viewer.ts
+    ├── collections-explorer.ts
+    ├── env-manager.ts
+    ├── graphql-explorer.ts
+    ├── request-builder.ts
+    └── response-viewer.ts
 ```
 
 ---
