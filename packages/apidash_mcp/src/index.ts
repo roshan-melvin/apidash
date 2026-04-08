@@ -157,34 +157,9 @@ if (isStdio) {
   });
 } else {
   // ── Start server ───────────────────────────────────────────
-  const port = parseInt(process.env.PORT || "3001");
-
-  app.listen(port, () => {
-    console.log(`\n🚀 APIDash MCP Server running on http://localhost:${port}`);
-    console.log(`📡 MCP endpoint:    http://localhost:${port}/mcp`);
-    console.log(`💓 Health check:    http://localhost:${port}/health`);
-    console.log(`🔍 Inspect with:    npx @modelcontextprotocol/inspector http://localhost:${port}/mcp`);
-    console.log(`\n🛠️  Tools available (13):`);
-    console.log(`   • request-builder           → HTTP request builder UI`);
-    console.log(`   • http-send-request         → Send HTTP requests`);
-    console.log(`   • view-response             → Response viewer UI`);
-    console.log(`   • explore-collections       → Browse request collections`);
-    console.log(`   • graphql-explorer          → GraphQL query explorer`);
-    console.log(`   • graphql-execute-query     → Execute GraphQL queries`);
-    console.log(`   • codegen-ui                → Code generator UI`);
-    console.log(`   • generate-code-snippet     → Generate code snippets`);
-    console.log(`   • manage-environment        → Environment vars manager`);
-    console.log(`   • update-environment-variables → Update env vars`);
-    console.log(`   • get-api-request-template  → Get request templates`);
-    console.log(`   • ai-llm-request            → Chat with any LLM/AI model`);
-    console.log(`   • save-request              → Save a request to workspace`);
-    console.log(`\n📱 UI Resources (6, SEP-1865):`);
-    console.log(`   • ${URI}/request-builder`);
-    console.log(`   • ${URI}/response-viewer`);
-    console.log(`   • ${URI}/collections-explorer`);
-    console.log(`   • ${URI}/graphql-explorer`);
-    console.log(`   • ${URI}/code-generator`);
-    console.log(`   • ${URI}/env-manager`);
-    console.log(`\n✨ Protocol: Streamable HTTP (SEP-1865 Apps Extension)\n`);
+  const port = parseInt(process.env.PORT || "8000");
+  const host = process.env.HOST || "0.0.0.0";
+  app.listen(port, host, () => {
+    console.log(`MCP server running at http://${host}:${port}`);
   });
 }
