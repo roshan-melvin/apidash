@@ -213,7 +213,43 @@ The same function. Zero duplication. The CLI now cold-starts in **under 50 ms** 
 | `codegen.ts` | `generate-code-snippet` tool + `apidash-cli codegen` command |
 | `workspace.ts` | All `save-*` / `update-*` tools + `apidash-cli save` / `set` commands |
 
+---
 
+## Future-Proof Dual Transport (Ahead of the Curve)
+
+### The Evolving MCP Cloud Architecture
+The MCP ecosystem is rapidly shifting towards **Streamable HTTP (Stateless)** for specific cloud environments. 
+
+When Model Context Protocol officially launched, it relied almost entirely on **SSE (Server-Sent Events)** for remote HTTP connections. However, SSE requires the server to lock in a long-lived, continuously open connection for the entire duration of the chat session. In modern **serverless enterprise environments** (like AWS Lambda, Cloudflare Workers, or lightweight AI wrappers like Amazon **AgentCore**), keeping long-lived idle continuous connections open is highly inefficient, incredibly costly, and sometimes technically impermissible by the API Gateway layer.
+
+Because of this friction, the newer **2025 MCP spec additions** introduced the stateless `StreamableHTTPServerTransport`. It strictly relies on standard HTTP POST requests that stream chunks down, intelligently avoiding the strict persistent session overhead of traditional SSE.
+
+### Where APIDash is Uniquely Positioned
+While typical modern deployment articles assume most web servers are isolated into either using the new standard or lagging behind on the older SSE spec, **APIDash's architecture uniquely implements BOTH transports concurrently**:
+
+1. **The Modern Stateless Spec (`POST /mcp`):**
+   ```typescript
+   app.post("/mcp", async (req: Request, res: Response) => {
+     // A fully functioning streaming HTTP tunnel 
+     const transport = new StreamableHTTPServerTransport({
+       sessionIdGenerator: undefined,   // forces stateless connections
+       enableJsonResponse: true,
+     });
+     await server.connect(transport);
+   });
+   ```
+   **This proves APIDash is AgentCore-ready right out of the box.** If any developer needs to integrate natively with AgentCore or a bleeding-edge serverless cloud platform, they simply point the agent to our `POST /mcp` endpoint and it operates natively without any manual proxy adaptations.
+
+2. **Legacy Backwards Compatibility (`GET /mcp/sse`):**
+   Because widespread tools like classical desktop clients (Claude Desktop) or legacy integrations strictly expect the original `SSEServerTransport`, we explicitly map an active server-sent events generator at `/mcp/sse` protecting the userbase from sudden deprecation shocks.
+   
+3. **Stand-Alone Processes (`stdio`):**
+   For lightweight desktop extensions securely bridged over local machine process pipelines (e.g. VS Code Copilot CLI integrations).
+
+### Transport Conclusion
+Our codebase uniquely supports **all paradigms simultaneously**. By hosting the modern, stateless, edge-ready `StreamableHTTPServerTransport` natively alongside the persistent `SSEServerTransport`, the APIDash implementation mathematically guarantees to be universally mountable across any hardware format without modification.
+
+---
 
 ## Installation & Start Scripts
 
@@ -304,6 +340,130 @@ If enforcing `APIDASH_MCP_TOKEN`, you must explicitly pass the `Authorization` h
 | Copilot stuck waiting for Server | Ensure your `.env` is loaded by restarting the server. Run `Developer: Reload Window` in VS Code to clear the broken handshake cache and trigger the OAuth prompt. |
 | Still getting `401` in Mode 3 | Ensure the header reads `Bearer <space> <token>` — the space after `Bearer` is mandatory |
 | Updated agent config but no change | Fully quit and relaunch Claude Desktop or VS Code |
+
+---
+
+## Amazon Bedrock AgentCore Cloud Deployment
+
+To take the MCP server beyond localhost and make it accessible globally to cloud agents or team members, APIDash natively supports deployment to the **Amazon Bedrock AgentCore Runtime**.
+
+Because our architecture uniquely supports the `StreamableHTTPServerTransport` at `POST /mcp` (the exact protocol AgentCore expects), the server is fully ready for zero-latency serverless cloud deployments.
+
+### Required Files & AWS Configurations
+
+To explicitly target the AWS runtime environment, the project root contains the following custom configurations:
+
+1. **`Dockerfile` & `.dockerignore`**: Preconfigured for a 2-stage build targeting AWS's `linux/arm64` container runtime utilizing Node.js 22 Slim.
+2. **`agentcore/agentcore.json`**: The internal scaffolding file read by the AWS `@aws/agentcore` CLI. It configures the runtime to recognize our server's `POST /mcp` endpoint and mandates a `CUSTOM_JWT` Authorizer to protect the web interfaces from unauthorized execution.
+3. **`agentcore/aws-targets.json`**: Declares the `us-east-1` AWS deployment region and specific AWS account targets.
+
+### Changes Made to `src/index.ts`
+
+Only a single minimal adjustment was made to the Express boot sequence to accommodate AWS serverless networking limitations:
+- The `app.listen()` block was explicitly bound to host `"0.0.0.0"` and assigned to `PORT=8000` via the environment variables to align with Amazon ECS's strict networking interface.
+
+### Deployment Setup Guide
+
+**Step 1: Update Target AWS Account**
+Edit `agentcore/aws-targets.json` and replace `"PLACEHOLDER_ACCOUNT_ID"` with your 12-digit AWS account number.
+
+**Step 2: Create AWS Cognito User Pool & App Client**
+To ensure secure M2M communication between Bedrock and the MCP server, we provision a Cognito User Pool specifically scoped for `client_credentials` flows:
+
+```bash
+export REGION=us-east-1
+
+# 1. Create user pool
+POOL_ID=$(aws cognito-idp create-user-pool --pool-name "salesmcpapps-pool" --region $REGION --query 'UserPool.Id' --output text)
+
+# 2. Add domain for OAuth
+aws cognito-idp create-user-pool-domain --user-pool-id $POOL_ID --domain "salesmcpapps-auth" --region $REGION
+
+# 3. Create resource server
+aws cognito-idp create-resource-server --user-pool-id $POOL_ID --identifier "salesmcpapps-auth" --name "Sales MCP Apps" --scopes '[{"ScopeName":"invoke","ScopeDescription":"Invoke MCP server"}]' --region $REGION
+
+# 4. Create an App Client
+CLIENT_OUTPUT=$(aws cognito-idp create-user-pool-client --user-pool-id $POOL_ID --client-name "salesmcpapps-client" --generate-secret --explicit-auth-flows ALLOW_USER_PASSWORD_AUTH ALLOW_REFRESH_TOKEN_AUTH --allowed-o-auth-flows client_credentials --allowed-o-auth-scopes "salesmcpapps-auth/invoke" --allowed-o-auth-flows-user-pool-client --supported-identity-providers COGNITO --region $REGION)
+
+CLIENT_ID=$(echo $CLIENT_OUTPUT | python3 -c "import sys,json; print(json.load(sys.stdin)['UserPoolClient']['ClientId'])")
+CLIENT_SECRET=$(echo $CLIENT_OUTPUT | python3 -c "import sys,json; print(json.load(sys.stdin)['UserPoolClient']['ClientSecret'])")
+
+echo "Your Client ID: $CLIENT_ID"
+echo "Your Discovery URL: https://cognito-idp.$REGION.amazonaws.com/$POOL_ID/.well-known/openid-configuration"
+```
+
+**Step 3: Hydrate AgentCore Configurations**
+Copy the `Client ID` and the `Discovery URL` outputted from the terminal block above. Open `agentcore/agentcore.json` and replace `"PLACEHOLDER_CLIENT_ID"` and `"PLACEHOLDER_DISCOVERY_URL"`.
+
+**Step 4: Execute Deployment**
+With the network and security layers configured, the server is deployed automatically via the `@aws/agentcore` CLI:
+
+```bash
+npm install -g @aws/agentcore
+agentcore deploy --target default --yes
+```
+
+AWS automates the CDK synthesis, builds the Docker container utilizing AWS CodeBuild, pushes the image to Amazon ECR, and configures the AgentCore API Gateway.
+
+### Connecting Custom AI Code Editors (VS Code)
+
+Once the deployment finishes and the ARN is returned in `.cli/deployed-state.json`, any MCP client can consume it instantly.
+
+You simply inject the ARN directly into your client's configuration (e.g., `.vscode/mcp.json`). Crucially, if you use VS Code, you must double-encode the URI parameter (`%252F` instead of `%2F`) so it strictly maps through the AgentCore HTTP translation API transparently:
+
+```json
+{
+  "servers": {
+    "apidash-mcp-remote": {
+      "type": "http",
+      "url": "https://bedrock-agentcore.us-east-1.amazonaws.com/runtimes/arn%3Aaws%3Abedrock-agentcore%...%252Fmy-server-abc123/invocations",
+      "headers": {
+        "Authorization": "Bearer <YOUR_GENERATED_JWT_TOKEN>"
+      }
+    }
+  }
+}
+}
+```
+
+### Server Configuration Testing via cURL
+To manually test the deployed Remote AWS endpoint securely, you must acquire an OAuth Bearer token using the `client_credentials` grant type and pass it alongside the URL-encoded runtime ARN.
+
+```bash
+# 1. Get Bearer token
+TOKEN=$(curl -s -X POST \
+  "https://salesmcpapps-auth.auth.$REGION.amazoncognito.com/oauth2/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials&client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&scope=salesmcpapps-auth/invoke" \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+# 2. Extract & URL-encode the deployed ARN
+RUNTIME_ARN=$(python3 -c "
+import json
+with open('agentcore/.cli/deployed-state.json') as f:
+    state = json.load(f)
+rt = list(state['targets']['default']['resources']['runtimes'].values())[0]
+print(rt['runtimeArn'])
+")
+ENCODED_ARN=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$RUNTIME_ARN', safe=''))")
+
+# 3. Execute MCP Initialization
+curl -s -X POST \
+  "https://bedrock-agentcore.$REGION.amazonaws.com/runtimes/${ENCODED_ARN}/invocations" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
+```
+You will receive a successful protocol response containing the `serverInfo` string, MCP version, and all 14 programmatic capabilities natively exported by APIDash.
+
+### Cloud Cleanup
+If you ever wish to cleanly destroy the deployed resources remotely without orphan entities (to permanently avoid unintended billing charges), execute:
+```bash
+aws cloudformation delete-stack --stack-name AgentCore-apidashmcp-default --region $REGION
+aws cognito-idp delete-user-pool-domain --user-pool-id $POOL_ID --domain "salesmcpapps-auth" --region $REGION
+aws cognito-idp delete-user-pool --user-pool-id $POOL_ID --region $REGION
+```
 
 ---
 
