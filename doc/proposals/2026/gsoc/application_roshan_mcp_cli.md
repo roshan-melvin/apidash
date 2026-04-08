@@ -1,26 +1,54 @@
+![](./images/GSOCBANNER_APIDASH.jpg)
+
+# APIDash Headless CLI & Model Context Protocol (MCP) Integration
+
+### Summary
+
+The main goal of this project is to implement a production-grade headless execution layer for APIDash and integrate it natively with a Model Context Protocol (MCP) server. The architecture enables zero-latency terminal execution ideal for CI/CD pipelines, and allows host AI Agents to securely execute HTTP/GraphQL/AI queries autonomously, transforming APIDash into an AI-first development platform.
+
+**Owner:** rocroshanga@gmail.com  
+**Contributors:** Roshan Melvin G A  
+**Approvers:** Ankit Mahato (`@animator`) , Ashita Prasad (`@ashitaprasad`) 
+**Status:** For Review  
+**Created:** 31/03/2026
+
+Currently, I am working on this bug - [Request/Response pane widths reset when toggling View Code [#1090] - API Dash](https://github.com/foss42/apidash/issues/1090)
+
+---
+
+## Overview
+
+I am **Roshan Melvin G A**, an active contributor to **API Dash** - the open-source, cross-platform API client built with Flutter. My proposal targets the integration of a **Headless CLI & Model Context Protocol (MCP)**, which empowers APIDash to act as a seamless provider of tools and resources directly to AI agents.
+
+API Dash is a collaboration-driven open-source project that aims to provide developers with a fast, native, cross-platform API testing and development tool. The goal of this project is to eliminate the fragmented workflow that forces developers to manually interact with the UI for automated tasks or AI-driven generation. By exposing APIDash state through a robust MCP layer and a shared workspace JSON, the system bridges the Flutter GUI securely into terminal pipelines and AI workflows.
+
+Before writing this proposal, I shipped a working PoC in PR `#1613` (which is an updated version of the initial PR `#1529`), which natively separates the CLI and MCP Server so neither depends on the other. This proposal describes the plan to take that PoC to a fully production-ready, tested, and documented merged implementation.
+
+---
+
 ### About
 
-1. Full Name: Roshan
-2. Contact info (public email): [Your Email]
-3. Discord handle in our server: rocroshan
-4. Home page: [Your Website]
-5. Blog: [Your Blog]
-6. GitHub profile link: https://github.com/rocroshan
-7. Twitter, LinkedIn, other socials: [Your Socials]
+1. Full Name: Roshan Melvin G A
+2. Contact info (public email): rocroshanga@gmail.com
+3. Discord handle in our server: roshanmelvin
+4. Home page: https://github.com/roshan-melvin
+5. Blog: https://dev.to/roshan_melvin
+6. GitHub profile link: https://github.com/roshan-melvin
+7. Twitter, LinkedIn, other socials: https://www.linkedin.com/in/roshan-melvin-tyech5/
 8. Time zone: IST (UTC+5:30)
-9. Link to a resume: [Link to PDF]
+9. Link to a resume: https://drive.google.com/file/d/195X3Ix5Q1sqyCQkNf_FjvrRBmP6azFIO/view?usp=drive_link
 
 ### University Info
 
-1. University name: [Your University]
-2. Program you are enrolled in (Degree & Major/Minor): [Your Degree]
-3. Year: [Your Year]
-4. Expected graduation date: [Graduation Date]
+1. University name: Sri Sairam Engineering College, Chennai
+2. Program you are enrolled in (Degree & Major/Minor): Bachelor of Engineering in Computer Science and Engineering (Internet of Things)
+3. Year: Third Year (2023–2027)
+4. Expected graduation date: 2027
 
 ### Motivation & Past Experience
 
 1. Have you worked on or contributed to a FOSS project before? Can you attach repo links or relevant PRs?
-   - Yes. My active Proof-of-Concept PR #1529 for APIDash demonstrates a fully working MCP & CLI integration inside the existing monorepo. The implementation spans three packages: `apidash_mcp` (Node.js MCP server), `apidash_mcp_core` (shared TypeScript library), and `apidash_cli` (headless terminal executor).
+   - Yes. My active Proof-of-Concept PR #1613 (which is an updated version of the initial PR #1529) for APIDash demonstrates a fully working MCP & CLI integration inside the existing monorepo. The implementation spans three packages: `apidash_mcp` (Node.js MCP server), `apidash_mcp_core` (shared TypeScript library), and `apidash_cli` (headless terminal executor).
 2. What is your one project/achievement that you are most proud of? Why?
    - The Decoupled Sibling Architecture: separating the CLI and MCP Server so neither depends on the other, yet both share a single `@apidash/mcp-core` library and a single workspace JSON file. This was non-trivial — it required redesigning the workspace reader/writer to be filesystem-singleton-safe, handling cross-platform path resolution (Linux XDG, macOS Application Support, Windows `%APPDATA%`), and implementing the SHA-256 `ToolHashRegistry` to prevent prompt-injection schema drift — all while keeping the Flutter GUI in full bi-directional sync through the `McpSyncService` Dart watcher.
 3. What kind of problems or challenges motivate you the most to solve them?
@@ -34,13 +62,26 @@
 7. Can you mention some areas where the project can be improved?
    - Adding headless automation for CI/CD pipelines (partially done in this proposal), deepening AI-agent integration so LLMs can self-heal broken request collections, and adding a streaming-response viewer for SSE/WebSocket endpoints directly in the MCP chat UI.
 8. Have you interacted with and helped API Dash community?
-   - Yes. Beyond PR #1529, I have reviewed open issues, proposed the `apidash_mcp_workspace.json` cross-platform path spec that was subsequently adopted in the main branch, and contributed documentation clarifying the Hive box key schema for new contributors.
+   - Yes. Beyond PR #1613, I have reviewed open issues, proposed the `apidash_mcp_workspace.json` cross-platform path spec that was subsequently adopted in the main branch, and contributed documentation clarifying the Hive box key schema for new contributors.
 
 ### Project Proposal Information
 
 1. Proposal Title: **APIDash Headless CLI & Model Context Protocol (MCP) Integration**
 2. Abstract:
    This project implements a production-grade headless execution layer for APIDash and integrates it natively with a Model Context Protocol (MCP) server. The architecture enables zero-latency terminal execution ideal for CI/CD pipelines, and allows host AI Agents (Claude Desktop, VS Code Copilot, or any MCP-compatible client) to securely execute HTTP/GraphQL/AI queries autonomously. All state — whether written by the Flutter GUI, the CLI, or an AI tool — flows through a single shared `apidash_mcp_workspace.json` file that the Flutter `McpSyncService` watches bidirectionally, keeping the desktop UI in perfect sync at all times.
+
+### Video Walkthroughs (Working PoC)
+
+Before reviewing the architecture breakdowns, please watch the actively working PoC (integrated in PR `#1613`):
+
+**Both MCP & CLI Demonstration**
+[Placeholder for both MCP & CLI video]
+
+**Only MCP Video**
+[Placeholder for only MCP video]
+
+**Only CLI Video**
+[Placeholder for only CLI video]
 
 3. Detailed Description:
 
@@ -349,6 +390,56 @@ To take the MCP server beyond localhost and make it accessible globally to cloud
 
 Because our architecture uniquely supports the `StreamableHTTPServerTransport` at `POST /mcp` (the exact protocol AgentCore expects), the server is fully ready for zero-latency serverless cloud deployments.
 
+#### Architecture Flow: Amazon Bedrock to APIDash MCP
+
+```mermaid
+graph TD
+    %% Styling Definitions
+    classDef client fill:#f4f6f8,stroke:#333,stroke-width:2px;
+    classDef aws fill:#FF9900,stroke:#232F3E,stroke-width:2px,color:black;
+    classDef mcp fill:#0073BB,stroke:#fff,stroke-width:2px,color:white;
+    classDef data fill:#2ca02c,stroke:#fff,stroke-width:2px,color:white;
+    
+    subgraph ClientEnv ["Client Environment Context"]
+        AGENT["🤖 AI Agent Client<br/>(VS Code Copilot, Claude Desktop)"]:::client
+        CONFIG["📄 mcp.json Config<br/>(Double-Encoded ARN Translation)"]:::client
+        AGENT -. "Reads Configuration" .-> CONFIG
+    end
+
+    subgraph AWSCloud ["Amazon Bedrock Cloud Infrastructure"]
+        COG["🔐 Amazon Cognito<br/>(OAuth 2.1 M2M Client Pool)"]:::aws
+        AGW["🌐 Bedrock AgentCore Gateway<br/>(CUSTOM_JWT Authorizer)"]:::aws
+        
+        subgraph ECSEnv ["Amazon ECS / Fargate Execution Layer"]
+            APID["🖥️ APIDash MCP Node.js Container<br/>(Port Binding: 0.0.0.0:8000)"]:::mcp
+            TRANS["📡 StreamableHTTPServerTransport<br/>(Endpoint: POST /mcp)"]:::mcp
+            CORE["⚙️ @apidash/mcp-core<br/>(Headless Exec Engine)"]:::mcp
+            WORKSPACE["🗄️ apidash_mcp_workspace.json<br/>(Cloud State Memory)"]:::data
+            
+            APID -->|Routes Traffic| TRANS
+            TRANS -->|Decodes JSON-RPC| CORE
+            CORE <-->|Reads/Writes Session Context| WORKSPACE
+        end
+    end
+    
+    %% Communication Flow Steps
+    AGENT -- "1. Request Access (client_credentials grant)" --> COG
+    COG -- "2. Issues Short-Lived Bearer JWT Token" --> AGENT
+    
+    AGENT -- "3. Execute JSON-RPC Tool Call<br/>(Header: Authorization: Bearer JWT)" --> AGW
+    
+    AGW -. "4. Validates Token Signature & Scopes" .-> COG
+    
+    AGW -- "5. Proxies Authenticated Payload" --> APID
+    
+    CORE -- "6. Dispatches Action (e.g. http-send-request)" --> EXT["🌍 External Resources / APIs"]
+    EXT -- "7. API Response/Data" --> CORE
+    
+    CORE -- "8. Wrap Results in MCP format" --> TRANS
+    TRANS -- "9. HTTP Stream Chunk Response" --> AGW
+    AGW -- "10. Resolves Results to Agent Engine" --> AGENT
+```
+
 ### Required Files & AWS Configurations
 
 To explicitly target the AWS runtime environment, the project root contains the following custom configurations:
@@ -477,8 +568,8 @@ curl http://localhost:3001/health
   "status": "ok",
   "server": "apidash-mcp",
   "version": "2.0.0",
-  "tools": 13,
-  "resources": 6,
+  "tools": 14,
+  "resources": 7,
   "transport": "streamable-http",
   "sep": "SEP-1865"
 }
@@ -586,7 +677,7 @@ During the development and testing of the Model Context Protocol (MCP) server, w
 
 ## Extended MCP Agent Triggering Prompts
 
-The following is a complete prompt reference for all 13 external tools exposed by the APIDash MCP server. These prompts are designed to trigger each tool naturally inside Claude Desktop, VS Code Copilot, or any MCP-compatible agent.
+The following is a complete prompt reference for all 14 tools exposed by the APIDash MCP server. These prompts are designed to trigger each tool naturally inside Claude Desktop, VS Code Copilot, or any MCP-compatible agent.
 
 ---
 
@@ -950,7 +1041,7 @@ The initial Proof-of-Concept for the APIDash MCP server was built as a single mo
 
 ```
 src/
-├── index.ts     ← 853 lines: entry point + server config + 13 tools + 6 resources + routing + security
+├── index.ts     ← 853 lines: entry point + server config + 14 tools + 7 resources + routing + security
 ├── styles.ts
 ├── data/
 │   └── api-data.ts
@@ -975,15 +1066,15 @@ src/
 ```
 src/
 ├── index.ts                  ← ~110 lines: thin composition root (wiring only)
-├── factory.ts                ← createMcpServer(): all 13 tools + 6 resources
+├── factory.ts                ← createMcpServer(): all 14 tools + 7 resources
 ├── middleware/
 │   └── auth.ts               ← OAuth 2.1 bearer token gate
 ├── routes/
 │   ├── health.ts             ← GET /health
 │   └── wellKnown.ts          ← GET /.well-known/mcp (server card, March 2026)
 ├── tools/
-│   ├── annotations.ts        ← ToolAnnotations for all 13 tools
-│   └── schemas.ts            ← outputSchema for all 13 tools
+│   ├── annotations.ts        ← ToolAnnotations for all 14 tools
+│   └── schemas.ts            ← outputSchema for all 14 tools
 ├── styles.ts                 ← (unchanged)
 ├── data/
 │   └── api-data.ts           ← (unchanged)
@@ -1055,7 +1146,7 @@ The middleware returns a `401` error in exactly three scenarios:
 ```
 
 #### 5. Tool Safety Annotations (`src/tools/annotations.ts`)
-- **Added:** Per-tool `ToolAnnotations` objects — `readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint` — for all 13 tools.
+- **Added:** Per-tool `ToolAnnotations` objects — `readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint` — for all 14 tools.
 - **Why (MCP Blog March 16 2026):** AI models use these hints to decide whether to ask for user confirmation. For example, `http-send-request` carries `destructiveHint: true, openWorldHint: true`, signalling to Claude that this action reaches out to the real world and may not be reversible. `explore-collections` carries `readOnlyHint: true`, allowing the LLM to call it freely with no confirmation needed.
 
 > **In Plain Terms:** These are "Warning Labels" on each tool that tell the AI exactly how dangerous it is.
@@ -1109,8 +1200,8 @@ npx @modelcontextprotocol/inspector -- npx tsx src/index.ts --stdio
 ```
 
 The Inspector lets you:
-- Browse all 13 registered tools and their Zod-validated input schemas
-- Browse all 6 SEP-1865 resource URIs and preview their HTML content
+- Browse all 14 registered tools and their Zod-validated input schemas
+- Browse all 7 SEP-1865 resource URIs and preview their HTML content
 - Execute tools manually and inspect raw JSON-RPC payloads
 - Verify SHA-256 Hash Gate signatures are accepting calls correctly
 
@@ -1140,13 +1231,40 @@ chmod +x test_cli.sh
 
 ---
 
-4. Weekly Timeline:
+## 4. Development Timeline (March 31 – April 8, 2026)
 
-| Weeks | Deliverables |
+| Date | Deliverables & Milestones |
 |---|---|
-| **1–2** | Finalize monorepo structure; confirm `apidash_mcp_core` build resolves as `"@apidash/mcp-core": "file:../apidash_mcp_core"` in both consumers; write `pubspec`-equivalent monorepo docs |
-| **3–4** | Implement Dart `McpSyncService`: Riverpod → JSON serialiser with 200 ms debounce, `fs.watch()` listener, schema validation, and Riverpod hydration; write Dart unit tests |
-| **5–6** | Harden `@apidash/mcp-core` executors: add retry logic to `executor.ts`, streaming-response support to `ai.ts`, and expand `codegen.ts` to a 15th generator (Swift `URLSession`); increase `test_cli.sh` to 40 scenarios |
-| **7–8** | Implement Express `StreamableHTTPServerTransport`, `StdioServerTransport`, and SSE endpoint; boot SHA-256 `ToolHashRegistry`; verify all 13 tools pass Claude Desktop and VS Code Copilot live sessions |
-| **9–10** | Integration phase: wire `McpSyncService` bidirectional write-back into the Flutter `RequestModelNotifier` and `EnvModelNotifier` providers; resolve race conditions via mutex debounce; add integration test in Flutter |
-| **11–12** | CI/CD: add GitHub Actions workflow running `test_cli.sh` on every PR; write `test_mcp_server.sh` for server-side JSON-RPC contract tests; final PR polish, README, and CHANGELOG |
+| **March 31** | Submitted PR #1613 covering the initial MQTT, WebSocket, and gRPC implementation idea and architecture. |
+| **April 1–2** | **Monorepo Architecture:** Finalized the Decoupled Sibling Architecture by extracting `@apidash/mcp-core` into a shared library. Confirmed it resolves cleanly in both consumers. |
+| **April 3** | **State Synchronization:** Implemented Dart `McpSyncService` for bi-directional file synchronization between Flutter and Node.js. |
+| **April 4–5** | **Amazon Bedrock AgentCore Implementation:** Containerized the APIDash MCP server for cloud environments. Configured `agentcore.json`, Dockerfiles, built AWS Cognito M2M Authorizer pools, and deployed serverless architecture onto the Amazon Bedrock AgentCore execution layer. |
+| **April 6** | **Transport, Security & OAuth 2.1:** Implemented `StreamableHTTPServerTransport`, `SSEServerTransport`, and `ToolHashRegistry`. Finalized RFC 8414 OAuth 2.1 Metadata Discovery to securely handshake with VS Code Copilot. |
+| **April 7** | **Integration & Flowcharts:** Resolved complex integration issues (e.g., Copilot Cache busting, AxiosHeaders validation crashes, UI iframe polling). Designed and added comprehensive Mermaid architecture flowcharts documenting the entire communication stack. |
+| **April 8** | **Final Merge & Submission:** Final PR Polish, synchronized proposal document details, and submitted the final GSoC 2026 Proposal PR. |
+
+---
+
+## 5. Communications
+
+I am comfortable with any communication channel. For text communication, I prefer **Discord** and **Email**. For video calls and pair programming sessions, I prefer using **Google Meet**.
+
+During the summer, as I will have no academic commitments, I will be dedicating **40-50 hours per week** (approximately **7-8 hours on weekdays** and **5-6 hours on weekends**). In case of any delays or blockers, I will promptly communicate with my mentors to discuss the issue and find a solution. I am also willing to work overtime if necessary to meet the project goals. I have explicitly set aside the final week of the timeline as a buffer to accommodate any unforeseen adjustments.
+
+- **Timezone:** IST / GMT +5:30 (Indian Standard Time)
+- **Working Hours:** Flexible, typically 10:00 AM – 8:00 PM IST
+- **Email:** rocroshanga@gmail.com
+- **Phone:** +91-7826860136
+- **Discord:** `roshanmelvin`
+
+---
+
+## 6. Feedback from API Dash
+
+*If you have read this proposal, please provide your short general feedback in the section below. Feel free to make comments anywhere above as well.*
+
+| Reviewer Username | Date | Comment |
+|:---|:---|:---|
+| *(reviewer)* | *(date)* | *(feedback here)* |
+| *(reviewer)* | *(date)* | *(feedback here)* |
+| *(reviewer)* | *(date)* | *(feedback here)* |
