@@ -75,13 +75,25 @@ Before writing this proposal, I shipped a working PoC in PR `#1613` (which is an
 Before reviewing the architecture breakdowns, please watch the actively working PoC (integrated in PR `#1613`):
 
 **Both MCP & CLI Demonstration**
-[Placeholder for both MCP & CLI video]
+
+
+https://github.com/user-attachments/assets/3a310ed8-6608-4db8-a18f-1e59a7e4a8e5
+
+
 
 **Only MCP Video**
-[Placeholder for only MCP video]
+
+
+https://github.com/user-attachments/assets/181532ac-5df0-4080-ac2d-7348140eeec9
+
+
 
 **Only CLI Video**
-[Placeholder for only CLI video]
+
+
+https://github.com/user-attachments/assets/0994cc8b-4c77-4fc9-97d6-2cff18ddbecb
+
+
 
 3. Detailed Description:
 
@@ -392,53 +404,8 @@ Because our architecture uniquely supports the `StreamableHTTPServerTransport` a
 
 #### Architecture Flow: Amazon Bedrock to APIDash MCP
 
-```mermaid
-graph TD
-    %% Styling Definitions
-    classDef client fill:#f4f6f8,stroke:#333,stroke-width:2px;
-    classDef aws fill:#FF9900,stroke:#232F3E,stroke-width:2px,color:black;
-    classDef mcp fill:#0073BB,stroke:#fff,stroke-width:2px,color:white;
-    classDef data fill:#2ca02c,stroke:#fff,stroke-width:2px,color:white;
-    
-    subgraph ClientEnv ["Client Environment Context"]
-        AGENT["🤖 AI Agent Client<br/>(VS Code Copilot, Claude Desktop)"]:::client
-        CONFIG["📄 mcp.json Config<br/>(Double-Encoded ARN Translation)"]:::client
-        AGENT -. "Reads Configuration" .-> CONFIG
-    end
+<img width="1408" height="768" alt="Gemini_Generated_Image_3irdc3irdc3irdc3" src="https://github.com/user-attachments/assets/d8e29bce-33fd-4521-b0b6-6bea187e0f76" />
 
-    subgraph AWSCloud ["Amazon Bedrock Cloud Infrastructure"]
-        COG["🔐 Amazon Cognito<br/>(OAuth 2.1 M2M Client Pool)"]:::aws
-        AGW["🌐 Bedrock AgentCore Gateway<br/>(CUSTOM_JWT Authorizer)"]:::aws
-        
-        subgraph ECSEnv ["Amazon ECS / Fargate Execution Layer"]
-            APID["🖥️ APIDash MCP Node.js Container<br/>(Port Binding: 0.0.0.0:8000)"]:::mcp
-            TRANS["📡 StreamableHTTPServerTransport<br/>(Endpoint: POST /mcp)"]:::mcp
-            CORE["⚙️ @apidash/mcp-core<br/>(Headless Exec Engine)"]:::mcp
-            WORKSPACE["🗄️ apidash_mcp_workspace.json<br/>(Cloud State Memory)"]:::data
-            
-            APID -->|Routes Traffic| TRANS
-            TRANS -->|Decodes JSON-RPC| CORE
-            CORE <-->|Reads/Writes Session Context| WORKSPACE
-        end
-    end
-    
-    %% Communication Flow Steps
-    AGENT -- "1. Request Access (client_credentials grant)" --> COG
-    COG -- "2. Issues Short-Lived Bearer JWT Token" --> AGENT
-    
-    AGENT -- "3. Execute JSON-RPC Tool Call<br/>(Header: Authorization: Bearer JWT)" --> AGW
-    
-    AGW -. "4. Validates Token Signature & Scopes" .-> COG
-    
-    AGW -- "5. Proxies Authenticated Payload" --> APID
-    
-    CORE -- "6. Dispatches Action (e.g. http-send-request)" --> EXT["🌍 External Resources / APIs"]
-    EXT -- "7. API Response/Data" --> CORE
-    
-    CORE -- "8. Wrap Results in MCP format" --> TRANS
-    TRANS -- "9. HTTP Stream Chunk Response" --> AGW
-    AGW -- "10. Resolves Results to Agent Engine" --> AGENT
-```
 
 ### Required Files & AWS Configurations
 
