@@ -65,3 +65,8 @@ installers/*
 # Testing Files & Folders
 test-hive-storage
 /logs
+
+# Node/JS related
+node_modules/
+dist/
+package-lock.json
