@@ -9,11 +9,42 @@ The main goal of this project is natively integrating **WebSocket**, **MQTT**, a
 
 **Owner:** rocroshanga@gmail.com  
 **Contributors:** Roshan Melvin G A  
-**Approvers:** Ashita Prasad (`@ashitaprasad`)  
+**Approvers:** Ankit Mahato (`@animator`), Ashita Prasad (`@ashitaprasad`) 
 **Status:** For Review  
 **Created:** 31/03/2026
 
-Currently, I am working on this bug - [Request/Response pane widths reset when toggling View Code [#1090] - API Dash](https://github.com/foss42/apidash/issues/1090)
+Edited `splitview_equal.dart`: I have found and fixed the bug causing the divider to snap back to the default center position!
+
+### Problem
+The `EqualSplitView` ([splitview_equal.dart](file:///home/rocroshan/Desktop/GSOC/apidash/lib/widgets/splitview_equal.dart)) was previously a `StatelessWidget`. Every time you interacted with a widget that caused a rebuild (such as toggling the **View Code** button), `LayoutBuilder` triggered a full rebuild. Due to `EqualSplitView` being stateless, the `MultiSplitViewController` was completely re-instantiated on every single build frame:
+```dart
+  controller: MultiSplitViewController(
+    areas: [
+      Area(id: "left", flex: 1, min: minWidth),
+      Area(id: "right", flex: 1, min: minWidth),
+    ],
+  )
+```
+This wiped out the user's dragged layout/width configuration and unconditionally snapped everything back to `flex: 1` (the perfect center position).
+
+### Solution
+1. **Converted `EqualSplitView` to a `StatefulWidget`**: This allows us to persist the controller state across rebuilds.
+2. **Initialized `MultiSplitViewController` in `initState()`**: Ensuring the layout state is preserved even when parent widgets rebuild.
+3. **Dynamic `minWidth` Updates**: Implemented a `Future.microtask` loop inside `LayoutBuilder` to safely update `minWidth` while preserving the user's manual adjustments.
+
+**Key Code Changes (Issue [#1090](https://github.com/foss42/apidash/issues/1090)):**
+```diff
+- class EqualSplitView extends StatelessWidget {
++ class EqualSplitView extends StatefulWidget {
+...
++ class _EqualSplitViewState extends State<EqualSplitView> {
++   late MultiSplitViewController _controller;
++   @override
++   void initState() {
++     _controller = MultiSplitViewController(areas: [Area(id: "left", flex: 1), Area(id: "right", flex: 1)]);
++   }
+```
+Now when you drag the divider and click `</> View Code`, the layout is correctly preserved!
 
 ---
 
@@ -549,38 +580,42 @@ The fix required the connection manager lookup to always go through the provider
 
 ---
 
-## 10. Comprehensive Week-by-Week Breakdown (12 Weeks)
+## 10. Comprehensive Project Timeline (March 1 - March 31)
 
 ![Workflow Diagram](./images/workflow.png)
 
-### Phase 1: Core Systems Architecture (Weeks 1-2)
-- **Week 1 (May 18 - May 24):** Finalize and register all Hive type adapters for `MqttRequestModel` (TypeId: 5), `WebSocketRequestModel` (TypeId: 6), and `GrpcRequestModel` (TypeId: 7). Deliver: a passing `hive_migration_test.dart` suite with three named tests - `test_mqtt_model_roundtrip`, `test_ws_model_roundtrip`, and `test_grpc_model_roundtrip` - verifying that existing user workspaces load without `HiveError: Cannot read, unknown typeId` on cold start.
+### Week 1: Core Systems & Data Architecture (March 1 - March 7)
+- **Objective:** Establish the production-ready Hive and Riverpod foundation.
+- **Tasks:** 
+  - Register and test Hive type adapters for `MqttRequestModel`, `WebSocketRequestModel`, and `GrpcRequestModel`.
+  - Wire all three models into the core `requests_notifier.dart` pipeline.
+  - Deliver: `hive_migration_test.dart` and `collection_isolation_test.dart` verifying that protocol-specific states are strictly isolated and persist correctly across app restarts.
 
-- **Week 2 (May 25 - May 31):** Wire `WebSocketRequestModel` and `MqttRequestModel` into the core request-tracking pipeline (`requests_notifier.dart`, `collection_notifier.dart`). Deliver: a `collection_isolation_test.dart` with a named test `test_mqtt_request_does_not_contaminate_http_state` confirming that adding an MQTT request to a collection does not alter the `HttpRequestModel` list - the exact regression that caused PR `#258` to be closed.
+### Week 2: WebSocket Ephemeral Mechanics & UI (March 8 - March 14)
+- **Objective:** Finalize a robust WebSocket engine with full spec compliance.
+- **Tasks:**
+  - Implement `WebSocketConnectionManager` with explicit `channel.ready` handshake handling.
+  - Build the duplex chat-bubble UI with real-time Rx/Tx counters.
+  - Map HTTP upgrade failures to actionable SnackBars.
+  - Deliver: `ws_manager_test.dart` and `ws_ui_integration_test.dart` covering handshake timing and tab-navigation state persistence.
 
-### Phase 2: WebSockets Ephemeral Mechanics (Weeks 3-4)
-- **Week 3 (June 1 - June 7):** Implement `WebSocketConnectionManager` using `dart:io`. Build the Request Pane UI with support for custom handshake headers. Deliver: `ws_manager_test.dart` with `test_connect_awaits_channel_ready` confirming the send lock is not released until `channel.ready` resolves, and `test_tls_handshake_upgrade_sequence` validating the three-phase upgrade on a local mock TLS server.
+### Week 3: MQTT Intelligence Metrics & Live Visualization (March 15 - March 21)
+- **Objective:** Deploy the dual-engine MQTT client and hardware-accelerated graphing.
+- **Tasks:**
+  - Implement full support for MQTT v3.1.1 and v5.0 with specialized payload builders.
+  - Construction of the 4-tab MQTT configuration interface (Topics, Publish, LWT, Config).
+  - Develop the `CustomPaint` `MQTTGraphPainter` for 60-fps live data plotting.
+  - Deliver: `mqtt_service_test.dart` and `mqtt_graph_render_test.dart` for protocol switching and frame-timing validation.
 
-- **Week 4 (June 8 - June 14):** Build the chat-bubble message feed - sent messages right-aligned, received left-aligned, errors in red. Implement Rx/Tx counters in the response pane header. Map HTTP upgrade failures to readable SnackBar messages. Deliver: `ws_ui_integration_test.dart` targeting `WebSocketChatBubbleView` with `test_received_message_aligns_left`, `test_sent_message_aligns_right`, `test_http_101_failure_shows_snackbar`, and `test_tab_switch_preserves_connection_state` (the exact regression from PR `#210`).
-
-### Phase 3: MQTT Intelligence Metrics (Weeks 5-7)
-- **Week 5 (June 15 - June 21):** Implement core `mqtt_client` / `mqtt5_client` dual-engine service layer with the`_clientV3` / `_clientV5` split. Construct the full 4-tab interface. Deliver: `mqtt_service_test.dart` with `test_v3_payload_builder_is_type_safe`, `test_v5_payload_builder_is_type_safe`, and `test_protocol_switch_does_not_throw_type_mismatch` - covering the exact crash from Learning #2.
-
-- **Week 6 (June 22 - June 28):** Build the `CustomPaint` `MQTTGraphPainter` with live chronological data input. Add pinch-to-zoom gesture handling scoped to the graph widget. Deliver: `mqtt_graph_render_test.dart` confirming `test_status_bar_rx_counter_does_not_recompute_on_idle_frame` (the O(n) per-frame regression from Learning #4) and `test_graph_renders_150_messages_at_60fps` via a golden frame-timing assertion.
-
-- **Week 7 (June 29 - July 5):** Implement LWT configuration - broker URL, topic, payload, QoS, and retain flag - wired into the MQTT `CONNECT` packet handshake. Deliver: `mqtt_lwt_integration_test.dart` with `test_lwt_payload_delivered_on_ungraceful_disconnect` verified against a local Docker-hosted `eclipse-mosquitto` instance, confirming the will message appears on the configured topic within the broker's keep-alive window after a forced `SIGKILL`.
-
-### Phase 4: gRPC Architecture Integrations & Codegen (Weeks 8-9) (Stretch Goal)
-- **Week 8 (July 6 - July 12):** Implement the core gRPC Unary client and dual-channel isolation (`ReflectionChannel` / `MainChannel`). Deliver: `grpc_channel_test.dart` with `test_reflection_rst_stream_does_not_propagate_to_main_channel` and `test_goaway_frame_does_not_kill_inflight_unary_call` - the two failure modes isolated in the Dual-Channel section.
-
-- **Week 9 (July 13 - July 19):** Expand the `protocol_code_pane.dart` generator to support gRPC. Deliver: `codegen_integration_test.dart` with `test_mqtt_uri_does_not_hit_legacy_http_parser` and `test_wss_uri_generates_valid_ws_snippet` - the exact regression from Learning #5 - plus `test_grpc_codegen_outputs_valid_grpcio_python`.
-
-### Phase 5: Final Testing & Documentation (Weeks 10-12)
-- **Week 10 (July 20 - July 26):** Execute comprehensive `flutter test` integration suites covering reconnection edge cases. Deliver: `reconnect_edge_case_test.dart` with `test_reconnect_after_tab_navigation_uses_live_manager_instance` and `test_stale_provider_reference_does_not_silently_drop_messages` - the exact regression from Learning #6.
-
-- **Week 11 (July 27 - August 2):** Complete widget boundary tests targeting mobile Android viewports. Deliver: `mobile_overflow_integration_test.dart` targeting `MqttRequestPane`, `WebSocketRequestPane`, and `GrpcRequestPane` at 360px, 390px, and 412px widths - with named assertions `test_mqtt_toolbar_no_renderflex_overflow_360px`, `test_ws_pane_no_renderflex_overflow_390px`, explicitly covering the overflow class from issues `#1535` and `#1508`.
-
-- **Week 12 (August 3 - August 9):** Write user-facing documentation for all three protocol types. Add tutorial scripts to `doc/` covering common use cases (e.g., MQTT sensor testing, WebSocket chat connections). Run final CI checks and submit the final PRs.
+### Week 4: gRPC Integration, Codegen & Final Polish (March 22 - March 31)
+- **Objective:** gRPC Server Reflection, Omni-Protocol Codegen, and production sign-off.
+- **Tasks:**
+  - Implement dual-channel gRPC isolation (Reflection vs. Execution) to prevent TCP connection drops.
+  - Rewrite `protocol_code_pane.dart` to support Python, JS, and Dart codegen for all three protocols.
+  - Execute final widget boundary testing for mobile overflow stability and write comprehensive user docs.
+  - **March 31:** Finalized drafted proposal and submitted to GSoC 2026.
+  - **April 9, 2026:** Fixed Issue [#1090](https://github.com/foss42/apidash/issues/1090) (Divider snapping bug) while maintaining full architectural integrity and preserving existing core features.
+  - Deliver: Complete `codegen_integration_test.dart` and finalized core feature set merging into the main branch.
 
 ---
 
