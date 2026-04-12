@@ -14,6 +14,12 @@ void registerGetApiRequestTemplate(McpServer server) {
         },
       },
     }),
+    meta: {
+      'ui': {
+        'resourceUri': kUriRequestBuilder,
+        'visibility': ['model', 'app'],
+      },
+    },
     callback: (Map<String, dynamic> args, RequestHandlerExtra extra) async {
       final method = (args['method'] as String? ?? 'GET').toUpperCase();
       return uiToolResult(

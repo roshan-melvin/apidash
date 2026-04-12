@@ -10,9 +10,16 @@ void registerRequestBuilder(McpServer server) {
       'type': 'object',
       'properties': <String, dynamic>{},
     }),
+    meta: {
+      'ui': {
+        'resourceUri': kUriRequestBuilder,
+        'visibility': ['model', 'app'],
+      },
+    },
     callback: (Map<String, dynamic> args, RequestHandlerExtra extra) async {
       final count = WorkspaceState().requests.length;
       return uiToolResult(
+
         resourceUri: kUriRequestBuilder,
         confirmationText: '✓ Request Builder opened — $count request(s) in workspace.',
       );

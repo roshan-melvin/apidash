@@ -13,6 +13,12 @@ void registerCodegenUi(McpServer server) {
         'url': <String, dynamic>{'type': 'string'},
       },
     }),
+    meta: {
+      'ui': {
+        'resourceUri': kUriCodeGenerator,
+        'visibility': ['model', 'app'],
+      },
+    },
     callback: (Map<String, dynamic> args, RequestHandlerExtra extra) async {
       final method = args['method'] as String? ?? 'GET';
       final url = args['url'] as String? ?? '';

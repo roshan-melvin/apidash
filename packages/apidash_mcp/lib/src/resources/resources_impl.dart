@@ -54,7 +54,7 @@ void registerRequestBuilderResource(McpServer server) {
   server.registerResource(
     'request-builder-ui',
     'ui://apidash-mcp/request-builder',
-    (description: 'Interactive panel showing all workspace requests.', mimeType: 'text/html'),
+    (description: 'Interactive panel showing all workspace requests.', mimeType: 'text/html;profile=mcp-app'),
     (Uri uri, RequestHandlerExtra extra) async {
       final requests = WorkspaceState().requests;
       final rows = requests.isEmpty
@@ -90,7 +90,7 @@ void registerRequestBuilderResource(McpServer server) {
 
       return ReadResourceResult(
         contents: [
-          TextResourceContents(uri: uri.toString(), mimeType: 'text/html', text: html),
+          TextResourceContents(uri: uri.toString(), mimeType: 'text/html;profile=mcp-app', text: html),
         ],
       );
     },
@@ -104,7 +104,7 @@ void registerResponseViewerResource(McpServer server) {
   server.registerResource(
     'response-viewer-ui',
     'ui://apidash-mcp/response-viewer',
-    (description: 'Displays the last HTTP response received in APIDash.', mimeType: 'text/html'),
+    (description: 'Displays the last HTTP response received in APIDash.', mimeType: 'text/html;profile=mcp-app'),
     (Uri uri, RequestHandlerExtra extra) async {
       final last = WorkspaceState().lastResponse;
 
@@ -144,7 +144,7 @@ void registerResponseViewerResource(McpServer server) {
 
       return ReadResourceResult(
         contents: [
-          TextResourceContents(uri: uri.toString(), mimeType: 'text/html', text: html),
+          TextResourceContents(uri: uri.toString(), mimeType: 'text/html;profile=mcp-app', text: html),
         ],
       );
     },
@@ -158,7 +158,7 @@ void registerCollectionsExplorerResource(McpServer server) {
   server.registerResource(
     'collections-explorer-ui',
     'ui://apidash-mcp/collections-explorer',
-    (description: 'Browse all API requests from the APIDash workspace.', mimeType: 'text/html'),
+    (description: 'Browse all API requests from the APIDash workspace.', mimeType: 'text/html;profile=mcp-app'),
     (Uri uri, RequestHandlerExtra extra) async {
       final requests = WorkspaceState().requests;
 
@@ -188,7 +188,7 @@ $items''',
 
       return ReadResourceResult(
         contents: [
-          TextResourceContents(uri: uri.toString(), mimeType: 'text/html', text: html),
+          TextResourceContents(uri: uri.toString(), mimeType: 'text/html;profile=mcp-app', text: html),
         ],
       );
     },
@@ -214,7 +214,7 @@ void registerGraphqlExplorerResource(McpServer server) {
   server.registerResource(
     'graphql-explorer-ui',
     'ui://apidash-mcp/graphql-explorer',
-    (description: 'GraphQL explorer panel with usage guide and example queries.', mimeType: 'text/html'),
+    (description: 'GraphQL explorer panel with usage guide and example queries.', mimeType: 'text/html;profile=mcp-app'),
     (Uri uri, RequestHandlerExtra extra) async {
       final html = _htmlShell(
         title: 'GraphQL Explorer',
@@ -237,7 +237,7 @@ void registerGraphqlExplorerResource(McpServer server) {
 
       return ReadResourceResult(
         contents: [
-          TextResourceContents(uri: uri.toString(), mimeType: 'text/html', text: html),
+          TextResourceContents(uri: uri.toString(), mimeType: 'text/html;profile=mcp-app', text: html),
         ],
       );
     },
@@ -251,7 +251,7 @@ void registerCodeGeneratorResource(McpServer server) {
   server.registerResource(
     'code-generator-ui',
     'ui://apidash-mcp/code-generator',
-    (description: 'Code snippet generator — shows all ${supportedGenerators.length} supported languages.', mimeType: 'text/html'),
+    (description: 'Code snippet generator — shows all ${supportedGenerators.length} supported languages.', mimeType: 'text/html;profile=mcp-app'),
     (Uri uri, RequestHandlerExtra extra) async {
       final pills = supportedGenerators.map((g) => '<span class="pill">$g</span>').join('');
 
@@ -274,7 +274,7 @@ void registerCodeGeneratorResource(McpServer server) {
 
       return ReadResourceResult(
         contents: [
-          TextResourceContents(uri: uri.toString(), mimeType: 'text/html', text: html),
+          TextResourceContents(uri: uri.toString(), mimeType: 'text/html;profile=mcp-app', text: html),
         ],
       );
     },
@@ -288,7 +288,7 @@ void registerEnvManagerResource(McpServer server) {
   server.registerResource(
     'env-manager-ui',
     'ui://apidash-mcp/env-manager',
-    (description: 'Environment variable manager — shows all APIDash environments.', mimeType: 'text/html'),
+    (description: 'Environment variable manager — shows all APIDash environments.', mimeType: 'text/html;profile=mcp-app'),
     (Uri uri, RequestHandlerExtra extra) async {
       final envs = WorkspaceState().environments;
 
@@ -326,7 +326,7 @@ void registerEnvManagerResource(McpServer server) {
 
       return ReadResourceResult(
         contents: [
-          TextResourceContents(uri: uri.toString(), mimeType: 'text/html', text: html),
+          TextResourceContents(uri: uri.toString(), mimeType: 'text/html;profile=mcp-app', text: html),
         ],
       );
     },
@@ -340,7 +340,7 @@ void registerCodeViewerResource(McpServer server) {
   server.registerResource(
     'code-viewer-ui',
     'ui://apidash-mcp/code-viewer',
-    (description: 'APIDash MCP — all 14 tools and 7 resources at a glance.', mimeType: 'text/html'),
+    (description: 'APIDash MCP — all 14 tools and 7 resources at a glance.', mimeType: 'text/html;profile=mcp-app'),
     (Uri uri, RequestHandlerExtra extra) async {
       const tools = [
         ('http-send-request',        'Send any HTTP request',                   '#58a6ff'),
@@ -393,7 +393,7 @@ void registerCodeViewerResource(McpServer server) {
 
       return ReadResourceResult(
         contents: [
-          TextResourceContents(uri: uri.toString(), mimeType: 'text/html', text: html),
+          TextResourceContents(uri: uri.toString(), mimeType: 'text/html;profile=mcp-app', text: html),
         ],
       );
     },

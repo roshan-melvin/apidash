@@ -10,6 +10,12 @@ void registerManageEnvironment(McpServer server) {
       'type': 'object',
       'properties': <String, dynamic>{},
     }),
+    meta: {
+      'ui': {
+        'resourceUri': kUriEnvManager,
+        'visibility': ['model', 'app'],
+      },
+    },
     callback: (Map<String, dynamic> args, RequestHandlerExtra extra) async {
       final count = WorkspaceState().environments.length;
       return uiToolResult(

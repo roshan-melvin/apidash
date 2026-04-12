@@ -20,20 +20,24 @@ const kUriCodeViewer          = '$_base/code-viewer';
 /// Build a [CallToolResult] that follows the SEP-1865 App lifecycle:
 ///   1. Returns a brief text confirmation visible in chat
 ///   2. Sets `_meta.ui.resourceUri` so the host fires `resources/read`
-///   3. Host renders the HTML returned by the resource as the iframe panel
+///   3. Returns empty `structuredContent` (required by VS Code renderer)
+///   4. Host renders the HTML returned by the resource as the iframe panel
 CallToolResult uiToolResult({
   required String resourceUri,
   required String confirmationText,
 }) {
   return CallToolResult(
     content: [TextContent(text: confirmationText)],
+    structuredContent: <String, dynamic>{},
     meta: {
       'ui': {
         'resourceUri': resourceUri,
+        'visibility': ['model', 'app'],
       },
     },
   );
 }
+
 
 
 // ─── Shared HTML shell ────────────────────────────────────────────────────────

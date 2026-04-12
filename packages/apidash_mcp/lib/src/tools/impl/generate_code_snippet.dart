@@ -21,6 +21,12 @@ void registerGenerateCodeSnippet(McpServer server) {
       },
       'required': ['generator', 'method', 'url'],
     }),
+    meta: {
+      'ui': {
+        'resourceUri': kUriCodeGenerator,
+        'visibility': ['model', 'app'],
+      },
+    },
     callback: (Map<String, dynamic> args, RequestHandlerExtra extra) async {
       final gen = args['generator'] as String;
       final method = args['method'] as String;

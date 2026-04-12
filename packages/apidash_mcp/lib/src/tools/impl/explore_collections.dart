@@ -10,6 +10,12 @@ void registerExploreCollections(McpServer server) {
       'type': 'object',
       'properties': <String, dynamic>{},
     }),
+    meta: {
+      'ui': {
+        'resourceUri': kUriCollectionsExplorer,
+        'visibility': ['model', 'app'],
+      },
+    },
     callback: (Map<String, dynamic> args, RequestHandlerExtra extra) async {
       final count = WorkspaceState().requests.length;
       return uiToolResult(

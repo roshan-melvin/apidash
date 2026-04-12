@@ -10,6 +10,12 @@ void registerGetLastResponse(McpServer server) {
       'type': 'object',
       'properties': <String, dynamic>{},
     }),
+    meta: {
+      'ui': {
+        'resourceUri': kUriResponseViewer,
+        'visibility': ['model', 'app'],
+      },
+    },
     callback: (Map<String, dynamic> args, RequestHandlerExtra extra) async {
       final last = WorkspaceState().lastResponse;
       final status = last?['responseStatus'];
