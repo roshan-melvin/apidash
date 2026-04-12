@@ -7,8 +7,8 @@ import 'package:crypto/crypto.dart';
 import 'store.dart';
 
 String baseUrl() {
-  final port = Platform.environment['PORT'] ?? '3001';
-  return Platform.environment['BASE_URL'] ?? 'http://localhost:\$port';
+  final port = Platform.environment['PORT'] ?? '8000';
+  return Platform.environment['BASE_URL'] ?? 'http://localhost:$port';
 }
 
 final oauthRouter = Router()
@@ -17,10 +17,10 @@ final oauthRouter = Router()
     return Response.ok(
       jsonEncode({
         'issuer': base,
-        'authorization_endpoint': '\$base/authorize',
-        'token_endpoint': '\$base/token',
-        'registration_endpoint': '\$base/register',
-        'revocation_endpoint': '\$base/token/revoke',
+        'authorization_endpoint': '$base/authorize',
+        'token_endpoint': '$base/token',
+        'registration_endpoint': '$base/register',
+        'revocation_endpoint': '$base/token/revoke',
         'response_types_supported': ['code'],
         'grant_types_supported': ['authorization_code', 'refresh_token'],
         'token_endpoint_auth_methods_supported': ['none', 'client_secret_basic'],
@@ -180,13 +180,9 @@ final oauthRouter = Router()
     <div class="logo">🔐</div>
     <h1>Authorize APIDash MCP</h1>
     <p>The following client is requesting access:</p>
-    <div class="client">\${client.clientName ?? clientId}</div>
-    <div class="scope">scope: \$scope</div>
-    <form action="/authorize/confirm" method="POST">
-      <input type="hidden" name="code"         value="\${authCode.code}">
-      <input type="hidden" name="redirect_uri" value="\$finalUrl">
-      <button type="submit" class="btn">✓ Allow Access</button>
-    </form>
+    <div class="client">${client.clientName ?? clientId}</div>
+    <div class="scope">scope: $scope</div>
+    <a href="$finalUrl" class="btn">✓ Allow Access</a>
     <p class="auto">You will be redirected back to the application.</p>
   </div>
 </body>

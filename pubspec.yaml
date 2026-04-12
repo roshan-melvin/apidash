@@ -3,6 +3,9 @@ description: API Dash is a beautiful open-source cross-platform API Client built
 publish_to: "none"
 version: 0.5.0+5
 
+executables:
+  apidash: bin/apidash_cli
+
 environment:
   sdk: ">=3.11.0 <4.0.0"
   flutter: ">=3.41.2"
@@ -38,6 +41,7 @@ dependencies:
   highlight: ^0.7.0
   highlighter: ^0.1.1
   hive_ce_flutter: ^2.3.4
+  hive_ce: any
   hooks_riverpod: ^3.2.1
   intl: ^0.20.2
   jinja: ^0.6.5
