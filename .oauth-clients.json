@@ -1,0 +1,1 @@
+[{"client_id":"w7MBQlJ38zTyBNzhdYV3Hg","client_secret":null,"redirect_uris":["http://127.0.0.1/callback"],"client_name":"VS Code","grant_types":["authorization_code","refresh_token"],"response_types":["code"],"token_endpoint_auth_method":"none","scope":"mcp","created_at":1776020210690}]

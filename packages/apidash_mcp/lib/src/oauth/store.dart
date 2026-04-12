@@ -10,7 +10,7 @@ String _generateRandomString(int length) {
   return base64UrlEncode(values).replaceAll('=', '');
 }
 
-final _clientsFile = File('.oauth-clients.json');
+final _clientsFile = File('${Platform.environment['HOME']}/.local/share/apidash/.oauth-clients.json');
 
 class OAuthClient {
   final String clientId;

@@ -36,6 +36,17 @@ void _loadDotEnv() {
 String? _env(String key) => _envOverrides[key] ?? Platform.environment[key];
 
 Future<bool> _checkAuth(HttpRequest request, {required bool oauthMode, required String? staticToken}) async {
+  request.response.headers
+    ..add('Access-Control-Allow-Origin', '*')
+    ..add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    ..add('Access-Control-Allow-Headers', 'Content-Type, Authorization, Mcp-Session-Id');
+
+  if (request.method == 'OPTIONS') {
+    request.response.statusCode = HttpStatus.ok;
+    await request.response.close();
+    return false;
+  }
+
   if (!oauthMode && (staticToken == null || staticToken.isEmpty)) return true;
 
   final authHeader = request.headers.value('authorization') ?? '';
@@ -43,6 +54,7 @@ Future<bool> _checkAuth(HttpRequest request, {required bool oauthMode, required 
     request.response
       ..statusCode = 401
       ..headers.contentType = ContentType.json
+      ..headers.add('WWW-Authenticate', 'Bearer realm="apidash-mcp"')
       ..write(jsonEncode({'error': 'invalid_token',
           'error_description': 'Authorization: Bearer <token> required'}));
     await request.response.close();
@@ -56,6 +68,7 @@ Future<bool> _checkAuth(HttpRequest request, {required bool oauthMode, required 
   request.response
     ..statusCode = 401
     ..headers.contentType = ContentType.json
+    ..headers.add('WWW-Authenticate', 'Bearer error="invalid_token"')
     ..write(jsonEncode({'error': 'invalid_token',
         'error_description': 'Token invalid or expired'}));
   await request.response.close();
@@ -234,6 +247,8 @@ Options:
       if (path == '/health' ||
           path == '/.well-known/oauth-authorization-server' ||
           path == '/.well-known/oauth-protected-resource' ||
+          path == '/mcp/.well-known/oauth-protected-resource' ||
+          path == '/sse/.well-known/oauth-protected-resource' ||
           path == '/.well-known/mcp' ||
           path == '/register' ||
           path == '/authorize' ||
@@ -275,6 +290,8 @@ Options:
       if (path == '/health' ||
           path == '/.well-known/oauth-authorization-server' ||
           path == '/.well-known/oauth-protected-resource' ||
+          path == '/mcp/.well-known/oauth-protected-resource' ||
+          path == '/sse/.well-known/oauth-protected-resource' ||
           path == '/.well-known/mcp' ||
           path == '/register' ||
           path == '/authorize' ||

@@ -99,11 +99,14 @@ final oauthRouter = Router()
     if (!client.redirectUris.contains(redirectUri)) {
       final requestedUrl = Uri.parse(redirectUri);
       bool isValidLocal = false;
+      // Allow any port on 127.0.0.1 or localhost (VS Code uses dynamic ports)
+      if (requestedUrl.host == '127.0.0.1' || requestedUrl.host == 'localhost') {
+        isValidLocal = true;
+      }
       for (final uri in client.redirectUris) {
         final registeredUrl = Uri.parse(uri);
-        if (requestedUrl.host == '127.0.0.1' &&
-            registeredUrl.host == '127.0.0.1' &&
-            requestedUrl.path.startsWith(registeredUrl.path)) {
+        if ((requestedUrl.host == '127.0.0.1' || requestedUrl.host == 'localhost') &&
+            (registeredUrl.host == '127.0.0.1' || registeredUrl.host == 'localhost')) {
           isValidLocal = true;
           break;
         }
