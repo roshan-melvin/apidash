@@ -1,8 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 import 'mcp_server.dart';
 import 'request_router.dart';
 import '../ui/html_builders.dart';
+import '../ui/panels/request_builder_panel.dart';
+import '../ui/panels/code_generator_panel.dart';
+import '../resources/code_generator_resource.dart';
 import '../tools/tool_ui_helper.dart';
+import 'package:apidash_mcp_core/apidash_mcp_core.dart';
 
 /// Hosts the MCP server **inside** the Flutter app process so that
 /// [WorkspaceState] (a Dart singleton) is shared between the Flutter
@@ -22,11 +27,42 @@ class EmbeddedMcpServer {
   /// When VS Code renders the EmbeddedResource chip or when resources/read
   /// is called, having an HTTP URL lets the webview load the page properly.
   static final _uiRoutes = <String, String Function()>{
-    '/ui/request-builder':      buildRequestBuilderHtml,
+    '/ui/request-builder': () {
+      // Serve the full interactive panel, with any pending preload injected
+      var html = buildRequestBuilderPanel();
+      final pending = WorkspaceState().pendingBuilderPreload;
+      if (pending != null) {
+        final script =
+            '<script>window.__PRELOAD_REQUEST__ = ${jsonEncode(pending)};</script>';
+        html = html.replaceFirst('</head>', '$script\n</head>');
+        WorkspaceState().pendingBuilderPreload = null;
+      }
+      return html;
+    },
     '/ui/response-viewer':      buildResponseViewerHtml,
     '/ui/collections-explorer': buildCollectionsExplorerHtml,
     '/ui/graphql-explorer':     buildGraphqlExplorerHtml,
-    '/ui/code-generator':       buildCodeGeneratorHtml,
+    '/ui/code-generator': () {
+      final wsRequests = WorkspaceState().requests;
+      final wsIds = wsRequests.map((r) => r['id'] as String? ?? '').toSet();
+      final allRequests = [
+        ...wsRequests,
+        ...builtinTemplates.where((t) => !wsIds.contains(t['id'] as String)),
+      ];
+      
+      var html = buildCodeGeneratorPanel(supportedGenerators);
+
+      final injectionScript = '<script>window.__INITIAL_CONTEXT__ = ${jsonEncode(allRequests)};</script>';
+      html = html.replaceFirst('</head>', '$injectionScript\n</head>');
+
+      final preloadId = WorkspaceState().pendingCodegenPreloadId;
+      if (preloadId != null) {
+        final preloadScript = '<script>window.__PRELOAD_REQUEST_ID__ = ${jsonEncode(preloadId)};</script>';
+        html = html.replaceFirst('</head>', '$preloadScript\n</head>');
+        WorkspaceState().pendingCodegenPreloadId = null;
+      }
+      return html;
+    },
     '/ui/env-manager':          buildEnvManagerHtml,
     '/ui/code-viewer':          buildCodeViewerHtml,
   };

@@ -15,6 +15,10 @@ class WorkspaceState {
   List<Map<String, dynamic>> environments = [];
   Map<String, dynamic>? lastResponse;
   String? selectedRequestId;
+  /// Transient: which request to pre-select next time the Code Generator resource is fetched.
+  String? pendingCodegenPreloadId;
+  /// Transient: full request object to preload into the Request Builder.
+  Map<String, dynamic>? pendingBuilderPreload;
 
   // ------- mutators -------------------------------------------------
   void updateRequests(List<Map<String, dynamic>> r) => requests = List.from(r);

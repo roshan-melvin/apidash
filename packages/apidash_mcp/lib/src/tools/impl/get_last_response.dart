@@ -5,7 +5,7 @@ import '../tool_ui_helper.dart';
 void registerGetLastResponse(McpServer server) {
   server.registerTool(
     'get-last-response',
-    description: 'Open the Response Viewer panel with the last APIDash HTTP response.',
+    description: 'Fetch the last HTTP response from the APIDash workspace and display it in the Response Viewer panel.',
     inputSchema: ToolInputSchema.fromJson(<String, dynamic>{
       'type': 'object',
       'properties': <String, dynamic>{},
@@ -18,14 +18,21 @@ void registerGetLastResponse(McpServer server) {
     },
     callback: (Map<String, dynamic> args, RequestHandlerExtra extra) async {
       final last = WorkspaceState().lastResponse;
-      final status = last?['responseStatus'];
-      final name = last?['name']?.toString() ?? '';
-      final msg = status != null
-          ? 'Last response: $status${name.isNotEmpty ? ' — $name' : ''}'
-          : 'No response yet';
-      return uiToolResult(
-        resourceUri: kUriResponseViewer,
-        confirmationText: '✓ $msg',
+      final status = last?['responseStatus'] as int?;
+      final msg = status != null ? 'Last response: $status' : 'No response yet — send a request first.';
+
+      // Return structuredContent so the Response Viewer iframe can read it
+      return CallToolResult(
+        content: [TextContent(text: '✓ $msg')],
+        structuredContent: <String, dynamic>{
+          'lastResponse': last ?? {},
+        },
+        meta: {
+          'ui': {
+            'resourceUri': kUriResponseViewer,
+            'visibility': ['model', 'app'],
+          },
+        },
       );
     },
   );

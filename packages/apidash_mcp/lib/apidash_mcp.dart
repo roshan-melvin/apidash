@@ -21,7 +21,6 @@ export 'src/tools/ai_llm_request.dart';
 export 'src/tools/save_request.dart';
 export 'src/tools/get_last_response.dart';
 export 'src/resources/resources_registry.dart';
-export 'src/resources/resources_impl.dart';
 export 'src/resources/request_builder_resource.dart';
 export 'src/resources/response_viewer_resource.dart';
 export 'src/resources/collections_explorer_resource.dart';

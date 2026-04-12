@@ -34,7 +34,22 @@ Future<Map<String, dynamic>> executeHttpRequest(HttpRequestContext context) asyn
       }
     }
 
-    final request = http.Request(context.method, Uri.parse(context.url));
+    // Add a browser-like User-Agent so WAF/Cloudflare doesn't block the request
+    if (!finalHeaders.keys.any((k) => k.toLowerCase() == 'user-agent')) {
+      finalHeaders['User-Agent'] = 'Mozilla/5.0 APIDash/1.0';
+    }
+    // Add Accept header if missing
+    if (!finalHeaders.keys.any((k) => k.toLowerCase() == 'accept')) {
+      finalHeaders['Accept'] = 'application/json, */*';
+    }
+
+    // Auto-prepend https:// if no scheme is provided (fixes "0 Network Error" for bare domains)
+    var resolvedUrl = context.url.trim();
+    if (!resolvedUrl.startsWith('http://') && !resolvedUrl.startsWith('https://')) {
+      resolvedUrl = 'https://$resolvedUrl';
+    }
+
+    final request = http.Request(context.method, Uri.parse(resolvedUrl));
     request.headers.addAll(finalHeaders);
     if (context.body != null) {
       request.body = context.body!;

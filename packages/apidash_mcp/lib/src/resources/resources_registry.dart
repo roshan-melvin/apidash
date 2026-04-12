@@ -1,5 +1,12 @@
 import 'package:mcp_dart/mcp_dart.dart';
-import 'resources_impl.dart';
+
+import 'request_builder_resource.dart';
+import 'response_viewer_resource.dart';
+import 'collections_explorer_resource.dart';
+import 'graphql_explorer_resource.dart';
+import 'code_generator_resource.dart';
+import 'env_manager_resource.dart';
+import 'code_viewer_resource.dart';
 
 class ResourcesRegistry {
   static void registerAll(McpServer server) {

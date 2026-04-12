@@ -14,6 +14,7 @@ import 'impl/get_api_request_template.dart';
 import 'impl/ai_llm_request.dart';
 import 'impl/save_request.dart';
 import 'impl/get_last_response.dart';
+import 'impl/get_preload_state.dart';
 
 void registerTools(McpServer server) {
   registerRequestBuilder(server);
@@ -30,4 +31,5 @@ void registerTools(McpServer server) {
   registerAiLlmRequest(server);
   registerSaveRequest(server);
   registerGetLastResponse(server);
+  registerGetPreloadState(server);
 }
