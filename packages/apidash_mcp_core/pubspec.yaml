@@ -1,0 +1,9 @@
+name: apidash_mcp_core
+description: Core library for APIDash MCP
+resolution: workspace
+publish_to: none
+environment:
+  sdk: ">=3.11.0 <4.0.0"
+dependencies:
+  http: ^1.2.0
+  crypto: ^3.0.3

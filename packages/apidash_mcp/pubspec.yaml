@@ -1,0 +1,13 @@
+name: apidash_mcp
+description: APIDash MCP server
+resolution: workspace
+publish_to: none
+environment:
+  sdk: ">=3.11.0 <4.0.0"
+dependencies:
+  shelf: ^1.4.1
+  shelf_router: ^1.1.4
+  crypto: ^3.0.3
+  mcp_dart: ^2.1.0
+  apidash_mcp_core:
+    path: ../apidash_mcp_core

@@ -1,0 +1,121 @@
+import 'dart:io';
+import 'mcp_server.dart';
+import 'request_router.dart';
+import '../ui/html_builders.dart';
+import '../tools/tool_ui_helper.dart';
+
+/// Hosts the MCP server **inside** the Flutter app process so that
+/// [WorkspaceState] (a Dart singleton) is shared between the Flutter
+/// Riverpod providers and the MCP tool callbacks without any IPC.
+///
+/// Usage in main.dart:
+/// ```dart
+/// if (kIsDesktop) await EmbeddedMcpServer.start();
+/// ```
+class EmbeddedMcpServer {
+  static HttpServer? _httpServer;
+  static bool _running = false;
+
+  static bool get isRunning => _running;
+
+  /// HTML pages served at GET /ui/<panel-name>
+  /// When VS Code renders the EmbeddedResource chip or when resources/read
+  /// is called, having an HTTP URL lets the webview load the page properly.
+  static final _uiRoutes = <String, String Function()>{
+    '/ui/request-builder':      buildRequestBuilderHtml,
+    '/ui/response-viewer':      buildResponseViewerHtml,
+    '/ui/collections-explorer': buildCollectionsExplorerHtml,
+    '/ui/graphql-explorer':     buildGraphqlExplorerHtml,
+    '/ui/code-generator':       buildCodeGeneratorHtml,
+    '/ui/env-manager':          buildEnvManagerHtml,
+    '/ui/code-viewer':          buildCodeViewerHtml,
+  };
+
+  /// Start the embedded MCP SSE server, trying [port] first then [port]+1..+9.
+  /// Safe to call multiple times — subsequent calls are no-ops.
+  static Future<void> start({int port = 8000}) async {
+    if (_running) return;
+
+    final server = createMcpServer();
+    final manager = setupRequestRouter(server);
+
+    // Try preferred port, then fall back up to +9 to avoid conflicts
+    // (e.g. from a standalone dart bin/server.dart still running)
+    for (var p = port; p < port + 10; p++) {
+      try {
+        _httpServer = await HttpServer.bind('localhost', p);
+        break;
+      } on SocketException {
+        if (p == port + 9) {
+          stderr.writeln(
+            '[EmbeddedMcpServer] No free port in range $port–${port + 9}. '
+            'Kill the other server and hot-restart.',
+          );
+          return;
+        }
+      }
+    }
+
+    _running = true;
+    final boundPort = _httpServer!.port;
+    _httpServer!.listen(
+      (request) {
+        // CORS headers for browser / VS Code webview
+        request.response.headers
+          ..add('Access-Control-Allow-Origin', '*')
+          ..add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+          ..add(
+            'Access-Control-Allow-Headers',
+            'Content-Type, Authorization, Mcp-Session-Id',
+          );
+
+        if (request.method == 'OPTIONS') {
+          request.response.statusCode = HttpStatus.ok;
+          request.response.close();
+          return;
+        }
+
+        final path = request.uri.path;
+
+        // ── /ui/* static HTML routes ──────────────────────────────────────
+        // Served so that VS Code webview can load the panel HTML via HTTP.
+        // Also used when the EmbeddedResource chip is clicked.
+        final uiBuilder = _uiRoutes[path];
+        if (uiBuilder != null && request.method == 'GET') {
+          final html = uiBuilder();
+          request.response
+            ..statusCode = HttpStatus.ok
+            ..headers.contentType = ContentType.html
+            ..write(html);
+          request.response.close();
+          return;
+        }
+
+        // ── MCP SSE / messages routes ─────────────────────────────────────
+        manager.handleRequest(request).catchError((e) {
+          stderr.writeln('[EmbeddedMcpServer] request error: $e');
+          try {
+            request.response.statusCode = HttpStatus.internalServerError;
+            request.response.close();
+          } catch (_) {}
+        });
+      },
+      onError: (e) => stderr.writeln('[EmbeddedMcpServer] server error: $e'),
+    );
+
+    stderr.writeln(
+      '[EmbeddedMcpServer] ✓ APIDash MCP running → '
+      'http://localhost:$boundPort/mcp/sse\n'
+      '[EmbeddedMcpServer] UI panels → http://localhost:$boundPort/ui/request-builder\n'
+      '[EmbeddedMcpServer] Update mcp.json if port ≠ $port: '
+      '"url": "http://localhost:$boundPort/mcp/sse"',
+    );
+  }
+
+  /// Gracefully shut down the HTTP server (called on app exit if needed).
+  static Future<void> stop() async {
+    await _httpServer?.close(force: true);
+    _httpServer = null;
+    _running = false;
+  }
+}

@@ -5,6 +5,7 @@ import 'package:apidash_core/apidash_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../services/services.dart' show hiveHandler, HiveHandler;
+import '../services/mcp_sync_service.dart';
 
 final selectedEnvironmentIdStateProvider = StateProvider<String?>(
   (ref) => null,
@@ -196,5 +197,11 @@ class EnvironmentsStateNotifier
     await hiveHandler.removeUnused();
     ref.read(saveDataStateProvider.notifier).state = false;
     ref.read(hasUnsavedChangesProvider.notifier).state = false;
+
+    // Bridge with MCP Agent
+    McpSyncService.syncWorkspaceToMcp(
+      null,
+      state?.values.map((e) => e.toJson()).toList(),
+    );
   }
 }

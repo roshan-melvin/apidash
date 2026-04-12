@@ -1,5 +1,6 @@
 import 'package:apidash_core/apidash_core.dart';
 import 'package:apidash_design_system/apidash_design_system.dart';
+import 'package:apidash_mcp/apidash_mcp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stac/stac.dart';
@@ -24,6 +25,8 @@ void main() async {
   );
   if (kIsDesktop) {
     await initWindow(settingsModel: settingsModel);
+    // Start the embedded MCP server (same Dart process → shared WorkspaceState)
+    await EmbeddedMcpServer.start(port: 8000);
   }
   if (!initStatus) {
     settingsModel = settingsModel?.copyWithPath(workspaceFolderPath: null);
@@ -41,6 +44,7 @@ void main() async {
     ),
   );
 }
+
 
 Future<bool> initApp(
   bool initializeUsingPath, {
