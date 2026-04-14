@@ -28,7 +28,7 @@ void registerSaveRequest(McpServer server) {
     callback: (Map<String, dynamic> args, RequestHandlerExtra extra) async {
       final req = <String, dynamic>{
         'name': args['name'] ?? '',
-        'method': args['method'],
+        'method': (args['method'] as String).toLowerCase(),
         'url': args['url'],
         'headers': args['headers'] ?? <String, dynamic>{},
         'body': args['body'],

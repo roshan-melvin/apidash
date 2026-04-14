@@ -611,6 +611,13 @@ class CollectionStateNotifier
         var jsonModel = hiveHandler.getRequestModel(id);
         if (jsonModel != null) {
           var jsonMap = Map<String, Object?>.from(jsonModel);
+          try {
+             if (jsonMap['httpRequestModel'] != null && jsonMap['httpRequestModel'] is Map) {
+                var hrm = Map<String, dynamic>.from(jsonMap['httpRequestModel'] as Map);
+                if (hrm['method'] is String) hrm['method'] = (hrm['method'] as String).toLowerCase();
+                jsonMap['httpRequestModel'] = hrm;
+             }
+          } catch(_) {}
           var requestModel = RequestModel.fromJson(jsonMap);
           if (requestModel.httpRequestModel == null) {
             requestModel = requestModel.copyWith(
