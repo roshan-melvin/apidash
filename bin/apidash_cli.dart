@@ -378,28 +378,114 @@ Future<void> printBeautifulResponse(Map<String, dynamic> result) async {
   else if (status >= 400 && status < 500)
     colorStatus = yellow;
 
+  String formatHtml(String html) {
+    String formatted = '';
+    int indent = 0;
+    final List<String> voidTags = [
+      'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 
+      'link', 'meta', 'param', 'source', 'track', 'wbr'
+    ];
+    for (int i = 0; i < html.length; i++) {
+        if (html[i] == '<' && i < html.length - 1 && html[i+1] == '/') {
+            indent -= 2;
+            if (indent < 0) indent = 0;
+            formatted += '\n' + ' ' * indent + '<';
+        } else if (html[i] == '<') {
+            formatted += '\n' + ' ' * indent + '<';
+            if (i < html.length - 1 && html[i+1] != '!' && html[i+1] != '?') {
+                int tagEnd = html.indexOf(RegExp(r'[\s>]'), i + 1);
+                if (tagEnd == -1) tagEnd = html.length;
+                String tagName = html.substring(i + 1, tagEnd).toLowerCase();
+                if (!voidTags.contains(tagName)) {
+                    indent += 2;
+                    if (indent > 40) indent = 40;
+                }
+            }
+        } else if (html[i] == '>') {
+            formatted += '>';
+        } else {
+            formatted += html[i];
+        }
+    }
+    return formatted.replaceAll(RegExp(r'\n\s*\n'), '\n').trim();
+  }
+
+  List<String> wrapColoredLine(String line, int maxW) {
+    if (maxW <= 0) return [line];
+    List<String> wrapped = [];
+    StringBuffer currentChunk = StringBuffer();
+    int visibleCount = 0;
+    bool inAnsi = false;
+    for (int i = 0; i < line.length; i++) {
+      if (line[i] == '\x1B') {
+        inAnsi = true;
+      }
+      currentChunk.write(line[i]);
+      if (inAnsi && RegExp(r'[a-zA-Z]').hasMatch(line[i])) {
+        inAnsi = false;
+        continue;
+      }
+      if (!inAnsi) {
+        visibleCount++;
+        if (visibleCount == maxW) {
+          wrapped.add(currentChunk.toString() + '\x1B[0m');
+          currentChunk.clear();
+          visibleCount = 0;
+        }
+      }
+    }
+    if (currentChunk.isNotEmpty) {
+      wrapped.add(currentChunk.toString());
+    }
+    return wrapped;
+  }
+
   List<String> getPrettyLines(String rawBody, int maxW) {
     List<String> lines = [];
     if (rawBody.trim().isEmpty) return lines;
+    
+    if (rawBody.trim().startsWith('<') && rawBody.trim().endsWith('>')) {
+       rawBody = formatHtml(rawBody.trim());
+    }
+
     try {
       final decoded = jsonDecode(rawBody);
       final pretty = JsonEncoder.withIndent('  ').convert(decoded);
-      for (final line in pretty.split('\n')) {
-        lines.add(truncate(line, maxW));
+      List<String> prettyLines = pretty.split('\n');
+      for (int i = 0; i < prettyLines.length; i++) {
+          String lineNum = '\x1B[90m' + (i + 1).toString().padLeft(4) + '\x1B[0m │ ';
+          String pLine = prettyLines[i];
+          pLine = pLine.replaceAllMapped(RegExp(r'"([^"]+)"\s*:'), (m) => '\x1B[32m"${m[1]}"\x1B[0m:');
+          pLine = pLine.replaceAllMapped(RegExp(r':\s*("[^"]*")'), (m) => ': \x1B[33m${m[1]}\x1B[0m');
+          
+          List<String> wrapped = wrapColoredLine(pLine, maxW - 7);
+          for (int j = 0; j < wrapped.length; j++) {
+            String prefix = j == 0 ? lineNum : '     │ ';
+            lines.add(prefix + wrapped[j]);
+          }
       }
-    } catch (_) {
-      for (var line in rawBody.split('\n')) {
-        line = line.replaceAll(RegExp(r'\x1B\[[0-9;]*[a-zA-Z]'), '');
-        line = line.replaceAll(RegExp(r'[\x00-\x08\x0B-\x1F]'), '');
-        if (line.isEmpty) {
-          lines.add('');
-          continue;
-        }
-        while (line.length > maxW && maxW > 0) {
-          lines.add(line.substring(0, maxW));
-          line = line.substring(maxW);
-        }
-        if (line.isNotEmpty) lines.add(line);
+      return lines;
+    } catch (_) {}
+
+    List<String> textLines = rawBody.split('\n');
+    for (int i = 0; i < textLines.length; i++) {
+      String line = textLines[i];
+      line = line.replaceAll(RegExp(r'\x1B\[[0-9;]*[a-zA-Z]'), '');
+      line = line.replaceAll(RegExp(r'[\x00-\x08\x0B-\x1F]'), '');
+      
+      line = line.replaceAllMapped(RegExp(r'<(/?[a-zA-Z0-9-]+)'), (m) => '<\x1B[32m${m[1]}\x1B[0m');
+      line = line.replaceAllMapped(RegExp(r'\s([a-zA-Z0-9-]+)="'), (m) => ' \x1B[33m${m[1]}\x1B[0m="');
+      
+      String lineNum = '\x1B[90m' + (i + 1).toString().padLeft(4) + '\x1B[0m │ ';
+      if (line.isEmpty) {
+        lines.add(lineNum);
+        continue;
+      }
+      
+      List<String> wrapped = wrapColoredLine(line, maxW - 7);
+      for (int j = 0; j < wrapped.length; j++) {
+        String prefix = j == 0 ? lineNum : '     │ ';
+        lines.add(prefix + wrapped[j]);
       }
     }
     return lines;
@@ -2491,7 +2577,7 @@ void main(List<String> args) async {
       case 'interactive':
       case 'tui':
       case 'i':
-        await runInteractive();
+        await _runInteractive();
         break;
       default:
         stderr.writeln('Unknown command: $command');
