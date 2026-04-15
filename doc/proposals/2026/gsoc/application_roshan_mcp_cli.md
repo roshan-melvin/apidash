@@ -99,10 +99,8 @@ https://github.com/user-attachments/assets/0994cc8b-4c77-4fc9-97d6-2cff18ddbecb
 
 **Interactive TUI Demo (APIDash CLI Terminal UI)**
 
-> 📹 *Video placeholder — TUI walkthrough to be uploaded. This demonstrates the full keyboard-navigable TUI with paginated request lists, real-time execution output, and flicker-free viewport rendering.*
+[Screencast from 2026-04-15 21-02-45.webm](https://github.com/user-attachments/assets/8a83160e-8b57-4cd7-bab0-23fe68c38933)
 
-<!-- TODO: Replace the line below with the actual GitHub asset URL once uploaded -->
-`[TUI_VIDEO_PLACEHOLDER]`
 
 
 
@@ -229,7 +227,8 @@ apidash/
 
 ## Flowchart 1 — High-Level System Topology
 
-<img width="1354" height="699" alt="Gemini_Generated_Image_j2ts0kj2ts0kj2ts" src="https://github.com/user-attachments/assets/3b08d91f-391d-4714-bd2e-7c990264f517" />
+<img width="1408" height="768" alt="Full" src="https://github.com/user-attachments/assets/e13864b4-312c-4658-82dd-fe46e30a79ce" />
+
 
 
 ---
@@ -238,7 +237,8 @@ apidash/
 
 This diagram traces a single AI-agent tool call from JSON-RPC arrival to response, showing exactly how the SHA-256 Hash Gate operates at every step.
 
-<img width="1392" height="752" alt="4006c45b-08d6-42dc-b1e2-765f16b9d8ff-u2_b8599359-a2c8-41ab-9b4a-1253fb142d28" src="https://github.com/user-attachments/assets/b7e1affe-bbd3-4477-bfd8-7ac1b38f9211" />
+<img width="1392" height="752" alt="Gemini_Generated_Image_ppld59ppld59ppld" src="https://github.com/user-attachments/assets/b3328f5f-ad61-41be-8a2f-754456759d00" />
+
 
 
 ---
@@ -247,7 +247,8 @@ This diagram traces a single AI-agent tool call from JSON-RPC arrival to respons
 
 This diagram shows the full path for every CLI command, from `process.argv` parsing to final output.
 
-<img width="1408" height="768" alt="Gemini_Generated_Image_8y9pbp8y9pbp8y9p" src="https://github.com/user-attachments/assets/0daa9165-4cfb-4ec9-abc4-654dbe1d77dd" />
+<img width="1408" height="768" alt="Gemini_Generated_Image_hsxb1shsxb1shsxb" src="https://github.com/user-attachments/assets/5f79380c-e778-491e-b734-c05616a9932c" />
+
 
 
 ---
@@ -256,14 +257,16 @@ This diagram shows the full path for every CLI command, from `process.argv` pars
 
 This diagram shows the internal Dart logic bridging Riverpod ↔ the JSON file ↔ the Dart tools.
 
-<img width="1328" height="800" alt="image" src="https://github.com/user-attachments/assets/e65d05e7-9d7e-4086-a0f2-65bc5ab7eeda" />
+<img width="1330" height="800" alt="Gemini_Generated_Image_f8tju3f8tju3f8tj" src="https://github.com/user-attachments/assets/9c2cd0d0-9ffb-49e1-a0de-dca24c0e55b5" />
+
 
 
 ---
 
 ## Flowchart 5 — Monorepo Package Dependency Graph
 
-<img width="1392" height="752" alt="eb80151b-5df3-49f3-989b-a5c4d928f537-u2_3a6b8a86-5ef6-4996-b353-4644d7003e9e" src="https://github.com/user-attachments/assets/4e2064f7-47f6-493e-b7c8-d9a5b4ce85f8" />
+<img width="1392" height="752" alt="Gemini_Generated_Image_y0hac6y0hac6y0ha (1)" src="https://github.com/user-attachments/assets/b2ad9c4a-3d6c-4b24-9e1b-cb56d3e8add6" />
+
 
 
 ---
@@ -503,7 +506,8 @@ Because our architecture uniquely supports the `StreamableHTTPServerTransport` a
 
 #### Architecture Flow: Amazon Bedrock to APIDash MCP
 
-<img width="1408" height="768" alt="Gemini_Generated_Image_3irdc3irdc3irdc3" src="https://github.com/user-attachments/assets/d8e29bce-33fd-4521-b0b6-6bea187e0f76" />
+<img width="1380" height="752" alt="Gemini_Generated_Image_faxpoyfaxpoyfaxp" src="https://github.com/user-attachments/assets/fcd4822a-f86c-4be6-bd79-7fd305531145" />
+
 
 
 ### Required Files & AWS Configurations
