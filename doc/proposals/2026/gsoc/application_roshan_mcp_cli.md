@@ -21,7 +21,7 @@ I am **Roshan Melvin G A**, an active contributor to **API Dash** - the open-sou
 
 API Dash is a collaboration-driven open-source project that aims to provide developers with a fast, native, cross-platform API testing and development tool. The goal of this project is to eliminate the fragmented workflow that forces developers to manually interact with the UI for automated tasks or AI-driven generation. By exposing APIDash state through a robust MCP layer and a shared workspace JSON, the system bridges the Flutter GUI securely into terminal pipelines and AI workflows.
 
-I first shipped a working TypeScript/Node.js PoC in PR `#1613` (updated from PR `#1529`), proving the decoupled CLI + MCP Server architecture end-to-end. That PoC was opened as PR `#1650` for review — but was closed because it was TypeScript-based, whereas the APIDash ecosystem is Flutter/Dart-native. Rather than stop there, I immediately re-architected the entire system in **pure Dart** on branch `feat/gsoc-2026-cli-mcp-dart-support`, porting all 13 tools, 7 UI resource panels, OAuth 2.1, SSE/Streamable HTTP transports, and the full interactive TUI — producing a working implementation that fits naturally into the existing monorepo without any cross-language tooling overhead.
+Before writing this proposal, I made three active contributions to the APIDash repository. **PR #1529** (closed) introduced Native WebSocket, MQTT (v3.1.1 + v5.0), and gRPC protocol support alongside UI Overflow fixes for GSoC 2026 issues (`#15`, `#115`, `#14`, `#1090`). **PR #1613** (open, tagged *Proof of Concept*) is the updated version of #1529, incorporating reviewer feedback and extending coverage to issue `#1529`. Both PRs demonstrate deep familiarity with the APIDash codebase and the Riverpod/Hive state model. **PR #1650** (closed) then shipped the full CLI & MCP Server implementation based on the March 2026 MCP spec updates — but it was closed because it was built in Node.js/TypeScript, which does not align with the APIDash Dart-native ecosystem. Rather than stop there, I immediately re-architected the entire system in **pure Dart** on branch `feat/gsoc-2026-cli-mcp-dart-support`, porting all 13 tools, 7 UI resource panels, OAuth 2.1, SSE/Streamable HTTP transports, and the full interactive TUI — producing a working implementation that fits naturally into the existing monorepo without any cross-language tooling overhead.
 
 ---
 
@@ -48,9 +48,10 @@ I first shipped a working TypeScript/Node.js PoC in PR `#1613` (updated from PR 
 
 1. Have you worked on or contributed to a FOSS project before? Can you attach repo links or relevant PRs?
    - Yes. I have multiple active contributions to APIDash:
-     - **PR #1529 / #1613** — Initial TypeScript PoC implementing the MCP server + CLI with the decoupled `@apidash/mcp-core` shared library architecture.
-     - **PR #1650** — Submitted and subsequently closed; the implementation was Node.js/TypeScript-based MCP, which does not align with APIDash's Dart-native stack.
-     - **`feat/gsoc-2026-cli-mcp-dart-support` (current branch)** — Full Dart re-architecture: `apidash_mcp` (Dart MCP server with 13 tools + 7 UI panels), `apidash_mcp_core` (shared pure-Dart library), and `apidash_cli` (headless Dart TUI + terminal executor). This is the active, production-ready implementation this proposal describes.
+     - **[PR #1529](https://github.com/foss42/apidash/pull/1529)** *(closed — missing video demo)* — `feat: Native WebSocket, MQTT (v3.1.1 + v5.0), and gRPC support + UI Overflow Fixes` addressing GSoC 2026 issues `#15`, `#115`, `#14`, `#1090`. This PR demonstrates deep familiarity with the APIDash Flutter codebase, Riverpod state model, and cross-platform networking layers.
+     - **[PR #1613](https://github.com/foss42/apidash/pull/1613)** *(open — Proof of Concept)* — Updated version of PR #1529, incorporating reviewer feedback on MQTT v3.1.1 + v5.0 dual-version support, WebSocket frame handling, and gRPC unary/streaming calls, also covering issue `#1529`.
+     - **[PR #1650](https://github.com/foss42/apidash/pull/1650)** *(closed — 4 days ago)* — `Feat/gsoc 2026 cli & mcp support based on march 2026 MCP updates` — Full CLI & MCP Server implementation per the March 2026 MCP spec. Closed because it was Node.js/TypeScript-based; the APIDash ecosystem requires Dart-native packages.
+     - **`feat/gsoc-2026-cli-mcp-dart-support` (current active branch)** — Full Dart re-architecture: `apidash_mcp` (Dart MCP server with 13 tools + 7 UI panels), `apidash_mcp_core` (shared pure-Dart library), and `apidash_cli` (headless Dart TUI + terminal executor). This is the production-ready implementation this proposal describes.
 2. What is your one project/achievement that you are most proud of? Why?
    - The Decoupled Sibling Architecture: separating the CLI and MCP Server so neither depends on the other, yet both share a single `apidash_mcp_core` library and a single workspace JSON file. This was non-trivial — it required redesigning the workspace reader/writer to be filesystem-singleton-safe, handling cross-platform path resolution (Linux XDG, macOS Application Support, Windows `%APPDATA%`), and implementing the SHA-256 `ToolHashRegistry` to prevent prompt-injection schema drift — all while keeping the Flutter GUI in full bi-directional sync through the `McpSyncService` Dart watcher.
 3. What kind of problems or challenges motivate you the most to solve them?
@@ -64,7 +65,7 @@ I first shipped a working TypeScript/Node.js PoC in PR `#1613` (updated from PR 
 7. Can you mention some areas where the project can be improved?
    - Adding headless automation for CI/CD pipelines (partially done in this proposal), deepening AI-agent integration so LLMs can self-heal broken request collections, and adding a streaming-response viewer for SSE/WebSocket endpoints directly in the MCP chat UI.
 8. Have you interacted with and helped API Dash community?
-   - Yes. Beyond PR #1613, I have reviewed open issues, proposed the `apidash_mcp_workspace.json` cross-platform path spec that was subsequently adopted in the main branch, and contributed documentation clarifying the Hive box key schema for new contributors.
+   - Yes. Beyond PRs #1529, #1613, and #1650, I have reviewed open issues, participated in Discord discussions, and contributed documentation clarifying the Hive box key schema for new contributors.
 
 ### Project Proposal Information
 
@@ -74,7 +75,7 @@ I first shipped a working TypeScript/Node.js PoC in PR `#1613` (updated from PR 
 
 ### Video Walkthroughs (Working PoC)
 
-Before reviewing the architecture breakdowns, please watch the actively working PoC (integrated in PR `#1613`):
+Before reviewing the architecture breakdowns, please watch the actively working PoC (from the current `feat/gsoc-2026-cli-mcp-dart-support` branch):
 
 **Both MCP & CLI Demonstration**
 
