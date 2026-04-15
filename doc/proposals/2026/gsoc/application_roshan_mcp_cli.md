@@ -4,7 +4,7 @@
 
 ### Summary
 
-This project implements a production-grade **Headless CLI** and a native **Model Context Protocol (MCP) Server** for APIDash — both written entirely in **Dart**. The `apidash` CLI enables zero-latency terminal execution of HTTP, GraphQL, and AI requests directly from the terminal (ideal for CI/CD pipelines), while the `apidash_mcp` server exposes 13 AI-callable tools and 7 interactive UI panels over Streamable HTTP, SSE, and stdio transports. Together they transform APIDash into an AI-first development platform where Claude Desktop, VS Code Copilot, or any MCP-compatible agent can securely browse, execute, and save API requests autonomously — all in perfect sync with the Flutter GUI via a shared `apidash_mcp_workspace.json` file.
+This project implements a production-grade **Headless CLI** and a native **Model Context Protocol (MCP) Server** for APIDash — both written entirely in **Dart**. The `apidash` CLI enables zero-latency terminal execution of HTTP, GraphQL, and AI requests directly from the terminal (ideal for CI/CD pipelines), while the `apidash_mcp` server exposes 13 AI-callable tools and 7 interactive UI panels over Streamable HTTP, SSE, and stdio transports. Together they transform APIDash into an AI-first development platform where Claude Desktop, VS Code Copilot, or any MCP-compatible agent can securely browse, execute, and save API requests autonomously — all in perfect sync with the Flutter GUI via `McpSyncService` (direct in-process `WorkspaceState` push when embedded; file-based sync for standalone CLI).
 
 **Owner:** rocroshanga@gmail.com  
 **Contributors:** Roshan Melvin G A  
@@ -54,7 +54,7 @@ I first shipped a working TypeScript/Node.js PoC in PR `#1613` (updated from PR 
 2. What is your one project/achievement that you are most proud of? Why?
    - The Decoupled Sibling Architecture: separating the CLI and MCP Server so neither depends on the other, yet both share a single `apidash_mcp_core` library and a single workspace JSON file. This was non-trivial — it required redesigning the workspace reader/writer to be filesystem-singleton-safe, handling cross-platform path resolution (Linux XDG, macOS Application Support, Windows `%APPDATA%`), and implementing the SHA-256 `ToolHashRegistry` to prevent prompt-injection schema drift — all while keeping the Flutter GUI in full bi-directional sync through the `McpSyncService` Dart watcher.
 3. What kind of problems or challenges motivate you the most to solve them?
-   - Bridging heterogeneous tech stacks elegantly. The APIDash ecosystem has a Flutter/Dart front-end and a headless Dart MCP/CLI back-end that must share live state without either depending on the other's internals. Solving this elegantly — a cross-process state channel using a shared JSON file (`apidash_mcp_workspace.json`) and OS `FileSystemWatcher` events — is exactly the kind of architectural challenge I thrive on.
+   - Bridging heterogeneous tech stacks elegantly. The APIDash ecosystem has a Flutter/Dart front-end and a headless Dart MCP/CLI back-end that must share live state without either depending on the other's internals. Solving this elegantly — a cross-process state bridge: the standalone CLI reads `apidash_mcp_workspace.json` from disk into `WorkspaceState()` at startup, while the embedded MCP server receives state via direct `McpSyncService` Riverpod push — is exactly the kind of architectural challenge I thrive on.
 4. Will you be working on GSoC full-time?
    - Yes, full-time throughout the coding period.
 5. Do you mind regularly syncing up with the project mentors?
@@ -70,7 +70,7 @@ I first shipped a working TypeScript/Node.js PoC in PR `#1613` (updated from PR 
 
 1. Proposal Title: **APIDash Headless CLI & Model Context Protocol (MCP) Integration**
 2. Abstract:
-   This project implements a production-grade headless execution layer for APIDash and integrates it natively with a Model Context Protocol (MCP) server. The architecture enables zero-latency terminal execution ideal for CI/CD pipelines, and allows host AI Agents (Claude Desktop, VS Code Copilot, or any MCP-compatible client) to securely execute HTTP/GraphQL/AI queries autonomously. All state — whether written by the Flutter GUI, the CLI, or an AI tool — flows through a single shared `apidash_mcp_workspace.json` file that the Flutter `McpSyncService` watches bidirectionally, keeping the desktop UI in perfect sync at all times.
+   This project implements a production-grade headless execution layer for APIDash and integrates it natively with a Model Context Protocol (MCP) server. The architecture enables zero-latency terminal execution ideal for CI/CD pipelines, and allows host AI Agents (Claude Desktop, VS Code Copilot, or any MCP-compatible client) to securely execute HTTP/GraphQL/AI queries autonomously. All state — whether driven by the Flutter GUI, the CLI, or an AI tool — is coordinated through `WorkspaceState()` (an in-process singleton for embedded mode) and `apidash_mcp_workspace.json` (for standalone CLI access), keeping the desktop UI in sync via `McpSyncService`'s Riverpod push.
 
 ### Video Walkthroughs (Working PoC)
 
@@ -118,7 +118,7 @@ The overarching system relies on a **Decoupled File-Sync Architecture** bridging
 
 | Component | Stack | Role |
 |---|---|---|
-| **APIDash Flutter GUI** | Flutter / Dart / Riverpod | Primary UI; persists requests in Hive; writes & watches `apidash_mcp_workspace.json` |
+| **APIDash Flutter GUI** | Flutter / Dart / Riverpod | Primary UI; persists requests in Hive; pushes state to `WorkspaceState()` via `McpSyncService` |
 | **McpSyncService** | Dart | Bi-directional file bridge; serialises Riverpod state → JSON; watches for external writes |
 | **`apidash_mcp`** (MCP Server) | Dart | Registers 13 MCP tools + 7 SEP-1865 UI resource panels over Streamable HTTP, SSE, or `stdio` |
 | **`apidash_mcp_core`** | Dart | Shared zero-duplication library: `executor.dart`, `graphql.dart`, `ai.dart`, `codegen.dart`, `workspace_state.dart` |
@@ -275,7 +275,7 @@ A defining characteristic of this architecture is that the **CLI (`apidash`) doe
 **Why this matters:**
 1. *Zero-Latency Terminal Execution:* The CLI fires requests without spinning up an HTTP server, perfect for sub-100 ms CI/CD pipelines.
 2. *AI Independence:* Developers get full automation natively with `apidash` without opting into any AI tooling.
-3. *Omni-Sync State:* Whether Claude edits an API key via `update-environment-variables`, or a developer runs `apidash set production AUTH_TOKEN s3cr3t`, the Flutter app reflects the change within milliseconds through `McpSyncService`'s `fs.watch()` listener.
+3. *Omni-Sync State:* Whether Claude edits an API key via `update-environment-variables`, or a developer runs `apidash set production AUTH_TOKEN s3cr3t`, the Flutter app reflects the change within milliseconds through `McpSyncService`'s direct Riverpod push into `WorkspaceState()`.
 4. *Zero Code Duplication:* `executor.dart`, `graphql.dart`, `ai.dart`, `codegen.dart`, and `workspace.dart` exist in exactly one place — `apidash_mcp_core` — and are statically imported by both consumers.
 
 ---
@@ -288,7 +288,7 @@ A defining characteristic of this architecture is that the **CLI (`apidash`) doe
 | `graphql.dart` | `executeGraphQLRequest({url,query,variables,operationName,headers,timeoutMs})` | GraphQL-over-HTTP; parses `errors[]` and `data` fields |
 | `ai.dart` | `executeAIRequest(AIRequestContext)`, `AI_PROVIDERS` | OpenAI-compat chat-completion; handles system prompt, token usage, finish reason |
 | `codegen.dart` | `generateCode(generatorId, CodeGenInput)`, `SUPPORTED_GENERATORS` | 12 language generators; pure functions, zero side-effects |
-| `workspace.dart` | `getMcpWorkspaceData()`, `updateMcpWorkspaceData(patch)`, `getSyncFilePath()` | Cross-platform JSON I/O; Linux XDG, macOS Application Support, Windows `%APPDATA%` |
+| `workspace_state.dart` | `WorkspaceState()` singleton | In-process state store (requests, environments, lastResponse, pendingRequests); CLI bootstraps it from `apidash_mcp_workspace.json` on startup |
 | `index.dart` | re-exports all above | Single entry point for consumers |
 
 ### The Story Behind `apidash_mcp_core`
@@ -645,7 +645,7 @@ curl http://localhost:3001/health
 
 ## Workspace Sync File — Cross-Platform Paths
 
-Both CLI and MCP Server resolve the path via `getSyncFilePath()` in `apidash_mcp_core/workspace.dart`:
+The standalone CLI resolves the workspace JSON path at startup (reads into `WorkspaceState()`):
 
 | Platform | Default Path | Override |
 |---|---|---|
@@ -715,7 +715,7 @@ During the development and testing of the Model Context Protocol (MCP) server, w
 | 1 | `request-builder` | model + app | Opens interactive HTTP request builder UI (SEP-1865 iframe) |
 | 2 | `http-send-request` | model + app | Executes HTTP request via `executeHttpRequest`; returns status, headers, body, timing |
 | 3 | `view-response` | model + app | Renders response in rich viewer UI with colour-coded status |
-| 4 | `explore-collections` | model + app | Reads `apidash_mcp_workspace.json` and renders a searchable request list |
+| 4 | `explore-collections` | model + app | Reads `WorkspaceState().requests` and renders a searchable request list |
 | 5 | `graphql-explorer` | model + app | Opens interactive GraphQL editor (pre-loaded Countries API example) |
 | 6 | `graphql-execute-query` | app only | Server-side GraphQL execution via `executeGraphQLRequest`; app-visibility sandboxed |
 | 7 | `codegen-ui` | model + app | Opens Code Generator UI; pre-populates with optional method/URL/body |
@@ -724,7 +724,7 @@ During the development and testing of the Model Context Protocol (MCP) server, w
 | 10 | `update-environment-variables` | **app only** | Mutates env scope in workspace JSON; UI-sandboxed to prevent LLM hallucination |
 | 11 | `get-api-request-template` | model + app | Fetches a saved request by ID from workspace JSON for inspection or execution |
 | 12 | `ai-llm-request` | model | Chat-completion proxy to any OpenAI-compatible LLM (7 built-in provider shortcuts) |
-| 13 | `save-request` | model | Persists a new HTTP/GraphQL request to `apidash_mcp_workspace.json` via `updateMcpWorkspaceData` |
+| 13 | `save-request` | model | Queues a new HTTP/GraphQL request via `WorkspaceState().queueRequest()` → Flutter drains via `McpSyncService.drainPending()` |
 | 14 | `_get-last-response` | app only | Internal polling endpoint used by Webview UIs to bypass `-32602` JSON-RPC payload limits |
 
 **SEP-1865 UI Resources (7 panels):**
@@ -797,7 +797,7 @@ The following is a complete prompt reference for all 14 tools exposed by the API
 - *"What requests have I saved in APIDash?"*
 - *"List my request library."*
 
-**What the Agent Does:** Calls `explore-collections` → reads `apidash_mcp_workspace.json` and returns a searchable list of all saved requests. Opens the Collections Explorer sidebar panel in the chat.
+**What the Agent Does:** Calls `explore-collections` → reads `WorkspaceState().requests` and returns a searchable list of all saved requests. Opens the Collections Explorer sidebar panel in the chat.
 
 ---
 
@@ -879,7 +879,7 @@ The following is a complete prompt reference for all 14 tools exposed by the API
 - *"Save my production API key. Set `API_KEY` to `sk-prod-abc123` as a secret."*
 - *"Update my staging environment: `HOST=staging.myapp.com`, `DEBUG=true`."*
 
-**What the Agent Does:** Calls `update-environment-variables` with the scope and variables array → writes to `apidash_mcp_workspace.json` → Flutter `McpSyncService` detects the file change and hydrates the Riverpod providers within milliseconds.
+**What the Agent Does:** Calls `update-environment-variables` with the scope and variables array → updates `WorkspaceState()` environments in-process → Flutter `McpSyncService.drainPending()` hydrates the Riverpod providers on the next frame.
 
 ---
 
@@ -924,7 +924,7 @@ The following is a complete prompt reference for all 14 tools exposed by the API
 - *"Add this POST endpoint to my APIDash workspace."*
 - *"Save the request we just built to my collection."*
 
-**What the Agent Does:** Calls `save-request` → generates a unique ID → appends the request to `apidash_mcp_workspace.json` → Flutter UI and `apidash list` both show it immediately. Returns the assigned ID so you can call `apidash run <id>` directly.
+**What the Agent Does:** Calls `save-request` → generates a unique ID → queues it via `WorkspaceState().queueRequest()` → Flutter drains it via `McpSyncService.drainPending()` and injects it into Riverpod state. Returns the assigned ID so you can call `apidash run <id>` directly.
 
 ---
 
@@ -1244,7 +1244,7 @@ dart run mcp_inspector --port 8000
 # → Connected to: http://localhost:3001/mcp
 
 # Inspect stdio transport
-npx @modelcontextprotocol/inspector -- dart run bin/apidash_cli.dart --stdio
+npx @modelcontextprotocol/inspector -- dart run bin/apidash_mcp.dart --stdio
 ```
 
 The Inspector lets you:
