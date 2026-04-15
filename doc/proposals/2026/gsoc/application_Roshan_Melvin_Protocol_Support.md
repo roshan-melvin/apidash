@@ -582,10 +582,12 @@ The fix required the connection manager lookup to always go through the provider
 
 ## 10. Comprehensive Project Timeline (March 1 - April 15)
 
-> **Note on Attached/Related Proposals:** 
-> This proposal (Protocol Support) serves as my primary GSoC submission and foundation. Over the past weeks, I have also architected and documented two major extensions covering headless capabilities. You can review them for detailed architecture on those features:
-> - **[APIDash Headless CLI & MCP Server Integration (Dart Native)](../../../../../application_roshan_mcp_cli_dart.md)** (My complete Dart-rewrite)
-> - **[APIDash Headless CLI & Model Context Protocol (MCP) Integration (TypeScript PoC)](../../../../../../gsoc-poc/2026/application_roshan_mcp_cli_typescript_support.md)**
+<details>
+<summary><b>View Attached/Related Proposals</b></summary>
+This proposal (Protocol Support) serves as the primary GSoC submission. In addition to this work, I have also architected two major extension proposals covering headless capabilities:
+- [APIDash Headless CLI & MCP Server Integration (Dart Native)](../../../../../application_roshan_mcp_cli_dart.md)
+- [APIDash Headless MCP Integration (TypeScript PoC)](../../../../../../gsoc-poc/2026/application_roshan_mcp_cli_typescript_support.md)
+</details>
 
 ![Workflow Diagram](./images/workflow.png)
 
@@ -622,23 +624,14 @@ The fix required the connection manager lookup to always go through the provider
   - **April 9, 2026:** Fixed Issue [#1090](https://github.com/foss42/apidash/issues/1090) (Divider snapping bug) while maintaining full architectural integrity and preserving existing core features.
   - Deliver: Complete `codegen_integration_test.dart` and finalized core feature set merging into the main branch.
 
-### Week 5: Headless CLI & MCP Server Architecture (April 1 - April 7)
-- **Objective:** Establish the Decoupled Sibling Architecture and Cloud Deployment.
+### Week 5 & 6: Headless CLI & MCP Server (April 1 - April 15)
+- **Objective:** Establish the Headless Execution Layer and Dart MCP integration.
 - **Tasks:**
-  - **Monorepo Architecture & State Sync (April 1-3):** Finalized the Decoupled Sibling Architecture by extracting `apidash_mcp_core`. Implemented Dart `McpSyncService` for bi-directional file synchronization between Flutter and headless tools.
-  - **Cloud Deployment (April 4-5):** Containerized and deployed serverless MCP architecture onto Amazon Bedrock AgentCore.
-  - **Transport & Security (April 6):** Implemented `StreamableHTTPServerTransport`, `SSEServerTransport`, and `ToolHashRegistry`. Completed RFC 8414 OAuth 2.1 Metadata Discovery flow.
-  - **April 7:** Resolved integration issues including Copilot cache busting and UI iframe polling.
-
-### Week 6: Native Dart MCP Pivot & Interactive TUI (April 8 - April 15)
-- **Objective:** Complete the native Dart port for the MCP & CLI tools and finalize the interactive TUI.
-- **Tasks:**
-  - **April 8:** Submitted final GSoC 2026 Proposal PR. Decided to pivot implementation from TypeScript to native Dart to align with APIDash's ecosystem. Bootstrapped `feat/gsoc-2026-cli-mcp-dart-support`.
-  - **Dart MCP Foundation (April 9-11):** Ported all 14 MCP tool handlers from TypeScript to idiomatic Dart (`mcp_dart`) with zero Flutter dependency leakage.
-  - **UI Panels & OAuth 2.1 (April 12):** Fixed iframe sandbox CSP violations and completed the OAuth 2.1 PKCE standalone flow for the Dart MCP server.
-  - **Stability Fixes (April 13):** Tuned `StreamableHTTPServerTransportOptions` to resolve VS Code’s initialize handshake errors payload issues.
-  - **TUI Completion (April 14):** Finalized the Terminal UI (`apidash_cli`) including keyboard-navigable menus, paginated request lists, and a flicker-free viewport setup.
-  - **April 15:** Submitted the updated proposal integrating all Native Dart MCP & CLI improvements.
+  - **Monorepo Architecture:** Finalized Decoupled Sibling Architecture via shared `apidash_mcp_core`.
+  - **State Sync:** Built `McpSyncService` for direct Flutter Riverpod `WorkspaceState` injection.
+  - **Dart MCP Foundation:** Ported 14 tool handlers and 7 UI panels to native Dart `apidash_mcp`.
+  - **TUI Completion:** Completed the interactive Terminal UI (`apidash_cli`).
+  - **April 15:** Submitted the comprehensive set of headless tools integrated into the APIDash ecosystem.
 
 ---
 
