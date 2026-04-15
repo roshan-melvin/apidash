@@ -120,10 +120,110 @@ The overarching system relies on a **Decoupled File-Sync Architecture** bridging
 |---|---|---|
 | **APIDash Flutter GUI** | Flutter / Dart / Riverpod | Primary UI; persists requests in Hive; writes & watches `apidash_mcp_workspace.json` |
 | **McpSyncService** | Dart | Bi-directional file bridge; serialises Riverpod state → JSON; watches for external writes |
-| **apidash_mcp** (MCP Server) | Dart | Registers 14 MCP tools + 7 SEP-1865 UI resources over `streamable-HTTP` or `stdio` |
-| **apidash_mcp_core | Dart | | Shared zero-duplication library: executor, graphql, ai, codegen, workspace I/O |
-| **apidash_cli** | Dart | Terminal-first headless executor; delegates all logic to `apidash_mcp_core` |
+| **`apidash_mcp`** (MCP Server) | Dart | Registers 13 MCP tools + 7 SEP-1865 UI resource panels over Streamable HTTP, SSE, or `stdio` |
+| **`apidash_mcp_core`** | Dart | Shared zero-duplication library: `executor.dart`, `graphql.dart`, `ai.dart`, `codegen.dart`, `workspace_state.dart` |
+| **`apidash_cli`** (CLI binary: `apidash`) | Dart | Interactive TUI + headless terminal executor; delegates all logic to `apidash_mcp_core` |
 | **Agent Client** | Any MCP-compatible host | Claude Desktop, VS Code Copilot, or custom chatflow connecting via JSON-RPC 2.0 |
+
+---
+
+## File Structure
+
+### Headless CLI (`packages/apidash_cli`)
+
+```text
+apidash/
+├── bin/
+│   └── apidash                  # Compiled native CLI binary (dart compile exe output)
+├── packages/
+│   └── apidash_cli/             # CLI package — full implementation lives here
+│       ├── bin/
+│       │   └── apidash_cli.dart # Package entry point (calls runCli)
+│       ├── lib/
+│       │   ├── apidash_cli.dart # Package exporter (exports src/tui.dart)
+│       │   └── src/
+│       │       └── tui.dart     # Full TUI + all CLI commands (run/list/send/envs/graphql…)
+│       ├── test_cli.sh          # E2E test suite (25 test cases, all commands)
+│       └── pubspec.yaml
+└── scripts/
+    └── install_cli.sh           # Native executable installation orchestrator
+```
+
+### MCP Server (`packages/apidash_mcp`)
+
+```text
+apidash/
+├── bin/
+│   └── apidash_mcp.dart         # Root entry point for the daemon MCP Server
+└── packages/
+    └── apidash_mcp/             # MCP Server package
+        ├── bin/
+        │   └── server.dart      # Standalone server process entry point
+        ├── lib/
+        │   ├── apidash_mcp.dart # Package exporter
+        │   └── src/
+        │       ├── middleware/auth.dart                # Auth middleware (token / OAuth gate)
+        │       ├── oauth/routes.dart                   # OAuth 2.1 PKCE routes
+        │       ├── oauth/store.dart                    # Token & client registration store
+        │       ├── resources/                          # MCP Resource endpoints (UI panels)
+        │       │   ├── resources_registry.dart
+        │       │   ├── request_builder_resource.dart
+        │       │   ├── response_viewer_resource.dart
+        │       │   ├── collections_explorer_resource.dart
+        │       │   ├── graphql_explorer_resource.dart
+        │       │   ├── code_generator_resource.dart
+        │       │   ├── code_viewer_resource.dart
+        │       │   └── env_manager_resource.dart
+        │       ├── routes/health.dart                  # GET /health endpoint
+        │       ├── routes/well_known.dart              # /.well-known/* discovery routes
+        │       ├── security/hash_gate.dart             # SHA-256 tool signature validation
+        │       ├── server/mcp_server.dart              # MCP protocol server wiring
+        │       ├── server/request_router.dart          # Streamable HTTP transport router
+        │       ├── server/sse_server.dart              # SSE (legacy) transport router
+        │       ├── tools/impl/                         # Tool business-logic implementations
+        │       │   ├── http_send_request.dart
+        │       │   ├── graphql_execute_query.dart
+        │       │   ├── ai_llm_request.dart
+        │       │   ├── generate_code_snippet.dart
+        │       │   ├── explore_collections.dart
+        │       │   ├── save_request.dart
+        │       │   ├── update_environment_variables.dart
+        │       │   ├── manage_environment.dart
+        │       │   ├── request_builder.dart
+        │       │   ├── view_response.dart
+        │       │   ├── codegen_ui.dart
+        │       │   ├── graphql_explorer.dart
+        │       │   ├── get_last_response.dart
+        │       │   └── get_api_request_template.dart
+        │       ├── tools/tools_registry.dart           # Registers all tools with MCP server
+        │       └── ui/panels/                          # HTML panel builders for resources
+        │           ├── request_builder_panel.dart
+        │           ├── response_viewer_panel.dart
+        │           ├── collections_explorer_panel.dart
+        │           ├── graphql_explorer_panel.dart
+        │           ├── code_generator_panel.dart
+        │           ├── code_viewer_panel.dart
+        │           └── env_manager_panel.dart
+        └── pubspec.yaml
+```
+
+### Shared Core (`packages/apidash_mcp_core`)
+
+```text
+apidash/
+└── packages/
+    └── apidash_mcp_core/        # Pure-Dart headless abstractions and state management
+        ├── lib/
+        │   ├── apidash_mcp_core.dart    # Package exporter
+        │   └── src/
+        │       ├── workspace_state.dart # Global state for environments/requests
+        │       ├── executor.dart        # Headless HTTP request execution engine
+        │       ├── codegen.dart         # Code snippet generation logic
+        │       ├── graphql.dart         # GraphQL parser and execution handler
+        │       └── ai.dart              # LLM inference API integrations
+        └── pubspec.yaml
+```
+
 
 ---
 
