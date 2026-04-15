@@ -1,5 +1,3 @@
-import 'package:apidash_cli/src/cli_runner.dart';
+import 'package:apidash_cli/apidash_cli.dart';
 
-void main(List<String> args) {
-  CliRunner().run(args);
-}
+Future<void> main(List<String> args) => runCli(args);

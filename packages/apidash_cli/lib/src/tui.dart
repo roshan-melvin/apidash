@@ -5,17 +5,60 @@ import 'package:hive_ce/hive.dart';
 import 'package:apidash_mcp_core/apidash_mcp_core.dart';
 import 'dart:math' as math;
 
-const reset = '\x1B[0m';
-const bold = '\x1B[1m';
-const green = '\x1B[32m';
-const yellow = '\x1B[33m';
-const blue = '\x1B[34m';
-const red = '\x1B[31m';
-const magenta = '\x1B[35m';
-const cyan = '\x1B[36m';
-const gray = '\x1B[90m';
-const bgYellow = '\x1B[43m';
-const clearScreen = '\x1B[2J\x1B[3J\x1B[H';
+const reset      = '\x1B[0m';
+const bold       = '\x1B[1m';
+const underline  = '\x1B[4m';
+
+// ── APIDash Logo-derived 24-bit palette ───────────────────────────────────────
+// Backgrounds
+const bgPrimary    = '\x1B[48;2;26;10;26m';    // #1a0a1a  deep purple-black
+const bgPanel      = '\x1B[48;2;36;13;46m';    // #240d2e  panel surfaces
+const bgSelected   = '\x1B[48;2;45;26;61m';    // #2d1a3d  highlighted row bg
+const bgInput      = '\x1B[48;2;30;17;40m';    // #1e1128  input field bg
+
+// Foreground accents
+const teal         = '\x1B[38;2;91;155;213m';   // #5b9bd5  primary accent (blue)
+const purple       = '\x1B[38;2;123;94;167m';  // #7b5ea7  secondary accent
+const amber        = '\x1B[38;2;240;165;0m';   // #f0a500  warning / POST
+const textPrimary  = '\x1B[38;2;212;200;224m'; // #d4c8e0  main body text
+const textMuted    = '\x1B[38;2;107;95;122m';  // #6b5f7a  hints / nav prompts
+const tabText      = '\x1B[97m';               // bright white  topbar tab labels
+const dimAccent    = '\x1B[38;2;126;79;194m';  // #7E4FC2  inactive menu numbers/icons
+const textLink     = '\x1B[38;2;79;195;247m';  // #4fc3f7  URLs / links
+
+// Method colours
+const mGet         = '\x1B[38;2;91;155;213m';   // blue
+const mPost        = '\x1B[38;2;240;165;0m';   // amber
+const mPut         = '\x1B[38;2;123;94;167m';  // purple
+const mDelete      = '\x1B[38;2;224;92;92m';   // coral-red
+const mPatch       = '\x1B[38;2;167;139;250m'; // lavender
+
+// Status colours
+const statusOk     = '\x1B[38;2;91;155;213m';   // #5b9bd5  2xx blue
+const statusRedir  = '\x1B[38;2;240;165;0m';   // #f0a500  3xx
+const statusErr    = '\x1B[38;2;224;92;92m';   // #e05c5c  4xx-5xx
+
+// Borders
+const borderDef    = '\x1B[38;2;61;42;77m';    // #3d2a4d  default border
+const borderActive = '\x1B[38;2;91;155;213m';   // #5b9bd5  active/focused
+
+// Log colours
+const logInit      = '\x1B[38;2;91;155;213m';   // blue
+const logAuth      = '\x1B[38;2;102;187;106m'; // green
+const logWarn      = '\x1B[38;2;240;165;0m';   // amber
+const logInfo      = '\x1B[38;2;212;200;224m'; // textPrimary
+const logError     = '\x1B[38;2;224;92;92m';   // coral-red
+
+// Legacy aliases kept for unchanged code paths
+const green        = statusOk;
+const yellow       = amber;
+const blue         = mPut;
+const red          = mDelete;
+const magenta      = mPatch;
+const cyan         = teal;
+const gray         = textMuted;
+const bgYellow     = '\x1B[43m';
+const clearScreen  = '\x1B[2J\x1B[3J\x1B[H';
 
 const String kDataBox = 'apidash-data';
 const String kEnvironmentBox = 'apidash-environments';
@@ -176,20 +219,15 @@ Future<void> loadHiveIntoWorkspace() async {
 
 String colorMethod(String method) {
   switch (method.toUpperCase()) {
-    case 'GET':
-      return '$green$method$reset';
-    case 'POST':
-      return '$yellow$method$reset';
-    case 'PUT':
-      return '$blue$method$reset';
-    case 'DELETE':
-      return '$red$method$reset';
-    case 'PATCH':
-      return '$magenta$method$reset';
-    default:
-      return '$cyan$method$reset';
+    case 'GET':    return '$mGet$bold$method$reset';
+    case 'POST':   return '$mPost$bold$method$reset';
+    case 'PUT':    return '$mPut$bold$method$reset';
+    case 'DELETE': return '$mDelete$bold$method$reset';
+    case 'PATCH':  return '$mPatch$bold$method$reset';
+    default:       return '$teal$bold$method$reset';
   }
 }
+
 
 String truncate(String text, int length) {
   if (length <= 0) return '';
@@ -203,22 +241,21 @@ void printApidashLogo() {
                           [38;2;169;201;250m⢀[0m[38;2;168;201;250m⣀[0m[38;2;168;201;250m⣀[0m
                          [38;2;170;202;250m⣰[0m[38;2;168;201;250m⣿[0m[38;2;168;201;250m⠟[0m[38;2;168;201;250m⣿[0m[38;2;169;202;250m⣧[0m
                        [38;2;168;201;250m⣠[0m[38;2;168;201;250m⣾[0m[38;2;168;201;250m⠟[0m[38;2;168;201;250m⠁[0m[38;2;168;201;250m⢀[0m[38;2;168;201;250m⣿[0m[38;2;168;201;250m⡇[0m
-               [38;2;40;95;159m⢠[0m[38;2;40;95;159m⣤[0m[38;2;40;95;159m⣤[0m[38;2;40;95;159m⣤[0m[38;2;40;95;159m⣄[0m [38;2;168;201;250m⢀[0m[38;2;116;158;213m⣴[0m[38;2;104;148;204m⣿[0m[38;2;95;140;198m⣯[0m[38;2;40;95;159m⣤[0m[38;2;40;95;159m⣤[0m[38;2;82;130;189m⣼[0m[38;2;152;187;238m⣿[0m [38;2;40;95;159m⣤[0m[38;2;40;95;159m⣤[0m[38;2;40;95;159m⣤[0m[38;2;40;95;159m⣤[0m[38;2;40;95;159m⣤[0m[38;2;40;95;159m⡄[0m
-              [38;2;40;95;159m⢠[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⠛[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;116;158;213m⣴[0m[38;2;168;201;250m⣿[0m[38;2;96;141;198m⢿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⠛[0m[38;2;40;95;159m⢻[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣷[0m [38;2;40;95;159m⠛[0m[38;2;40;95;159m⢻[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⠛[0m[38;2;40;95;159m⠃[0m
-              [38;2;40;95;159m⣾[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣯[0m[38;2;40;95;159m⣤[0m[38;2;40;95;159m⣽[0m[38;2;40;95;159m⣿[0m[38;2;41;95;159m⣿[0m[38;2;168;201;250m⠁[0m[38;2;40;95;159m⢸[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣶[0m[38;2;40;95;159m⣾[0m[38;2;40;95;159m⣿[0m[38;2;46;99;161m⡿[0m  [38;2;40;95;159m⢸[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m
-              [38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;58;110;172m⣟[0m[38;2;104;148;204m⣿[0m[38;2;72;121;181m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m [38;2;40;95;159m⢸[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⠉[0m[38;2;131;170;224m⢿[0m[38;2;136;174;227m⣿[0m[38;2;168;201;250m⣶[0m[38;2;168;201;250m⣶[0m[38;2;82;130;189m⣶[0m[38;2;58;110;172m⣾[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;82;130;189m⣶[0m[38;2;125;165;219m⣶[0m[38;2;168;201;250m⣄[0m
-              [38;2;65;116;177m⢛[0m[38;2;104;148;204m⣿[0m[38;2;136;174;227m⣿[0m[38;2;168;201;250m⠋[0m[38;2;40;95;159m⠘[0m[38;2;40;95;159m⠛[0m[38;2;40;95;159m⠛[0m [38;2;40;95;159m⠘[0m[38;2;40;95;159m⠛[0m[38;2;40;95;159m⠛[0m     [38;2;40;95;159m⠛[0m[38;2;40;95;159m⠛[0m[38;2;40;95;159m⠛[0m[38;2;40;95;159m⠛[0m[38;2;84;131;189m⣛[0m[38;2;136;174;227m⣿[0m[38;2;168;201;250m⡿[0m
-             [38;2;168;201;250m⣠[0m[38;2;168;201;250m⣾[0m[38;2;168;201;250m⠟[0m[38;2;168;201;250m⠁[0m               [38;2;174;204;250m⢠[0m[38;2;169;202;250m⣶[0m[38;2;168;201;250m⡿[0m[38;2;168;201;250m⠋[0m
-         [38;2;40;95;159m⢰[0m[38;2;40;95;159m⣶[0m[38;2;40;95;159m⣶[0m[38;2;56;108;170m⣾[0m[38;2;69;119;180m⣿[0m[38;2;58;110;172m⣷[0m[38;2;40;95;159m⣦[0m[38;2;168;201;250m⣀[0m[38;2;168;201;250m⣀[0m[38;2;99;142;198m⣠[0m[38;2;40;95;159m⣶[0m[38;2;40;95;159m⣶[0m[38;2;40;95;159m⣶[0m[38;2;40;95;159m⣶[0m[38;2;40;95;159m⡄[0m [38;2;144;175;216m⢀[0m[38;2;40;95;159m⣴[0m[38;2;40;95;159m⣶[0m[38;2;40;95;159m⣶[0m[38;2;40;95;159m⣶[0m[38;2;40;95;159m⣶[0m[38;2;114;156;211m⣾[0m[38;2;168;201;250m⡿[0m[38;2;70;120;180m⣿[0m[38;2;40;95;159m⣶[0m[38;2;40;95;159m⡆[0m [38;2;40;95;159m⢰[0m[38;2;40;95;159m⣶[0m[38;2;40;95;159m⣶[0m
-         [38;2;40;95;159m⢸[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⠉[0m[38;2;90;136;193m⠛[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;83;130;189m⡟[0m[38;2;168;201;250m⠛[0m[38;2;56;108;170m⣿[0m[38;2;40;95;159m⣿[0m[38;2;88;134;193m⣿[0m[38;2;88;134;193m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣷[0m[38;2;44;98;161m⡀[0m[38;2;43;97;160m⢸[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;52;104;165m⣯[0m[38;2;88;135;193m⣿[0m[38;2;104;148;204m⣿[0m[38;2;104;148;204m⡋[0m [38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣧[0m[38;2;40;95;159m⣤[0m[38;2;40;95;159m⣼[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m
-         [38;2;40;95;159m⢸[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m  [38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⡇[0m[38;2;40;95;159m⢸[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;72;121;181m⣿[0m[38;2;58;110;172m⣷[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⡇[0m [38;2;84;131;189m⣛[0m[38;2;73;122;182m⣿[0m[38;2;58;110;172m⡿[0m[38;2;40;95;159m⢿[0m[38;2;40;95;159m⣿[0m[38;2;42;96;160m⣿[0m [38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⡿[0m[38;2;40;95;159m⠿[0m[38;2;40;95;159m⢿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m
-         [38;2;40;95;159m⢸[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;58;109;167m⣿[0m[38;2;48;101;163m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⡿[0m[38;2;40;95;159m⠁[0m[38;2;40;95;159m⢸[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;116;158;213m⡏[0m[38;2;40;95;159m⠉[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;84;131;189m⣧[0m[38;2;106;149;204m⣶[0m[38;2;51;104;167m⣿[0m[38;2;51;104;167m⣿[0m[38;2;58;109;167m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⡿[0m [38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⡇[0m [38;2;40;95;159m⢸[0m[38;2;40;95;159m⣿[0m[38;2;40;95;159m⣿[0m
-         [38;2;40;95;159m⠈[0m[38;2;40;95;159m⠉[0m[38;2;40;95;159m⠉[0m[38;2;40;95;159m⠉[0m[38;2;40;95;159m⠉[0m[38;2;40;95;159m⠁[0m  [38;2;40;95;159m⠈[0m[38;2;131;170;224m⣽[0m[38;2;131;170;224m⡿[0m  [38;2;107;149;204m⣉[0m[38;2;131;170;224m⣽[0m[38;2;149;185;237m⡿[0m[38;2;168;201;250m⠋[0m[38;2;40;95;159m⠉[0m[38;2;40;95;159m⠉[0m[38;2;40;95;159m⠉[0m[38;2;40;95;159m⠉[0m[38;2;40;95;159m⠁[0m  [38;2;40;95;159m⠈[0m[38;2;40;95;159m⠉[0m[38;2;40;95;159m⠁[0m [38;2;58;108;167m⠈[0m[38;2;40;95;159m⠉[0m[38;2;40;95;159m⠉[0m
-                 [38;2;168;201;250m⢰[0m[38;2;168;201;250m⣿[0m[38;2;168;201;250m⠃[0m[38;2;168;201;250m⢀[0m[38;2;169;202;250m⣶[0m[38;2;168;201;250m⡿[0m[38;2;168;201;250m⠋[0m
-                 [38;2;168;201;250m⠸[0m[38;2;168;201;250m⣿[0m[38;2;169;201;250m⣾[0m[38;2;168;201;250m⡿[0m[38;2;168;201;250m⠋[0m
-                        [90mhttps://github.com/foss42/apidash[0m
-
+              \x1B[38;2;40;95;159m⢠\x1B[0m\x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;40;95;159m⣄\x1B[0m \x1B[38;2;168;201;250m⢀\x1B[0m\x1B[38;2;116;158;213m⣴\x1B[0m\x1B[38;2;104;148;204m⣿\x1B[0m\x1B[38;2;95;140;198m⣯\x1B[0m\x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;82;130;189m⣼\x1B[0m\x1B[38;2;152;187;238m⣿\x1B[0m \x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;40;95;159m⡄\x1B[0m
+             \x1B[38;2;40;95;159m⢠\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⠛\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;116;158;213m⣴\x1B[0m\x1B[38;2;168;201;250m⣿\x1B[0m\x1B[38;2;96;141;198m⢿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⠛\x1B[0m\x1B[38;2;40;95;159m⢻\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣷\x1B[0m \x1B[38;2;40;95;159m⠛\x1B[0m\x1B[38;2;40;95;159m⢻\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⠛\x1B[0m\x1B[38;2;40;95;159m⠃\x1B[0m
+             \x1B[38;2;40;95;159m⣾\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣯\x1B[0m\x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;40;95;159m⣽\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;41;95;159m⣿\x1B[0m\x1B[38;2;168;201;250m⠁\x1B[0m\x1B[38;2;40;95;159m⢸\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;40;95;159m⣾\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;46;99;161m⡿\x1B[0m  \x1B[38;2;40;95;159m⢸\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m
+             \x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;58;110;172m⣟\x1B[0m\x1B[38;2;104;148;204m⣿\x1B[0m\x1B[38;2;72;121;181m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m \x1B[38;2;40;95;159m⢸\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;131;170;224m⢿\x1B[0m\x1B[38;2;136;174;227m⣿\x1B[0m\x1B[38;2;168;201;250m⣶\x1B[0m\x1B[38;2;168;201;250m⣶\x1B[0m\x1B[38;2;82;130;189m⣶\x1B[0m\x1B[38;2;58;110;172m⣾\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;82;130;189m⣶\x1B[0m\x1B[38;2;125;165;219m⣶\x1B[0m\x1B[38;2;168;201;250m⣄\x1B[0m
+             \x1B[38;2;65;116;177m⢛\x1B[0m\x1B[38;2;104;148;204m⣿\x1B[0m\x1B[38;2;136;174;227m⣿\x1B[0m\x1B[38;2;168;201;250m⠋\x1B[0m\x1B[38;2;40;95;159m⠘\x1B[0m\x1B[38;2;40;95;159m⠛\x1B[0m\x1B[38;2;40;95;159m⠛\x1B[0m \x1B[38;2;40;95;159m⠘\x1B[0m\x1B[38;2;40;95;159m⠛\x1B[0m\x1B[38;2;40;95;159m⠛\x1B[0m     \x1B[38;2;40;95;159m⠛\x1B[0m\x1B[38;2;40;95;159m⠛\x1B[0m\x1B[38;2;40;95;159m⠛\x1B[0m\x1B[38;2;40;95;159m⠛\x1B[0m\x1B[38;2;84;131;189m⣛\x1B[0m\x1B[38;2;136;174;227m⣿\x1B[0m\x1B[38;2;168;201;250m⡿\x1B[0m
+            \x1B[38;2;168;201;250m⣠\x1B[0m\x1B[38;2;168;201;250m⣾\x1B[0m\x1B[38;2;168;201;250m⠟\x1B[0m\x1B[38;2;168;201;250m⠁\x1B[0m               \x1B[38;2;174;204;250m⢠\x1B[0m\x1B[38;2;169;202;250m⣶\x1B[0m\x1B[38;2;168;201;250m⡿\x1B[0m\x1B[38;2;168;201;250m⠋\x1B[0m
+        \x1B[38;2;40;95;159m⢰\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;56;108;170m⣾\x1B[0m\x1B[38;2;69;119;180m⣿\x1B[0m\x1B[38;2;58;110;172m⣷\x1B[0m\x1B[38;2;40;95;159m⣦\x1B[0m\x1B[38;2;168;201;250m⣀\x1B[0m\x1B[38;2;168;201;250m⣀\x1B[0m\x1B[38;2;99;142;198m⣠\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;40;95;159m⡄\x1B[0m \x1B[38;2;144;175;216m⢀\x1B[0m\x1B[38;2;40;95;159m⣴\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;114;156;211m⣾\x1B[0m\x1B[38;2;168;201;250m⡿\x1B[0m\x1B[38;2;70;120;180m⣿\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;40;95;159m⡆\x1B[0m \x1B[38;2;40;95;159m⢰\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m\x1B[38;2;40;95;159m⣶\x1B[0m
+        \x1B[38;2;40;95;159m⢸\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;90;136;193m⠛\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;83;130;189m⡟\x1B[0m\x1B[38;2;168;201;250m⠛\x1B[0m\x1B[38;2;56;108;170m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;88;134;193m⣿\x1B[0m\x1B[38;2;88;134;193m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣷\x1B[0m\x1B[38;2;44;98;161m⡀\x1B[0m\x1B[38;2;43;97;160m⢸\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;52;104;165m⣯\x1B[0m\x1B[38;2;88;135;193m⣿\x1B[0m\x1B[38;2;104;148;204m⣿\x1B[0m\x1B[38;2;104;148;204m⡋\x1B[0m \x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣧\x1B[0m\x1B[38;2;40;95;159m⣤\x1B[0m\x1B[38;2;40;95;159m⣼\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m
+        \x1B[38;2;40;95;159m⢸\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m  \x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⡇\x1B[0m\x1B[38;2;40;95;159m⢸\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;72;121;181m⣿\x1B[0m\x1B[38;2;58;110;172m⣷\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⡇\x1B[0m \x1B[38;2;84;131;189m⣛\x1B[0m\x1B[38;2;73;122;182m⣿\x1B[0m\x1B[38;2;58;110;172m⡿\x1B[0m\x1B[38;2;40;95;159m⢿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;42;96;160m⣿\x1B[0m \x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⡿\x1B[0m\x1B[38;2;40;95;159m⠿\x1B[0m\x1B[38;2;40;95;159m⢿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m
+        \x1B[38;2;40;95;159m⢸\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;58;109;167m⣿\x1B[0m\x1B[38;2;48;101;163m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⡿\x1B[0m\x1B[38;2;40;95;159m⠁\x1B[0m\x1B[38;2;40;95;159m⢸\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;116;158;213m⡏\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;84;131;189m⣧\x1B[0m\x1B[38;2;106;149;204m⣶\x1B[0m\x1B[38;2;51;104;167m⣿\x1B[0m\x1B[38;2;51;104;167m⣿\x1B[0m\x1B[38;2;58;109;167m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⡿\x1B[0m \x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⡇\x1B[0m \x1B[38;2;40;95;159m⢸\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m\x1B[38;2;40;95;159m⣿\x1B[0m
+        \x1B[38;2;40;95;159m⠈\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;40;95;159m⠁\x1B[0m  \x1B[38;2;40;95;159m⠈\x1B[0m\x1B[38;2;131;170;224m⣽\x1B[0m\x1B[38;2;131;170;224m⡿\x1B[0m  \x1B[38;2;107;149;204m⣉\x1B[0m\x1B[38;2;131;170;224m⣽\x1B[0m\x1B[38;2;149;185;237m⡿\x1B[0m\x1B[38;2;168;201;250m⠋\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;40;95;159m⠁\x1B[0m  \x1B[38;2;40;95;159m⠈\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;40;95;159m⠁\x1B[0m \x1B[38;2;58;108;167m⠈\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m\x1B[38;2;40;95;159m⠉\x1B[0m
+                \x1B[38;2;168;201;250m⢰\x1B[0m\x1B[38;2;168;201;250m⣿\x1B[0m\x1B[38;2;168;201;250m⠃\x1B[0m\x1B[38;2;168;201;250m⢀\x1B[0m\x1B[38;2;169;202;250m⣶\x1B[0m\x1B[38;2;168;201;250m⡿\x1B[0m\x1B[38;2;168;201;250m⠋\x1B[0m
+                \x1B[38;2;168;201;250m⠸\x1B[0m\x1B[38;2;168;201;250m⣿\x1B[0m\x1B[38;2;169;201;250m⣾\x1B[0m\x1B[38;2;168;201;250m⡿\x1B[0m\x1B[38;2;168;201;250m⠋\x1B[0m
 ''');
+  stdout.write('  \x1B[97mGitHub:\x1B[0m  \x1B[38;2;79;195;247mhttps://github.com/foss42/apidash\x1B[0m\n\n');
 }
 
 void printHelp() {
@@ -315,16 +352,14 @@ Future<bool> _paginateLines(List<String> lines) async {
         break; // we printed everything, exit paginator naturally!
       }
 
+      final h = stdout.hasTerminal ? stdout.terminalLines : 24;
+      stdout.write('\x1B[${h}H');
+      final navW = stdout.hasTerminal ? stdout.terminalColumns : 90;
+      final pageHint = '  ↓ = next page  │  ↑ = prev page  │  ESC = back  ';
+      stdout.write('\x1B[${h}H$bgPanel$borderActive$bold${pageHint.padRight(navW)}$reset');
+
       final isLast = (i + pageSize) >= total;
       final isFirst = i == 0;
-
-      if (isLast) {
-        stdout.write('\x1B[33m-- End of output  [↑] prev  [q/Esc] back --\x1B[0m ');
-      } else if (isFirst) {
-        stdout.write('\x1B[33m-- [↵/↓] next page  [q/Esc] back --\x1B[0m ');
-      } else {
-        stdout.write('\x1B[33m-- [↵/↓] next  [↑] prev  [q/Esc] back --\x1B[0m ');
-      }
 
       while (true) {
         final k = await _readKey();
@@ -1845,10 +1880,12 @@ void _leaveAltScreen() {
 // ── Input helpers ─────────────────────────────────────────────────────────────
 
 Future<void> _pressEnter() async {
-  stdout.write('\n  $gray[Press Enter to continue...]$reset');
+  stdout.write('\n  $borderDef─────────────────────────────────────────$reset\n');
+  stdout.write('  $dimAccent[ PRESS ENTER TO CONTINUE ]$reset');
   while (true) {
     if (await _readKey() == 'enter') break;
   }
+  print('');
 }
 
 /// Read ONE key in raw mode.  Returns 'esc', 'enter', 'backspace',
@@ -1921,11 +1958,17 @@ Future<String> _readKey() async {
 
 // Keys helpers simplified
 
-/// Styled line-mode text input.  Returns null on blank input (= go back).
+/// Styled line-mode text input with APIDash palette.
+/// Returns null on blank input (= go back).
 Future<String?> _readLine(String label, {bool isUrl = false}) async {
-  print('  $cyan\u250c\u2500 $yellow$label $gray(blank = back)$reset');
-  stdout.write('  $cyan\u2514\u25ba$reset $green');
-  stdout.write('\x1B[?25h'); // Show cursor during input
+  final w = stdout.hasTerminal ? stdout.terminalColumns : 80;
+  final innerW = math.max(20, w - 8);
+  // Inactive box header
+  stdout.write('  $borderDef\u250c\u2500 $dimAccent${label.toUpperCase()} $dimAccent(blank = back) $borderDef${"\u2500" * math.max(0, innerW - label.length - 16)}\u2510$reset\n');
+  // Active input row with ACCENT_TEAL border
+  stdout.write('  $borderActive\u2502$reset $bgInput$textPrimary');
+  if (isUrl) stdout.write('https://');
+  stdout.write('\x1B[?25h'); // Show cursor
 
   try {
     stdin.echoMode = false;
@@ -1933,6 +1976,7 @@ Future<String?> _readLine(String label, {bool isUrl = false}) async {
   } catch (_) {}
 
   final buffer = StringBuffer();
+  if (isUrl) buffer.write('https://');
 
   while (true) {
     final bytes = await _keyController.stream.first;
@@ -1940,14 +1984,9 @@ Future<String?> _readLine(String label, {bool isUrl = false}) async {
     final b = bytes[0];
 
     if (b == 13 || b == 10) {
-      stdout.write('\n$reset');
+      stdout.write('$reset\n');
       break;
     } else if (b == 27) {
-      // Ignore ALL escape sequences (single ESC or multi-byte arrow/focus/resize
-      // sequences). GNOME Terminal in alt-screen sends spurious lone ESC bytes
-      // on resize / focus-in events — treating them as "cancel" causes the
-      // URL input to silently abort mid-typing.
-      // Cancellation is via Enter on an empty buffer (see prompt hint).
       continue;
     } else if (b == 127 || b == 8) {
       if (buffer.isNotEmpty) {
@@ -1965,15 +2004,15 @@ Future<String?> _readLine(String label, {bool isUrl = false}) async {
         }
       }
     }
-    // Ignore arrow keys and other multi-byte sequences (b==27 with more bytes)
   }
 
-  stdout.write('\x1B[?25l'); // Hide cursor again after input
+  stdout.write('$reset  $borderActive\u2514${"\u2500" * (innerW + 2)}\u2518$reset\n');
+  stdout.write('\x1B[?25l');
   String val = buffer.toString().trim();
   if (val.isEmpty) return null;
   if (isUrl && !val.startsWith('http://') && !val.startsWith('https://')) {
     val = 'https://' + val;
-    print('  $gray(auto-added https:// prefix)$reset');
+    print('  $textMuted(auto-added https:// prefix)$reset');
   }
   return val;
 }
@@ -2015,11 +2054,11 @@ Future<void> _mcpCommand(String displayCmd, String shCmd) async {
   stdout.write('\x1B[2J\x1B[H');
   printApidashLogo();
   print('');
-  print('  $bold$yellow  MCP Command$reset\n');
+  print('  $teal$bold  MCP COMMAND$reset\n');
   print('  $cyan\$ $displayCmd$reset\n');
-  stdout.write('\n  ${green}Run this? [y/n]: $reset');
+  stdout.write('\n  $teal$bold Run this? [y/n]: $reset');
   final ans = await _readKey();
-  stdout.write('${yellow}$ans$reset\n');
+  stdout.write('$amber$ans$reset\n');
 
   if (ans == 'y') {
     _leaveAltScreen();
@@ -2038,43 +2077,81 @@ Future<void> _mcpCommand(String displayCmd, String shCmd) async {
 
 // ── HTTP Requests submenu ─────────────────────────────────────────────────────
 
+// ── Shared submenu renderer ───────────────────────────────────────────────────
+void _drawSubmenu(String title, List<String> items, int selected) {
+  stdout.write('\x1B[2J\x1B[H');
+  final w = stdout.hasTerminal ? stdout.terminalColumns : 90;
+  final innerW = math.max(50, w - 6);
+
+  final topLabel = ' APIDASH_CLI ';
+  final tabPart = '  SESSIONS  NETWORK  STORAGE';
+  stdout.write('$bgPanel$teal$bold$topLabel$reset$bgPanel$tabText$tabPart${' ' * math.max(0, w - topLabel.length - tabPart.length)}$reset\n');
+  stdout.write('$dimAccent${"\u2500" * w}$reset\n');
+
+  // Section title
+  print('');
+  stdout.write('  $teal$bold${title.toUpperCase()}$reset\n');
+  stdout.write('  $tabText${"\u2500" * innerW}$reset\n\n');
+
+  for (int i = 0; i < items.length; i++) {
+    final idx = i + 1;
+    final item = items[i];
+    final isSelected = i == selected;
+    // Active:   inner = 2sp + [n](3) + 1sp + lbl(innerW-8) + →(1) + 1sp = innerW
+    // Inactive: inner = 2sp + [n](3) + 1sp + lbl.padRight(innerW-6) = innerW
+    final lblA = item.length > innerW - 8 ? item.substring(0, innerW - 9) + '\u2026' : item.padRight(innerW - 8);
+    final lblI = item.length > innerW - 6 ? item.substring(0, innerW - 7) + '\u2026' : item.padRight(innerW - 6);
+    if (isSelected) {
+      stdout.write('  $borderActive\u2554${"\u2550" * innerW}\u2557$reset\n');
+      stdout.write('  $borderActive\u2551$reset  $teal$bold[$idx] $lblA\u2192 $reset$borderActive\u2551$reset\n');
+      stdout.write('  $borderActive\u255a${"\u2550" * innerW}\u255d$reset\n');
+    } else {
+      stdout.write('  $tabText\u250c${"\u2500" * innerW}\u2510$reset\n');
+      stdout.write('  $tabText\u2502$reset  $dimAccent[$idx]$reset $textPrimary$lblI$reset$tabText\u2502$reset\n');
+      stdout.write('  $tabText\u2514${"\u2500" * innerW}\u2518$reset\n');
+    }
+  }
+
+  // Nav bar pinned to very last terminal row (mirrors main menu)
+  final h = stdout.hasTerminal ? stdout.terminalLines : 24;
+  final navHint = '  Navigate: \u2191\u2193  \u2502  Select: ENTER or 1\u2013${items.length}  \u2502  ESC = back  ';
+  stdout.write('\x1B[${h}H$bgPanel$borderActive$bold${navHint.padRight(w)}$reset');
+}
+
+
 Future<void> _menuHttp() async {
+  int selected = 0;
+  final displayItems = [
+    'Run a new GET request',
+    'Run a new POST request',
+    'Run a new PUT request',
+    'Run a new DELETE request',
+  ];
   while (true) {
-    stdout.write('\x1B[2J\x1B[H');
-    printApidashLogo();
-    print('');
-    print('  $bold$yellow HTTP Requests$reset\n');
-    print('  ${yellow}[1]$reset Run a new ${green}GET$reset request');
-    print('  ${yellow}[2]$reset Run a new ${yellow}POST$reset request');
-    print('  ${yellow}[3]$reset Run a new ${blue}PUT$reset request');
-    print('  ${yellow}[4]$reset Run a new ${red}DELETE$reset request');
-    print('  ${yellow}[5]$reset List all saved requests');
-    print('  ${yellow}[6]$reset Filter saved requests by method');
-    print('  ${yellow}[7]$reset Send saved request by ID');
-    print('  ${yellow}[8]$reset Send saved request by name');
-    print('  ${yellow}[b / ESC]$reset Back\n');
-    print('  $gray[1-8 / ESC=back]$reset');
-    stdout.write('  ${green}Select > $reset');
+    _drawSubmenu('HTTP Requests', displayItems, selected);
     final choice = await _readKey();
 
-    if (choice == 'esc')
-      stdout.write('${yellow}ESC$reset\n');
-    else if (choice.isNotEmpty)
-      stdout.write('${yellow}$choice$reset\n');
+    if (choice == 'esc' || choice == 'b') return;
+    if (choice == 'up') { if (selected > 0) selected--; continue; }
+    if (choice == 'down') { if (selected < displayItems.length - 1) selected++; continue; }
 
-    if (choice == 'esc') return;
+    String? activated;
+    if (choice == 'enter') activated = '${selected + 1}';
+    else if (['1','2','3','4'].contains(choice)) { activated = choice; selected = int.parse(choice) - 1; }
 
-    switch (choice) {
+    if (activated == null) continue;
+
+    switch (activated) {
       case '1':
         stdout.write('\x1B[2J\x1B[H');
-        print('  $bold$green GET Request$reset\n');
+        print('  $mGet$bold GET REQUEST$reset\n');
         final url = await _readLine('URL', isUrl: true);
         if (url == null) break;
         await _runApidash(['run', '--url', url, '--method', 'GET']);
         break;
       case '2':
         stdout.write('\x1B[2J\x1B[H');
-        print('  $bold$yellow POST Request$reset\n');
+        print('  $mPost$bold POST REQUEST$reset\n');
         final url = await _readLine('URL', isUrl: true);
         if (url == null) break;
         final body = await _readLine('Body JSON (blank = {})') ?? '{}';
@@ -2092,7 +2169,7 @@ Future<void> _menuHttp() async {
         break;
       case '3':
         stdout.write('\x1B[2J\x1B[H');
-        print('  $bold$blue PUT Request$reset\n');
+        print('  $mPut$bold PUT REQUEST$reset\n');
         final url = await _readLine('URL', isUrl: true);
         if (url == null) break;
         final body = await _readLine('Body JSON (blank = {})') ?? '{}';
@@ -2108,37 +2185,10 @@ Future<void> _menuHttp() async {
         break;
       case '4':
         stdout.write('\x1B[2J\x1B[H');
-        print('  $bold$red DELETE Request$reset\n');
+        print('  $mDelete$bold DELETE REQUEST$reset\n');
         final url = await _readLine('URL', isUrl: true);
         if (url == null) break;
         await _runApidash(['run', '--url', url, '--method', 'DELETE']);
-        break;
-      case '5':
-        final selectedId = await handleList([], isStandalone: false);
-        if (selectedId != null) {
-          await _runApidash(['send', '--id', selectedId]);
-        }
-        break;
-      case '6':
-        stdout.write('\x1B[2J\x1B[H');
-        print('  $bold Filter by Method$reset\n');
-        final method = await _readLine('Method (GET/POST/PUT/DELETE/PATCH)');
-        if (method == null) break;
-        await _runApidash(['list', '--filter', method.toUpperCase()]);
-        break;
-      case '7':
-        stdout.write('\x1B[2J\x1B[H');
-        print('  $bold Send by ID$reset\n');
-        final id = await _readLine('Request ID');
-        if (id == null) break;
-        await _runApidash(['send', '--id', id]);
-        break;
-      case '8':
-        stdout.write('\x1B[2J\x1B[H');
-        print('  $bold Send by Name$reset\n');
-        final name = await _readLine('Request Name');
-        if (name == null) break;
-        await _runApidash(['send', '--name', name]);
         break;
       default:
         break;
@@ -2149,30 +2199,29 @@ Future<void> _menuHttp() async {
 // ── GraphQL submenu ───────────────────────────────────────────────────────────
 
 Future<void> _menuGraphQL() async {
+  int selected = 0;
+  final displayItems = [
+    'Explore a GraphQL schema',
+    'Execute a GraphQL query',
+    'Send saved GraphQL request',
+  ];
   while (true) {
-    stdout.write('\x1B[2J\x1B[H');
-    printApidashLogo();
-    print('');
-    print('  $bold$cyan GraphQL$reset\n');
-    print('  ${yellow}[1]$reset Explore a GraphQL schema');
-    print('  ${yellow}[2]$reset Execute a GraphQL query');
-    print('  ${yellow}[3]$reset Send saved GraphQL request');
-    print('  ${yellow}[b / ESC]$reset Back\n');
-    print('  $gray[1-3 / b=back / ESC=back]$reset');
-    stdout.write('  ${green}Select > $reset');
+    _drawSubmenu('GraphQL', displayItems, selected);
     final choice = await _readKey();
 
-    if (choice == 'esc')
-      stdout.write('${yellow}ESC$reset\n');
-    else if (choice.isNotEmpty)
-      stdout.write('${yellow}$choice$reset\n');
+    if (choice == 'esc' || choice == 'b') return;
+    if (choice == 'up') { if (selected > 0) selected--; continue; }
+    if (choice == 'down') { if (selected < displayItems.length - 1) selected++; continue; }
 
-    if (choice == 'esc') return;
+    String? activated;
+    if (choice == 'enter') activated = '${selected + 1}';
+    else if (['1','2','3'].contains(choice)) { activated = choice; selected = int.parse(choice) - 1; }
+    if (activated == null) continue;
 
-    switch (choice) {
+    switch (activated) {
       case '1':
         stdout.write('\x1B[2J\x1B[H');
-        print('  $bold$cyan Schema Introspection$reset\n');
+        print('  $teal$bold SCHEMA INTROSPECTION$reset\n');
         final url = await _readLine('GraphQL Endpoint URL');
         if (url == null) break;
         final body = jsonEncode({'query': '{ __schema { types { name } } }'});
@@ -2190,7 +2239,7 @@ Future<void> _menuGraphQL() async {
         break;
       case '2':
         stdout.write('\x1B[2J\x1B[H');
-        print('  $bold$cyan Execute Query$reset\n');
+        print('  $teal$bold EXECUTE QUERY$reset\n');
         final url = await _readLine('GraphQL Endpoint URL');
         if (url == null) break;
         final query = await _readLine('GraphQL Query (single line)');
@@ -2213,7 +2262,7 @@ Future<void> _menuGraphQL() async {
         break;
       case '3':
         stdout.write('\x1B[2J\x1B[H');
-        print('  ${gray}Loading workspace...$reset\n');
+        print('  $textMuted LOADING WORKSPACE...$reset\n');
         await loadHiveIntoWorkspace();
         final allReqs = WorkspaceState().requests;
         final gqlReqs = allReqs.where((r) {
@@ -2224,7 +2273,7 @@ Future<void> _menuGraphQL() async {
               body.contains('"query"');
         }).toList();
         if (gqlReqs.isEmpty) {
-          print('  ${yellow}No saved GraphQL requests found.$reset');
+          print('  $amber NO SAVED GRAPHQL REQUESTS FOUND.$reset');
           await _pressEnter();
           break;
         }
@@ -2234,13 +2283,13 @@ Future<void> _menuGraphQL() async {
         if (numStr == null) break;
         final num = int.tryParse(numStr) ?? 0;
         if (num < 1 || num > gqlReqs.length) {
-          print('  ${gray}Cancelled.$reset');
+          print('  $textMuted CANCELLED.$reset');
           await _pressEnter();
           break;
         }
         final theId = gqlReqs[num - 1]['id']?.toString() ?? '';
         if (theId.isEmpty) {
-          print('  ${red}Request has no ID.$reset');
+          print('  $statusErr REQUEST HAS NO ID.$reset');
           await _pressEnter();
           break;
         }
@@ -2253,67 +2302,54 @@ Future<void> _menuGraphQL() async {
 }
 
 // ── Workspace submenu ─────────────────────────────────────────────────────────
-
 Future<void> _menuWorkspace() async {
+  int selected = 0;
+  final displayItems = [
+    'List all requests',
+    'List GET requests',
+    'List POST requests',
+    'List all environments',
+    'Send request by ID',
+    'Send request by name',
+    'View raw workspace JSON',
+  ];
   while (true) {
-    stdout.write('\x1B[2J\x1B[H');
-    printApidashLogo();
-    print('');
-    print('  $bold$magenta Workspace$reset\n');
-    print('  ${yellow}[1]$reset List all requests');
-    print('  ${yellow}[2]$reset List GET requests');
-    print('  ${yellow}[3]$reset List POST requests');
-    print('  ${yellow}[4]$reset List all environments');
-    print('  ${yellow}[5]$reset Send request by ID');
-    print('  ${yellow}[6]$reset Send request by name');
-    print('  ${yellow}[7]$reset View raw workspace JSON');
-    print('  ${yellow}[b / ESC]$reset Back\n');
-    print('  $gray[1-7 / b=back / ESC=back]$reset');
-    stdout.write('  ${green}Select > $reset');
+    _drawSubmenu('Workspace', displayItems, selected);
     final choice = await _readKey();
 
-    if (choice == 'esc')
-      stdout.write('${yellow}ESC$reset\n');
-    else if (choice.isNotEmpty)
-      stdout.write('${yellow}$choice$reset\n');
+    if (choice == 'esc' || choice == 'b') return;
+    if (choice == 'up') { if (selected > 0) selected--; continue; }
+    if (choice == 'down') { if (selected < displayItems.length - 1) selected++; continue; }
 
-    if (choice == 'esc') return;
+    String? activated;
+    if (choice == 'enter') activated = '${selected + 1}';
+    else if (['1','2','3','4','5','6','7'].contains(choice)) { activated = choice; selected = int.parse(choice) - 1; }
+    if (activated == null) continue;
 
-    switch (choice) {
+    switch (activated) {
       case '1':
         final selectedId = await handleList([], isStandalone: false);
-        if (selectedId != null) {
-          await _runApidash(['send', '--id', selectedId]);
-        }
+        if (selectedId != null) await _runApidash(['send', '--id', selectedId]);
         break;
-      case '2':
-        await _runApidash(['list', '--filter', 'GET']);
-        break;
-      case '3':
-        await _runApidash(['list', '--filter', 'POST']);
-        break;
-      case '4':
-        await _runApidash(['envs']);
-        break;
+      case '2': await _runApidash(['list', '--filter', 'GET']); break;
+      case '3': await _runApidash(['list', '--filter', 'POST']); break;
+      case '4': await _runApidash(['envs']); break;
       case '5':
         stdout.write('\x1B[2J\x1B[H');
-        print('  $bold Send by ID$reset\n');
+        print('  $teal$bold SEND BY ID$reset\n');
         final id = await _readLine('Request ID');
         if (id == null) break;
         await _runApidash(['send', '--id', id]);
         break;
       case '6':
         stdout.write('\x1B[2J\x1B[H');
-        print('  $bold Send by Name$reset\n');
+        print('  $teal$bold SEND BY NAME$reset\n');
         final name = await _readLine('Request Name');
         if (name == null) break;
         await _runApidash(['send', '--name', name]);
         break;
-      case '7':
-        await _runApidash(['list', '--json']);
-        break;
-      default:
-        break;
+      case '7': await _runApidash(['list', '--json']); break;
+      default: break;
     }
   }
 }
@@ -2321,31 +2357,30 @@ Future<void> _menuWorkspace() async {
 // ── MCP Server submenu ────────────────────────────────────────────────────────
 
 Future<void> _menuMCP() async {
+  int selected = 0;
+  final displayItems = [
+    'Start MCP server  (HTTP :8000)',
+    'Start on custom port',
+    'SSE mode',
+    'Stdio mode',
+    'With OAuth 2.1',
+    'With static token',
+    'Health check',
+  ];
   while (true) {
-    stdout.write('\x1B[2J\x1B[H');
-    printApidashLogo();
-    print('');
-    print('  $bold$blue MCP Server$reset\n');
-    print('  ${yellow}[1]$reset Start server  ${gray}(HTTP :8000)$reset');
-    print('  ${yellow}[2]$reset Start on custom port');
-    print('  ${yellow}[3]$reset SSE mode');
-    print('  ${yellow}[4]$reset Stdio mode');
-    print('  ${yellow}[5]$reset With OAuth 2.1');
-    print('  ${yellow}[6]$reset With static token');
-    print('  ${yellow}[7]$reset Health check');
-    print('  ${yellow}[b / ESC]$reset Back\n');
-    print('  $gray[1-7 / b=back / ESC=back]$reset');
-    stdout.write('  ${green}Select > $reset');
+    _drawSubmenu('MCP Server', displayItems, selected);
     final choice = await _readKey();
 
-    if (choice == 'esc')
-      stdout.write('${yellow}ESC$reset\n');
-    else if (choice.isNotEmpty)
-      stdout.write('${yellow}$choice$reset\n');
+    if (choice == 'esc' || choice == 'b') return;
+    if (choice == 'up') { if (selected > 0) selected--; continue; }
+    if (choice == 'down') { if (selected < displayItems.length - 1) selected++; continue; }
 
-    if (choice == 'esc') return;
+    String? activated;
+    if (choice == 'enter') activated = '${selected + 1}';
+    else if (['1','2','3','4','5','6','7'].contains(choice)) { activated = choice; selected = int.parse(choice) - 1; }
+    if (activated == null) continue;
 
-    switch (choice) {
+    switch (activated) {
       case '1':
         await _mcpCommand(
           'dart run bin/apidash_mcp.dart',
@@ -2405,13 +2440,13 @@ Future<void> _showQuickCommands() async {
   stdout.write('\x1B[2J\x1B[H');
   printApidashLogo();
   print('');
-  print('  $bold$yellow Quick Commands Cheatsheet$reset\n');
+  print('  $teal$bold QUICK COMMANDS CHEATSHEET$reset\n');
 
-  print('  $bold$cyan HTTP Requests$reset');
+  print('  $purple$bold HTTP REQUESTS$reset');
   print(r"  $ apidash run --url https://httpbin.org/get --method GET");
   print('  $gray  \u2192 Run a GET request$reset\n');
 
-  print('  $bold$cyan Saved Requests$reset');
+  print('  $purple$bold SAVED REQUESTS$reset');
   print(r"  $ apidash list                        " + '$gray\u2192 All$reset');
   print(
     r"  $ apidash list --filter GET           " +
@@ -2429,7 +2464,7 @@ Future<void> _showQuickCommands() async {
         '$gray\u2192 Send by name$reset\n',
   );
 
-  print('  $bold$cyan Environments$reset');
+  print('  $purple$bold ENVIRONMENTS$reset');
   print(
     r"  $ apidash envs                        " + '$gray\u2192 List envs$reset',
   );
@@ -2438,7 +2473,7 @@ Future<void> _showQuickCommands() async {
         '$gray\u2192 JSON output$reset\n',
   );
 
-  print('  $bold$cyan GraphQL$reset');
+  print('  $purple$bold GRAPHQL$reset');
   print(r'  $ apidash run --url <gql> --method POST \');
   print(r'       --header "Content-Type: application/json" \');
   print(
@@ -2449,7 +2484,7 @@ Future<void> _showQuickCommands() async {
   );
   print('  $gray  \u2192 Schema introspection$reset\n');
 
-  print('  $bold$cyan MCP Server$reset');
+  print('  $purple$bold MCP SERVER$reset');
   print(
     r"  $ dart run bin/apidash_mcp.dart       " +
         '$gray\u2192 HTTP :8000$reset',
@@ -2462,10 +2497,10 @@ Future<void> _showQuickCommands() async {
         '$gray\u2192 Health check$reset\n',
   );
 
-  print('  $bold$cyan TUI Modes$reset');
+  print('  $purple$bold TUI MODES$reset');
   print(r"  $ apidash             " + '$gray\u2192 This menu TUI$reset');
   print(r"  $ apidash interactive " + '$gray\u2192 Arrow-key TUI$reset\n');
-  stdout.write('\n  $gray[Press Enter to continue...]$reset');
+  stdout.write('\n  $dimAccent[ PRESS ENTER TO CONTINUE ]$reset');
   while (true) {
     if (await _readKey() == 'enter') break;
   }
@@ -2481,11 +2516,11 @@ Future<void> _runInteractive() async {
 
   _ensureStdinListening();
 
-  StreamSubscription? sigintSub;
+  
   try {
-    sigintSub = ProcessSignal.sigint.watch().listen((_) {
+    ProcessSignal.sigint.watch().listen((_) {
       _leaveAltScreen();
-      print('\n${green}  Goodbye! \u{1F44B}$reset\n');
+      print('\n${teal}  Goodbye.$reset\n');
       exit(0);
     });
   } catch (_) {}
@@ -2493,50 +2528,164 @@ Future<void> _runInteractive() async {
   _enterAltScreen();
 
   try {
+    int selectedIndex = 0;
     while (true) {
       stdout.write('\x1B[2J\x1B[H');
+
+      final w = stdout.hasTerminal ? stdout.terminalColumns : 90;
+      final h = stdout.hasTerminal ? stdout.terminalLines : 24;
+
+      // ── TOPBAR ────────────────────────────────────────────────────────────
+      final topLabel = ' APIDASH_CLI ';
+      final tabs = '  SESSIONS  NETWORK  STORAGE';
+      stdout.write('$bgPanel$teal$bold$topLabel$reset$bgPanel$tabText$tabs${' ' * math.max(0, w - topLabel.length - tabs.length)}$reset\n');
+      stdout.write('$dimAccent${"\u2500" * w}$reset\n');
+
+      // ── LOGO + HEADER BLOCK ───────────────────────────────────────────────
       printApidashLogo();
-      print('');
-      print('  $bold$yellow Main Menu$reset\n');
-      print('  ${yellow}[1]$reset HTTP Requests');
-      print('  ${yellow}[2]$reset GraphQL');
-      print('  ${yellow}[3]$reset Workspace');
-      print('  ${yellow}[4]$reset MCP Server');
-      print('  ${yellow}[5]$reset Quick Commands ${gray}(cheatsheet)$reset');
-      print('  ${yellow}[ESC]$reset Quit\n');
-      print('  $gray[1-5 / ESC=quit]$reset');
-      stdout.write('  ${green}Select > $reset');
 
-      final choice = await _readKey();
+      // ── MENU GRID (2-column cards) ────────────────────────────────────────
+      final options = [
+        ('HTTP Requests',     'Browse, run, and save API calls',   '\u2192'),
+        ('GraphQL',           'Schema exploration and queries',     '\u25ce'),
+        ('Workspace',         'Manage saved requests and envs',     '\u21ba'),
+        ('MCP Server',        'Start and configure MCP server',     '\u25b6'),
+        ('Quick Commands',    'CLI cheatsheet and examples',        '\u00bb'),
+      ];
 
-      if (choice == 'esc') {
-        stdout.write('${yellow}ESC$reset\n');
-      } else if (choice.isNotEmpty) {
-        stdout.write('${yellow}$choice$reset\n');
+      // Two cards per row, with gap between them
+      final cardW = math.max(18, (w - 7) ~/ 2); // width of each card (2 cards + 3 gaps)
+      stdout.write('\n');
+      for (int row = 0; row < (options.length / 2).ceil(); row++) {
+        final leftIdx  = row * 2;
+        final rightIdx = row * 2 + 1;
+        final hasRight = rightIdx < options.length;
+        final isLastAlone = !hasRight;
+
+        if (isLastAlone) {
+          // Lone card spans full width
+          final fullW = 2 * cardW + 3;
+          final (lbl, desc, icon) = options[leftIdx];
+          final isSel = leftIdx == selectedIndex;
+          final idx = leftIdx + 1;
+          if (isSel) {
+            stdout.write('  $borderActive\u2554${"\u2550" * fullW}\u2557$reset\n');
+            stdout.write('  $borderActive\u2551$reset  $teal$bold[$idx] ${lbl.padRight(fullW - 9)}$icon$reset  $borderActive\u2551$reset\n');
+            // blank spacer
+            stdout.write('  $borderActive\u2551$reset${" " * fullW}$borderActive\u2551$reset\n');
+            // desc: 6sp + padRight(fullW-6) = fullW ✓ (no trailing spaces)
+            stdout.write('  $borderActive\u2551$reset      $textPrimary${desc.padRight(fullW - 6)}$reset$borderActive\u2551$reset\n');
+            stdout.write('  $borderActive\u255a${"\u2550" * fullW}\u255d$reset\n');
+          } else {
+            stdout.write('  $tabText\u250c${"\u2500" * fullW}\u2510$reset\n');
+            stdout.write('  $tabText\u2502$reset  $dimAccent[$idx]$reset $textPrimary${lbl.padRight(fullW - 9)}$dimAccent$icon$reset  $tabText\u2502$reset\n');
+            // blank spacer
+            stdout.write('  $tabText\u2502$reset${" " * fullW}$tabText\u2502$reset\n');
+            // desc: 6sp + padRight(fullW-6) = fullW ✓
+            stdout.write('  $tabText\u2502$reset      $tabText${desc.padRight(fullW - 6)}$reset$tabText\u2502$reset\n');
+            stdout.write('  $tabText\u2514${"\u2500" * fullW}\u2518$reset\n');
+          }
+        } else {
+          // ── TOP BORDER ROW ──
+          final leftSel  = leftIdx  == selectedIndex;
+          final rightSel = rightIdx == selectedIndex;
+          final leftBorderH  = leftSel  ? borderActive : tabText;
+          final rightBorderH = rightSel ? borderActive : tabText;
+          final lTL = leftSel  ? '\u2554' : '\u250c';
+          final lTR = leftSel  ? '\u2557' : '\u2510';
+          final lHH = leftSel  ? '\u2550' : '\u2500';
+          final rTL = rightSel ? '\u2554' : '\u250c';
+          final rTR = rightSel ? '\u2557' : '\u2510';
+          final rHH = rightSel ? '\u2550' : '\u2500';
+          final lVV = leftSel  ? '\u2551' : '\u2502';
+          final rVV = rightSel ? '\u2551' : '\u2502';
+          final lBL = leftSel  ? '\u255a' : '\u2514';
+          final lBR = leftSel  ? '\u255d' : '\u2518';
+          final rBL = rightSel ? '\u255a' : '\u2514';
+          final rBR = rightSel ? '\u255d' : '\u2518';
+
+          final (lLbl, lDesc, lIcon) = options[leftIdx];
+          final (rLbl, rDesc, rIcon) = options[rightIdx];
+          final lIdx = leftIdx  + 1;
+          final rIdx = rightIdx + 1;
+          final lLblT = lLbl.length > cardW - 7 ? lLbl.substring(0, cardW - 8) + '\u2026' : lLbl.padRight(cardW - 7);
+          final rLblT = rLbl.length > cardW - 7 ? rLbl.substring(0, cardW - 8) + '\u2026' : rLbl.padRight(cardW - 7);
+          final lDescT = lDesc.length > cardW - 3 ? lDesc.substring(0, cardW - 4) + '\u2026' : lDesc.padRight(cardW - 3);
+          final rDescT = rDesc.length > cardW - 3 ? rDesc.substring(0, cardW - 4) + '\u2026' : rDesc.padRight(cardW - 3);
+
+          // Top
+          stdout.write('  $leftBorderH$lTL${lHH * cardW}$lTR$reset ');
+          stdout.write('$rightBorderH$rTL${rHH * cardW}$rTR$reset\n');
+          // Title row
+          if (leftSel) {
+            stdout.write('  $leftBorderH$lVV$reset $teal$bold[$lIdx] $lLblT$lIcon$reset $leftBorderH$lVV$reset ');
+          } else {
+            stdout.write('  $leftBorderH$lVV$reset $dimAccent[$lIdx]$reset $textPrimary$lLblT$dimAccent$lIcon$reset $leftBorderH$lVV$reset ');
+          }
+          if (rightSel) {
+            stdout.write('$rightBorderH$rVV$reset $teal$bold[$rIdx] $rLblT$rIcon$reset $rightBorderH$rVV$reset\n');
+          } else {
+            stdout.write('$rightBorderH$rVV$reset $dimAccent[$rIdx]$reset $textPrimary$rLblT$dimAccent$rIcon$reset $rightBorderH$rVV$reset\n');
+          }
+          // Blank spacer row
+          stdout.write('  $leftBorderH$lVV$reset${" " * cardW}$leftBorderH$lVV$reset ');
+          stdout.write('$rightBorderH$rVV$reset${" " * cardW}$rightBorderH$rVV$reset\n');
+          // Desc row
+          stdout.write('  $leftBorderH$lVV$reset  $tabText$lDescT$reset $leftBorderH$lVV$reset ');
+          stdout.write('$rightBorderH$rVV$reset  $tabText$rDescT$reset $rightBorderH$rVV$reset\n');
+          // Bottom
+          stdout.write('  $leftBorderH$lBL${lHH * cardW}$lBR$reset ');
+          stdout.write('$rightBorderH$rBL${rHH * cardW}$rBR$reset\n');
+        }
+        stdout.write('\n');
       }
 
-      switch (choice) {
-        case '1':
-          await _menuHttp();
-          break;
-        case '2':
-          await _menuGraphQL();
-          break;
-        case '3':
-          await _menuWorkspace();
-          break;
-        case '4':
-          await _menuMCP();
-          break;
-        case '5':
-          await _showQuickCommands();
-          break;
-        case 'esc':
-          _leaveAltScreen();
-          print('${green}  Goodbye! \u{1F44B}$reset\n');
-          exit(0);
-        default:
-          break;
+      // ── THEMED BOTTOM NAV BAR (mirrors topbar) ────────────────────────────
+      final navHint = '  Navigate: \u2190\u2192\u2191\u2193  \u2502  Select: ENTER or 1\u20135  \u2502  ESC = quit  ';
+      stdout.write('\x1B[${h}H');
+      stdout.write('$bgPanel$borderActive$bold${navHint.padRight(w)}$reset');
+
+      // ── INPUT ─────────────────────────────────────────────────────────────
+      final choice = await _readKey();
+
+      if (choice == 'esc' || choice == 'q') {
+        _leaveAltScreen();
+        print('\n${teal}  Goodbye.$reset\n');
+        exit(0);
+      } else if (choice == 'up') {
+        // Move up one row (same column)
+        if (selectedIndex >= 2) selectedIndex -= 2;
+      } else if (choice == 'down') {
+        // Move down one row (same column)
+        if (selectedIndex + 2 < options.length) {
+          selectedIndex += 2;
+        } else if (selectedIndex + 2 == options.length) {
+          // bottom-right moving down goes to lone last item (e.g. index 3 → 4)
+          selectedIndex = options.length - 1;
+        }
+      } else if (choice == 'left') {
+        // Move left within same row
+        if (selectedIndex % 2 == 1) selectedIndex--;
+      } else if (choice == 'right') {
+        // Move right within same row
+        if (selectedIndex % 2 == 0 && selectedIndex + 1 < options.length) selectedIndex++;
+      } else if (choice == 'enter') {
+        switch (selectedIndex + 1) {
+          case 1: await _menuHttp(); break;
+          case 2: await _menuGraphQL(); break;
+          case 3: await _menuWorkspace(); break;
+          case 4: await _menuMCP(); break;
+          case 5: await _showQuickCommands(); break;
+        }
+      } else if (['1','2','3','4','5'].contains(choice)) {
+        selectedIndex = int.parse(choice) - 1;
+        switch (choice) {
+          case '1': await _menuHttp(); break;
+          case '2': await _menuGraphQL(); break;
+          case '3': await _menuWorkspace(); break;
+          case '4': await _menuMCP(); break;
+          case '5': await _showQuickCommands(); break;
+        }
       }
     }
   } finally {
@@ -2544,7 +2693,7 @@ Future<void> _runInteractive() async {
   }
 }
 
-void main(List<String> args) async {
+Future<void> runCli(List<String> args) async {
   if (args.isEmpty) {
     await _runInteractive();
     return;

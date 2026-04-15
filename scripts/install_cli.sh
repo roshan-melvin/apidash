@@ -3,8 +3,8 @@ set -e
 
 echo "Building APIDash native CLI..."
 
-# Compile the pure Dart CLI
-dart compile exe bin/apidash_cli.dart -o bin/apidash
+# Compile from the apidash_cli package
+dart compile exe packages/apidash_cli/bin/apidash_cli.dart -o bin/apidash
 
 echo "Compilation successful!"
 echo "Installing to /usr/local/bin/apidash (requires sudo)..."
@@ -16,6 +16,6 @@ echo "✅ apidash CLI installed! Run: apidash --help"
 
 echo "--------------------------------------------------------"
 echo "Manual install (no sudo):"
-echo "  dart compile exe bin/apidash_cli.dart -o bin/apidash"
+echo "  dart compile exe packages/apidash_cli/bin/apidash_cli.dart -o bin/apidash"
 echo '  export PATH="$PATH:$(pwd)/bin"   # add to ~/.bashrc or ~/.zshrc'
 echo "--------------------------------------------------------"

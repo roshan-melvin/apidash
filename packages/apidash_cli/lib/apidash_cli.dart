@@ -1,1 +1,1 @@
-// Barrel file
+export 'src/tui.dart';
